@@ -1,5 +1,5 @@
 #!/bin/sh
-# PlayOn!HD Simple RSS Jukebox Generator
+# Simple RSS Jukebox Generator
 # Author: mikka [mika.hellmann@gmail.com]
 # Modified by Snappy46 [levesque.marcel@gmail.com]
 
@@ -34,24 +34,23 @@ OPTIONS:
            (Optional) ex: -f sample,trailer 
 NOTES:  If any of the arguments have spaces in them they must be surrounded by quotes: ""
 
-    The Following options are only required if you decide to use the script built-iname
-    capability to create automatically Moviesheet/Thumbnails. I suggest you consult this
-    Web site: http://playon.unixstorm.org/imdb.php if you want to know more about 
+    The following options are only required if you decide to use the script built-in
+    capability to create automatically Moviesheets/Thumbnails. I suggest you consult this
+    website: http://playon.unixstorm.org/imdb.php if you want to know more about 
     the various options.
 
-   -m      Generate moviesheets and thumbnails. (Optional)
-           Possible values are: moviesheet, poster, both
-   -n      name of the moviesheeet ?????????????????????????????
-   -b	   if set to "yes" random backdrop will be used (Optional)
-   -c      Possible values are: bdrip, bluray, dtheater, dvd, generic, hddvd, 
-           hdtv, itunes (works only with mode set to moviesheet) (Default generic)
+   -m      Generate moviesheets and/or thumbnails (Required)
+           Possible values are: "moviesheet", "poster", "both"
+   -b	   If set to "yes" random backdrop will be used (Optional)
+   -c      Generate box cases (Optional)
+           Possible values are: "bdrip", "bluray", "dtheater", "dvd", "generic", 
+           "hddvd", "hdtv", "itunes" (Default: generic)
    -s      If set to "tmdb" random poster from themoviedb.org will be used
-           Otherwise default poster from IMDB will be used (works only with mode 
-           set to poster or moviesheet) (Optional)
+           Otherwise default poster from IMDB will be used (Optional)
    -t      If set to "real" time will represented in HH:MM format
            If set to "hours" time will be represented in HHh MMm format
            Otherwise time will be represented in minutes (works only with mode 
-           set to moviesheet)(Optional)            
+           set to moviesheet)(Optional)                
 EOF
 exit 1
 }
@@ -91,7 +90,7 @@ done
 
 if [ -z "$MOVIESPATH" ]
 then
-  echo -e "A directory must be specified using -p must be specified."
+  echo -e "A directory must be specified using -p option."
   usage
   exit 1
 fi  
@@ -117,7 +116,7 @@ echo "Found `sed -n '$=' $SORTEDTMP` movies"
 # Creates moviesheets by calling IMDB API
 genmoviesheet()
 {
-echo "Generating Moviesheet.."
+echo "Generating moviesheets/thumbnails.."
 API="http://playon.unixstorm.org/IMDB/imdb.php?"
 
 grep "$MOVIESPATH" "$SORTEDTMP" | while read LINE
@@ -154,7 +153,7 @@ do
            wget "${API}name=$MOVIETITLE&mode=moviesheet&backdrop=$BACKDROP&box=$COVER&source=$SOURCE&time=$TIMESTYLE" -O "$MOVIEPATH/${MOVIENAME}_sheet.jpg";
         fi
 done
-echo "Done generating Moviesheet/Thumbnails"
+echo "Done generating moviesheets/thumbnails"
 }
 
 
