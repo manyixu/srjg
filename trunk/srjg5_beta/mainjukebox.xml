@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Jukebox>
+  <Category>
+    <title>Jukebox Main Menu</title>
+    <link>MainJukebox.rss</link>
+  </Category>
+<genre>
+<title>ALL</title>
+<poster>/usr/local/bin/scripts/srjg/Modules/JukeMenu_ALL.jpg</poster>
+<link>/usr/local/bin/scripts/srjg/Jbx/jbx_ALL.xml</link>
+</genre>
+<genre>
+<title>0</title>
+<poster>/usr/local/bin/scripts/srjg/Modules/JukeMenu_0.jpg</poster>
+<link>/usr/local/bin/scripts/srjg/Jbx/jbx_0.xml</link>
+</genre>
+<genre>
+<title>A</title>
+<poster>/usr/local/bin/scripts/srjg/Modules/JukeMenu_A.jpg</poster>
+<link>/usr/local/bin/scripts/srjg/Jbx/jbx_A.xml</link>
+</genre>
+<genre>
+<title>B</title>
+<poster>/usr/local/bin/scripts/srjg/Modules/JukeMenu_B.jpg</poster>
+<link>/usr/local/bin/scripts/srjg/Jbx/jbx_B.xml</link>
+</genre>
+<genre>
+<title>C</title>
+<poster>/usr/local/bin/scripts/srjg/Modules/JukeMenu_C.jpg</poster>
+<link>/usr/local/bin/scripts/srjg/Jbx/jbx_C.xml</link>
+</genre>
+<genre>
+<title>D</title>
+<poster>/usr/local/bin/scripts/srjg/Modules/JukeMenu_D.jpg</poster>
+<link>/usr/local/bin/scripts/srjg/Jbx/jbx_D.xml</link>
+</genre>
+<genre>
+<title>L</title>
+<poster>/usr/local/bin/scripts/srjg/Modules/JukeMenu_L.jpg</poster>
+<link>/usr/local/bin/scripts/srjg/Jbx/jbx_L.xml</link>
+</genre>
+<genre>
+<title>Q</title>
+<poster>/usr/local/bin/scripts/srjg/Modules/JukeMenu_Q.jpg</poster>
+<link>/usr/local/bin/scripts/srjg/Jbx/jbx_Q.xml</link>
+</genre>
+<genre>
+<title>T</title>
+<poster>/usr/local/bin/scripts/srjg/Modules/JukeMenu_T.jpg</poster>
+<link>/usr/local/bin/scripts/srjg/Jbx/jbx_T.xml</link>
+</genre>
+</Jukebox>

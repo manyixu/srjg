@@ -1,0 +1,6 @@
+# srjg Version 5.0
+# http://code.google.com/p/srjg/
+# based on the srjg PlayOn!HD Original work by Mikka.
+# Programmed by Snappy46 and addapted by Zozodesbois
+
+

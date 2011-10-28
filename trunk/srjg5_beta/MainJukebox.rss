@@ -1,0 +1,223 @@
+﻿<?xml version="1.0" ?>
+<rss version="2.0" xmlns:dc="http://purl.org/dc/elements/1.1/">
+<!-- 
+# srjg Version 5.0
+# http://code.google.com/p/srjg/
+# based on the srjg PlayOn!HD Original work by Mikka.
+# Programmed by Snappy46 and addapted by Zozodesbois
+-->
+<onEnter>
+  showIdle();
+</onEnter>
+
+<script>
+  /* Chargement de la config */
+  Config="./scripts/srjg/Jukebox.cfg";
+  Etat = loadXMLFile(Config);
+  if (Etat == null) {
+    Config="/usr/local/etc/srjg/Jukebox.cfg";
+    Etat = loadXMLFile(Config);
+    if (Etat == null) {
+      print("Impossible de lire le fichier cfg");
+      Erreur=1;
+      postMessage("return");
+    }
+  }
+  print("Le fichier cfg est lu");
+
+  /* Affectation des variables de la config */
+  Jukebox_Path = getXMLText("Config", "Jukebox_Path");
+  Jukebox_Size = getXMLText("Config", "Jukebox_Size");
+  Skin = getXMLText("Config", "Skin");
+
+  Skin_Path = Jukebox_Path+"/Skin/"+Skin;
+
+  /* Chargement config du Skin */
+  ConfigSkin=Skin_Path+"/Skin.cfg";
+  Etat = loadXMLFile(ConfigSkin);
+  if (Etat == null) {
+    print("Impossible de lire le fichier cfg du Skin "+Skin);
+    Erreur=1;
+    postMessage("return");
+  }
+  print("Le fichier cfg du Skin est lu");
+
+  /* Affectation des variables de la config du Skin */
+  Jbx_itemBorderColor = getXMLText("Skin_cfg", "Jbx_itemBorderColor");
+  Jbx_backgroundColor = getXMLText("Skin_cfg", "Jbx_backgroundColor");
+
+  Jukebox = Jukebox_Path+"/mainjukebox.xml";
+  Jukebox_ok = loadXMLFile(Jukebox);
+  if (Jukebox_ok == null) {
+    Jukebox_itemSize = 0;
+    print("Load Jukebox fail ", Jukebox);
+  } else {
+    Jukebox_itemSize = getXMLElementCount("Jukebox", "genre");
+    print("Jukebox Item Size = ", Jukebox_itemSize);
+  }
+  if (Jukebox_itemSize &gt; 0) {
+    Category_Title = getXMLText("Jukebox", "Category", "title");
+    Category_RSS = getXMLText("Jukebox", "Category", "link");
+    count=0;
+    while(1) {
+      Genre_Title = getXMLText("Jukebox", "genre", count, "title");
+      Genre_Poster = getXMLText("Jukebox", "genre", count, "poster");
+      Genre_Link = getXMLText("Jukebox", "genre", count, "link");
+
+      Genre_Title_Array = pushBackStringArray(Genre_Title_Array, Genre_Title);
+      Genre_Poster_Array = pushBackStringArray(Genre_Poster_Array, Genre_Poster);
+      Genre_Link_Array = pushBackStringArray(Genre_Link_Array, Genre_Link);
+
+      count += 1;
+      if (count &gt; Jukebox_itemSize) {
+        break;
+      }
+    }
+  }
+  setFocusItemIndex(0);
+  Current_Item_index=0;
+</script>
+
+<mediaDisplay
+  name="onePartView"
+  drawItemText="no"
+  itemImageWidthPC="0"
+  itemImageHeightPC="0"
+  centerXPC="6" 
+  centerYPC="12.3"    
+  itemBackgroundColor="0:0:0"
+  backgroundColor="0:0:0"
+  sideColorBottom="0:0:0"
+  sideColorTop="0:0:0"
+  sideLeftWidthPC="0"
+  sideRightWidthPC="0"
+  sideTopHeightPC="0"
+  sideBottomHeightPC="0"
+  fontSize="13"
+  itemBorderColor="220:220:0"
+  imageBorderPC="0"
+  rowCount="12"
+  columnCount="0"
+  itemPerPage="12"
+  itemXPC="50"
+  itemYPC="20"
+  itemGapXPC="0.5"
+  itemGapYPC="0.5"
+  itemWidthPC="40"
+  itemHeightPC="5"
+  itemGap="0.2"
+  showHeader="no"
+  showDefaultInfo="no"
+  imageFocus="/usr/local/etc/scripts/srjg/Modules/list_select_bar.bmp"
+  imageUnFocus="/usr/local/etc/scripts/srjg/Modules/list_select_bar_inactive.bmp"
+  idleImageWidthPC="9"
+  idleImageHeightPC="16"
+  >
+
+  <idleImage> image/POPUP_LOADING_01.png </idleImage>
+  <idleImage> image/POPUP_LOADING_02.png </idleImage>
+  <idleImage> image/POPUP_LOADING_03.png </idleImage>
+  <idleImage> image/POPUP_LOADING_04.png </idleImage>
+  <idleImage> image/POPUP_LOADING_05.png </idleImage>
+  <idleImage> image/POPUP_LOADING_06.png </idleImage>
+  <idleImage> image/POPUP_LOADING_07.png </idleImage>
+  <idleImage> image/POPUP_LOADING_08.png </idleImage>
+
+  <text redraw="no" align="center" offsetXPC="2.5" offsetYPC="3" widthPC="90" heightPC="10" fontSize="20" backgroundColor="-1:-1:-1" foregroundColor="192:192:192">
+    <script>
+      print(Category_Title);
+    </script>
+  </text>
+
+  <backgroundDisplay>
+    <script>
+      Max_index = (-1 + Jukebox_itemSize);
+    </script>
+    <image offsetXPC="0" offsetYPC="0" widthPC="100" heightPC="100">
+      <script>
+        print(Skin_Path+"/mainbackground.bmp");
+      </script>
+    </image>
+  </backgroundDisplay>
+
+  <image offsetXPC=15 offsetYPC=20 widthPC=22 heightPC=58>
+    <script>
+      thumbnailPath = getStringArrayAt(Genre_Poster_Array , -1);
+      thumbnailPath;
+     </script>
+  </image>
+
+  <onUserInput>
+    <script>
+      userInput = currentUserInput();
+      Prev_index = (-1 + Current_Item_index);
+      Next_index = (1 + Current_Item_index);
+      Prev10_index = (-10 + Current_Item_index);
+      Next10_index = (10 + Current_Item_index);
+
+      
+      if (userInput == "enter") {
+      	Current_Genre_Link=getStringArrayAt(Genre_Link_Array , Current_Item_index);
+        Dest_tmp = "/tmp/destination.tmp";
+        writeStringToFile(Dest_tmp, Current_Genre_Link);
+        jumpToLink("jukebox");
+        "true";
+      } else if (userInput == "up" &amp;&amp; Current_Item_index &gt; 0) {
+      	setFocusItemIndex( Prev_index );
+      	Current_Item_index=getFocusItemIndex();
+      	redrawDisplay();
+      	"true";
+      } else if (userInput == "down" &amp;&amp; Current_Item_index &lt; Max_index ) {
+      	setFocusItemIndex( Next_index );
+      	Current_Item_index=getFocusItemIndex();
+      	redrawDisplay();
+      	"true";
+      } else if (userInput == "pageup" &amp;&amp; Current_Item_index &gt; 9) {
+      	setFocusItemIndex(Prev10_index); 
+      	Current_Item_index=getFocusItemIndex();
+      	redrawDisplay();
+      	"true";
+      } else if (userInput == "pagedown"  &amp;&amp; Current_Item_index &lt; (Max_index - 9)) {
+      	setFocusItemIndex(Next10_index); 
+      	Current_Item_index=getFocusItemIndex();
+      	redrawDisplay();
+      	"true";
+      } else if (userInput == "right") {
+        "true";
+      }
+    </script>
+  </onUserInput>
+
+  <!-- Show Page Info -->
+  <text offsetXPC=50 offsetYPC=88.8 widthPC=8 heightPC=5 fontSize=14 foregroundColor=195:196:195 useBackgroundSurface=yes redraw=yes lines=1>
+   <script>
+    pageInfo = Add(getFocusItemIndex(),1) + "/" + Jukebox_itemSize;
+    pageInfo;
+   </script>
+  </text>
+
+</mediaDisplay>
+
+<item_template>
+  <displayTitle>
+    <script>
+      displayTitle=getStringArrayAt(Genre_Title_Array , -1);
+      print(displayTitle);
+    </script>
+  </displayTitle>
+</item_template>
+
+<jukebox>
+  <link>
+    <script>
+      print(Jukebox_Path+"/Jukebox"+Jukebox_Size+".rss");
+    </script>
+  </link>
+</jukebox>
+
+<channel>
+  <title><script>Category_Title;</script></title>
+  <link><script>Category_RSS;</script></link>
+  <itemSize><script>Jukebox_itemSize;</script></itemSize>
+</channel>
+</rss>

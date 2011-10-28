@@ -1,0 +1,285 @@
+﻿<?xml version="1.0" ?>
+<rss version="2.0" xmlns:dc="http://purl.org/dc/elements/1.1/">
+<!-- 
+# srjg Version 5.0
+# http://code.google.com/p/srjg/
+# based on the srjg PlayOn!HD Original work by Mikka.
+# Programmed by Snappy46 and addapted by Zozodesbois
+-->
+<onEnter>
+  showIdle();
+  RedrawDisplay();
+</onEnter>
+
+<script>
+  /* Chargement de la config */
+  Config="./scripts/srjg/Jukebox.cfg";
+  Etat = loadXMLFile(Config);
+  if (Etat == null) {
+    Config="/usr/local/etc/srjg/Jukebox.cfg";
+    Etat = loadXMLFile(Config);
+    if (Etat == null) {
+      print("Impossible de lire le fichier cfg");
+      Erreur=1;
+      postMessage("return");
+    }
+  }
+  print("Le fichier cfg est lu");
+
+  /* Affectation des variables de la config */
+  Jukebox_Path = getXMLText("Config", "Jukebox_Path");
+  AllMovies_Path = getXMLText("Config", "AllMovies_Path");
+  Background_Img = getXMLText("Config", "Background_Img");
+  Type_Poster = getXMLText("Config", "Type_Poster");
+  Type_Sheet = getXMLText("Config", "Type_Sheet");
+  Skin = getXMLText("Config", "Skin");
+
+  Skin_Path = Jukebox_Path+"/Skin/"+Skin;
+
+  /* Chargement config du Skin */
+  ConfigSkin=Skin_Path+"/Skin.cfg";
+  Etat = loadXMLFile(ConfigSkin);
+  if (Etat == null) {
+    print("Impossible de lire le fichier cfg du Skin "+Skin);
+    Erreur=1;
+    postMessage("return");
+  }
+  print("Le fichier cfg du Skin est lu");
+
+  /* Affectation des variables de la config du Skin */
+  Jbx_itemBorderColor = getXMLText("Skin_cfg", "Jbx_itemBorderColor");
+  Jbx_backgroundColor = getXMLText("Skin_cfg", "Jbx_backgroundColor");
+
+  if ( Type_Poster == "MovieName" || Type_Poster == "folder" ){
+    Poster_Path=AllMovies_Path;
+  } else {
+    Poster_Path=Type_Poster;
+  }
+
+  if ( Type_Sheet == "MovieName" || Type_Sheet == "about" || Type_Sheet == "0001" ){
+    Sheet_Path=AllMovies_Path;
+  } else {
+    Sheet_Path=Type_Sheet;
+  }
+
+  Jukebox_Temp = "/tmp";
+  MovieInfo_RSS =  Jukebox_Temp+"/MovieInfo_RSS";
+  Category_RSS = "Jukebox.rss";
+  MovieInfo_Template = "MovieInfo_Template.rss";
+
+  /* Chargement du Jukebox */
+  Dest_tmp =  Jukebox_Temp+"/destination.tmp";                     /* indique quel Jukebox a ete choisi dans le MainJukebox.rss */
+  Jukebox = readStringFromFile(Dest_tmp);
+  Jukebox_ok = loadXMLFile(Jukebox);
+  if (Jukebox_ok == null) {
+    Jukebox_itemSize = 0;
+    print("Load Jukebox fail ", Jukebox);
+  } else {
+    Jukebox_itemSize = getXMLText("Jukebox", "Count");
+    print("Jukebox Item Size = ", Jukebox_itemSize);
+    Category_Title = getXMLText("Jukebox", "title");
+  }
+
+  if (Jukebox_itemSize &gt; 0) {
+    count=0;
+    while(1) {
+      Movie_Title = getXMLText("Jukebox", "Movie", count, "title");
+      Movie_Poster = Poster_Path + "/" + getXMLText("Jukebox", "Movie", count, "poster");
+      Etat = readStringFromFile(Movie_Poster);
+      if (Etat==null){
+        Movie_Poster=Skin_Path+"/nofolder.bmp";
+      }
+      Movie_sheet = Sheet_Path + "/" + getXMLText("Jukebox", "Movie", count, "sheet");
+      Movie_File = AllMovies_Path + "/" + getXMLText("Jukebox", "Movie", count, "file");
+      Movie_Title_Array = pushBackStringArray(Movie_Title_Array, Movie_Title);
+      Movie_Poster_Array = pushBackStringArray(Movie_Poster_Array, Movie_Poster);
+      Movie_sheet_Array = pushBackStringArray(Movie_sheet_Array, Movie_sheet);
+      Movie_File_Array = pushBackStringArray(Movie_File_Array, Movie_File);
+
+      count += 1;
+      if (count &gt; Jukebox_itemSize) {
+        break;
+      }
+    }
+  }
+  setFocusItemIndex(0);
+  Current_Item_index=0;
+</script>
+
+<onExit>
+  playItemURL(-1, 1);
+  setRefreshTime(-1);
+</onExit>
+
+<mediaDisplay
+  name=photoView
+
+  rowCount=2
+  columnCount=6
+  imageFocus=null
+  showHeader=no
+  showDefaultInfo=no
+  drawItemBorder=no
+
+  viewAreaXPC=0
+  viewAreaYPC=0
+  viewAreaWidthPC=100
+  viewAreaHeightPC=100
+
+  itemGapXPC=0.7
+  itemGapYPC=1
+  itemWidthPC=14.06
+  itemHeightPC=35.42
+  itemOffsetXPC=5.5
+  itemOffsetYPC=12.75
+  itemBorderPC=0
+  
+  itemBackgroundColor=-1:-1:-1
+
+  sideTopHeightPC=0
+  sideBottomHeightPC=0
+  bottomYPC=100
+
+  idleImageXPC=67.81
+  idleImageYPC=89.17
+  idleImageWidthPC=4.69
+  idleImageHeightPC=4.17
+
+  >
+<!-- Jbx_itemBorderColor et Jbx_backgroundColor se transforment en 0:0:0 ???? pas pris en compte -->
+<itemBorderColor><script>Jbx_itemBorderColor;</script></itemBorderColor>
+<backgroundColor><script>Jbx_backgroundColor;</script></backgroundColor>
+
+  <idleImage> image/POPUP_LOADING_01.png </idleImage>
+  <idleImage> image/POPUP_LOADING_02.png </idleImage>
+  <idleImage> image/POPUP_LOADING_03.png </idleImage>
+  <idleImage> image/POPUP_LOADING_04.png </idleImage>
+  <idleImage> image/POPUP_LOADING_05.png </idleImage>
+  <idleImage> image/POPUP_LOADING_06.png </idleImage>
+  <idleImage> image/POPUP_LOADING_07.png </idleImage>
+  <idleImage> image/POPUP_LOADING_08.png </idleImage>
+
+  <backgroundDisplay>
+    <image redraw="no" offsetXPC="0" offsetYPC="0" widthPC="100" heightPC="100">
+      <script>
+        print(Skin_Path+"/background.bmp");
+      </script>
+    </image>
+  </backgroundDisplay>
+
+  <text redraw="no" align="left" offsetXPC="4" offsetYPC="1" widthPC="100" heightPC="3" fontSize="12" backgroundColor="-1:-1:-1" foregroundColor="130:130:130">1 = 3x8 View |		</text>
+  <text redraw="no" align="left" offsetXPC="17" offsetYPC="1" widthPC="90" heightPC="3" fontSize="12" backgroundColor="-1:-1:-1" foregroundColor="130:130:130">Enter = Moviesheet |			</text>                
+  <text redraw="no" align="left" offsetXPC="34" offsetYPC="1" widthPC="90" heightPC="3" fontSize="12" backgroundColor="-1:-1:-1" foregroundColor="130:130:130">Rtn = Previous Menu/View |			</text>     
+  <text redraw="no" align="left" offsetXPC="56" offsetYPC="1" widthPC="90" heightPC="3" fontSize="12" backgroundColor="-1:-1:-1" foregroundColor="130:130:130">Play = Play Video/Movie |			</text> 
+  <text redraw="no" align="left" offsetXPC="76" offsetYPC="1" widthPC="90" heightPC="3" fontSize="12" backgroundColor="-1:-1:-1" foregroundColor="130:130:130">2 = Jukebox Update			</text>  
+  <text redraw="no" align="center" offsetXPC="2.5" offsetYPC="3" widthPC="90" heightPC="10" fontSize="20" backgroundColor="-1:-1:-1" foregroundColor="192:192:192">
+    <script>
+      print(Category_Title);
+    </script>
+  </text>
+
+  <onUserInput>
+    userInput = currentUserInput();
+
+    Current_Item_index=getFocusItemIndex();
+    Max_index = (-1 + Jukebox_itemSize);
+    Prev_index = (-1 + Current_Item_index);
+    Next_index = (1 + Current_Item_index);
+    Prev10_index = (-10 + Current_Item_index);
+    Next10_index = (10 + Current_Item_index);
+    if (userInput == "pageup" &amp;&amp; Current_Item_index &gt; 9) {
+      setFocusItemIndex(Prev10_index); 
+      "true";
+      redrawDisplay();
+    } else if (userInput == "pagedown"  &amp;&amp; Current_Item_index &lt; (Max_index - 9)) {
+      setFocusItemIndex(Next10_index); 
+      "true";
+      redrawDisplay();
+    } else if (userInput == "left") {
+      "false";
+    } else if (userInput == "right") {
+      "false";
+    } else if (userInput == "two") {                                        
+      rss = "rss_file://"+Jukebox_Path+"/UpdatingDialog.rss";
+      ret = doModalRss(rss);
+      if (ret == "Confirm")    {
+        writeStringToFile(Jukebox_Temp+"/path.tmp", Jukebox_Path);
+        jumpToLink("cgiscript");
+        postMessage("return");
+      }
+      "false";
+    } else if (userInput == "video_play") {
+      Current_Movie_File=getStringArrayAt(Movie_File_Array , Current_Item_index);
+      playItemURL(Current_Movie_File, 10);
+      "false";                                   
+    } else if (userInput == "enter") {
+      Current_Movie_File=getStringArrayAt(Movie_File_Array , Current_Item_index);
+      Current_Movie_sheet=getStringArrayAt(Movie_sheet_Array , Current_Item_index);
+      Curent_Movie_XML="&lt;movie&gt;&lt;file&gt;"+Current_Movie_File+"&lt;/file&gt;&lt;sheet&gt;"+Current_Movie_sheet+"&lt;/sheet&gt;&lt;/movie&gt;";
+      writeStringToFile(Jukebox_Temp+"/Curent_Sheet.xml", Curent_Movie_XML);
+ 
+      jumpToLink("moviesheet");
+      "false";
+    }
+  </onUserInput>
+
+<!-- Show Folder Name -->
+  <text offsetXPC=7 offsetYPC=88.8 widthPC=60 heightPC=5 fontSize=14 useBackgroundSurface=yes foregroundColor=195:196:195 redraw=yes lines=1>
+    <script>
+      displayTitle=getStringArrayAt(Movie_Title_Array , -1); 
+      displayTitle;
+    </script>
+  </text>
+
+
+<!-- Show Page Info -->
+  <text offsetXPC=85 offsetYPC=88.8 widthPC=8 heightPC=5 fontSize=14 foregroundColor=195:196:195 useBackgroundSurface=yes redraw=yes lines=1>
+    <script>
+      pageInfo = Add(getFocusItemIndex(),1) + "/" + Jukebox_itemSize;
+      pageInfo;
+    </script>
+  </text>
+
+  <itemDisplay>
+
+<!-- Bottom Layer focus/unfocus -->
+    <image offsetXPC=0 offsetYPC=0 widthPC=100 heightPC=100>
+      <script>
+        if (getDrawingItemState() == "focus")
+        {
+           Skin_Path+"/focus.bmp";
+        } else {
+           Skin_Path+"/unfocus.bmp";
+        }
+      </script>
+    </image>
+
+<!-- Top Layer folder.jpg -->
+    <image offsetXPC=8.2 offsetYPC=5.5 widthPC=84.25 heightPC=89.25>
+      <script>
+        thumbnailPath = getStringArrayAt(Movie_Poster_Array , -1);
+        thumbnailPath;
+      </script>
+    </image>
+
+  </itemDisplay>
+</mediaDisplay>
+
+<moviesheet>
+  <link>
+     <script>
+         print("rss_file://"+Jukebox_Path+"/MovieSheet.rss");          
+     </script>
+  </link>
+</moviesheet>
+
+<cgiscript>
+  <link>http://127.0.0.1/cgi-bin/jukebox_update.cgi</link>  
+</cgiscript>
+
+<channel>
+  <title><script>Category_Title;</script></title>
+  <link><script>Category_RSS;</script></link>
+  <itemSize><script>	Jukebox_itemSize;</script></itemSize>
+</channel>
+</rss>
