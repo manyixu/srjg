@@ -1,14 +1,14 @@
 <Config>
   <lang>fr</lang>
-  <Jukebox_Path>/usr/local/etc/srjg</Jukebox_Path>
-  <Jukebox_Size>3x8</Jukebox_Size>
+  <Jukebox_Path>/usr/local/bin/scripts/srjg</Jukebox_Path>
+  <Jukebox_Size>2x6</Jukebox_Size>
   <AllMovies_Path>/usr/local/bin/scripts/Films</AllMovies_Path>
   <AllMovies_Name>filename</AllMovies_Name>
-  <Type_Info>MovieInfo</Type_Info>
-  <Type_Poster>folder</Type_Poster>
-  <Type_Sheet>about</Type_Sheet>
+  <Type_Info>MovieName</Type_Info>
+  <Type_Poster>MovieName</Type_Poster>
+  <Type_Sheet>MovieName</Type_Sheet>
   <Poster_Ext>jpg</Poster_Ext>
   <Sheet_Ext>jpg</Sheet_Ext>
   <Movie_Filter>xxooxxooip</Movie_Filter>
-  <Skin>Snappy46</Skin>
+  <Skin>HardManBlue</Skin>
 </Config>
