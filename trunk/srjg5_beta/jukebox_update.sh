@@ -180,7 +180,7 @@ echo -e '<Jukebox><title>'$Jukebox_Title'</title>' > $RSS
 # fermeture des jukebox
 genjukexmlfooter()
 {
-Nb_Ligne=`cat $RSS | wc -l`
+Nb_Ligne=`cat "$RSS" | wc -l`
 Nb_Ligne=`expr $Nb_Ligne - 1`
 echo "<Count>$Nb_Ligne</Count></Jukebox>">>$RSS
 }
@@ -189,9 +189,9 @@ echo "<Count>$Nb_Ligne</Count></Jukebox>">>$RSS
 genjukexml()
 {
 
-MoviePath_length=`expr length ${AllMovies_Path} + 2`		# longueur du chemin film
-PosterPath_length=`expr length ${Poster_Path} + 2`		# longueur du chemin Poster
-SheetPath_length=`expr length ${Sheet_Path} + 2`		# longueur du chemin Sheet
+MoviePath_length=`expr length "${AllMovies_Path}" + 2`		# longueur du chemin film
+PosterPath_length=`expr length "${Poster_Path}" + 2`		# longueur du chemin Poster
+SheetPath_length=`expr length "${Sheet_Path}" + 2`		# longueur du chemin Sheet
 
 cat ${AllMovies_Bd_Sort} | while read plik
 do
