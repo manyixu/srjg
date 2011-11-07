@@ -1,0 +1,5 @@
+Jukebox.cfg				/usr/local/etc/srjg/
+jukebox.cgi 			inside of httpd /cgi-bin directory
+MainJukebox.rss			/usr/local/etc/srjg/
+movies.db				/home/srjgsql/
+sqlite3					/home/srjgsql/
