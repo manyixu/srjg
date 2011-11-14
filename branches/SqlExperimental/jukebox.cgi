@@ -1,21 +1,20 @@
 #!/bin/sh
 
-#XmlPath=`cat /tmp/destination.tmp`  #File with link created by Mainjukebox rss only needed for xml files
-#CategoryTitle=$QUERY_STRING
-CategoryTitle=`cat /tmp/genre.tmp`
-Jukebox_Size=$QUERY_STRING
-#CfgFile=/usr/local/etc/srjg/Jukebox.cfg
-#if [ ! -f "${CfgFile}" ]; then
-#  echo "Don't found config file : ${CfgFile}"
-#  exit 1
-#fi
-#sed '1d;$d;s:<\(.*\)>\(.*\)</.*>:\1=\2:' ${CfgFile} >/tmp/Jukebox.cfg
-#. /tmp/Jukebox.cfg
+QUERY=$QUERY_STRING
+SAVEIFS=$IFS
+IFS="@"
+set -- $QUERY
+CategoryTitle=`echo $1 | sed "s/%20/ /g`
+Jukebox_Size=`echo $2`
+IFS=$SAVEIFS
+GenreSearch=`echo ${CategoryTitle:0:3}`
 
 if [ $Jukebox_Size = "2x6" ]; then
    row="2"; col="6"; itemWidth="14.06"; itemHeight="35.42";
+   NewView="3x8";
 else
    row="3"; col="8"; itemWidth="10.3"; itemHeight="23.42";
+   NewView="2x6";
 fi
    
 echo -e '
@@ -30,6 +29,8 @@ echo -e '
 	    MovieInfo_RSS = "/tmp/MovieInfo.rss";						           
             setFocusItemIndex(0);
             Current_Item_index=0;
+            NewView = "'$NewView'";
+            Genre_Title = Category_Title;
 	</script>
 
 <mediaDisplay
@@ -90,7 +91,7 @@ cat <<EOF
 		  	</image>      
 		</backgroundDisplay>   
 
-                <text redraw="no" align="left" offsetXPC="4" offsetYPC="1" widthPC="100" heightPC="3" fontSize="12" backgroundColor="-1:-1:-1" foregroundColor="130:130:130">1 = 3x8 View |		
+                <text redraw="no" align="left" offsetXPC="3" offsetYPC="1" widthPC="100" heightPC="3" fontSize="12" backgroundColor="-1:-1:-1" foregroundColor="130:130:130">1 = Switch View |		
 		</text>
 
                 <text redraw="no" align="left" offsetXPC="17" offsetYPC="1" widthPC="90" heightPC="3" fontSize="12" backgroundColor="-1:-1:-1" foregroundColor="130:130:130">Enter = Moviesheet |			
@@ -134,9 +135,10 @@ cat <<EOF
 				} else if (userInput == "right") {
 					"false";
                                 } else if (userInput == "one") {
-                                        jumpToLink("view3x8");
-					"false";
-                                        redrawDisplay();
+                                         Genre_Title=urlEncode(Genre_Title); 
+					 jumpToLink("SwitchView");
+					 "false";
+                                         redrawDisplay();
                                 } else if (userInput == "two") {                                        
                                         rss = "rss_file:///usr/local/etc/srjg/UpdatingDialog.rss";
                                         ret = doModalRss(rss);
@@ -321,9 +323,13 @@ cat <<EOF
   <link>http://127.0.0.1/cgi-bin/jukebox_update.cgi</link>  
 </cgiscript>
 
-<view3x8>
-    <link>http://127.0.0.1/cgi-bin/jukebox.cgi?3x8</link>
-</view3x8>
+<SwitchView>
+    <link>
+       <script>
+           print("http://127.0.0.1/cgi-bin/jukebox.cgi?"+Genre_Title+"@"+NewView);
+       </script>
+    </link>
+</SwitchView>
 
 <channel>
 	<title><script>Category_Title;</script></title>
@@ -331,11 +337,12 @@ cat <<EOF
 	<itemSize><script>Jukebox_itemSize;</script></itemSize>
 EOF
 
-#cat $XmlPath      #Uncomment this line to use xml files
 
-#Uncomment this line for sqlite DB.
-#/home/srjgsql/sqlite3 -separator ''  /home/srjgsql/movies.db  "select * from t1"; # All Movies
-/home/srjgsql/sqlite3 -separator ''  /home/srjgsql/movies.db  "select * from t1 where genre='<genre>action</genre>'";   
+if [ "$GenreSearch" = "All" ]; then
+   /home/srjgsql/sqlite3 -separator ''  /home/srjgsql/movies.db  "SELECT * FROM t1 ORDER BY title COLLATE NOCASE"; # All Movies
+else
+   /home/srjgsql/sqlite3 -separator ''  /home/srjgsql/movies.db  "SELECT head,title,poster,info,file,footer FROM t1 WHERE genre LIKE '%$GenreSearch%' ORDER BY title COLLATE NOCASE";
+fi   
 
 echo -e '
 </channel>

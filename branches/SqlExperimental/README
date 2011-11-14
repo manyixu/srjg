@@ -1,0 +1,9 @@
+All the files located in this Experimental branch are just that experimental and have not been fully tested.  The jukebox_update.sh is a total mess but will work assuming that your moviesheet,folder, and nfo files resides in the same directory as your movies.  I am currently working on a big overall of that file and there are good chances that the next release of that file won't look anything like this one.  I am taking some stuff from that file + some stuff from Georges (zozodesbois) to create a new jukebox_update.sh. Until I have it sort out there is no point on posting it here. Once the framework has been build we can all concentrate on optimizing it.
+
+Stuff left to do:
+
+Mainjukebox currently just handle genre need to be able to handle alpha + year as well.  Same goes for the jukebox.cgi currently just implemented the All Movies + genres need to add alpha + year.
+
+DB file need to have the year + ID field added has a minimum and whatever else it might need.
+
+
