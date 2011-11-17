@@ -64,6 +64,13 @@ EOF
 exit 1
 }
 
+CreateMovieDB()
+# Create the Movie Database
+# DB as an automatic datestamp but unfortunately it relies on the player having the
+# correct date which can be trivial with some players.
+{
+/home/srjgsql/sqlite3 /home/srjgsql/movies.db "create table t1 (Movie_ID INTEGER PRIMARY KEY AUTOINCREMENT,head TEXT,genre TEXT,title TEXT,poster TEXT,info TEXT,file TEXT,footer TEXT,dateStamp DATE DEFAULT CURRENT_DATE);"
+}
 
 GenerateMovieList()
 # Find the movies based on movie extension and path provided.  Remove movies 
@@ -168,7 +175,7 @@ DBMovieDelete()
 echo "Removing movies from the Database ...."
 while read LINE
 do
-/home/srjgsql/sqlite3 /home/srjgsql/movies.db  "DELETE from t1 WHERE file='${LINE}'";
+/home/srjgsql/sqlite3 /home/srjgsql/movies.db  "DELETE from t1 WHERE file='<file>${LINE}</file>'";
 done < $DeleteList
 /home/srjgsql/sqlite3 /home/srjgsql/movies.db  "VACUUM";
 }
