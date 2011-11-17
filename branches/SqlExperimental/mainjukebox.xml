@@ -6,12 +6,12 @@
   </Category>
 <genre>
 <title>All Movies</title>
-<poster>/tmp/usbmounts/sdb1/genre.jpg</poster>
+<poster>/home/srjgsql/genre_img/3D_AllMovies.jpg</poster>
 </genre>
 
 <genre>
 <title>Action</title>
-<poster>/tmp/usbmounts/sdb1/Movies/Action/genre.jpg</poster>
+<poster>/home/srjgsql/genre_img/Action/genre.jpg</poster>
 </genre>
 
 <genre>
@@ -31,7 +31,7 @@
 
 <genre>
 <title>Comedy</title>
-<poster>/tmp/usbmounts/sdb1/Movies/Comedy/genre.jpg</poster>
+<poster>/home/srjgsql/genre_img/Comedy/genre.jpg</poster>
 </genre>
 
 <genre>
@@ -46,28 +46,27 @@
 
 <genre>
 <title>Drama</title>
-<poster>/tmp/usbmounts/sdb1/Movies/Drama/genre.jpg</poster>
+<poster>/home/srjgsql/genre_img/Drama/genre.jpg</poster>
 </genre>
 
 <genre>
 <title>Family</title>
-<poster>/tmp/usbmounts/sdb1/Kids Movies/genre.jpg</poster>
+<poster>/home/srjgsql/genre_img/Family/genre.jpg</poster>
 </genre>
 
 <genre>
 <title>Fantasy</title>
-<poster>/tmp/usbmounts/sdb1/Movies/Fantasy/genre.jpg</poster>
+<poster>/home/srjgsql/genre_img/Fantasy/genre.jpg</poster>
 </genre>
 
 <genre>
 <title>History</title>
 <poster>/home/srjgsql/genre_img/History/genre.jpg</poster>
-<string>/tmp/usbmounts/sdb1/Movies/Action/jukebox.xml</string>
 </genre>
 
 <genre>
 <title>Horror</title>
-<poster>/tmp/usbmounts/sdb1/Movies/Horror/genre.jpg</poster>
+<poster>/home/srjgsql/genre_img/Horror/genre.jpg</poster>
 </genre>
 
 <genre>
@@ -82,12 +81,12 @@
 
 <genre>
 <title>Romance</title>
-<poster>/tmp/usbmounts/sdb1/Movies/Romance/genre.jpg</poster>
+<poster>/home/srjgsql/genre_img/Romance/genre.jpg</poster>
 </genre>
 
 <genre>
 <title>Science Fiction</title>
-<poster>/tmp/usbmounts/sdb1/Movies/Science Fiction/genre.jpg</poster>
+<poster>/home/srjgsql/genre_img/Science Fiction/genre.jpg</poster>
 </genre>
 
 <genre>
@@ -107,7 +106,7 @@
 
 <genre>
 <title>Unknown</title>
-<poster>/tmp/usbmounts/sdb1/Movies/genre.jpg</poster>
+<poster>/home/srjgsql/genre_img/Movies/genre.jpg</poster>
 </genre>
 
 </Jukebox>
