@@ -1,18 +1,9 @@
 #!/bin/sh
-# PlayOn!HD Simple RSS Jukebox Generator
-
-# Initialize some Variables
-
-MoviesList="/tmp/movies.list"
-InsertList="/tmp/insert.list"
-DeleteList="/tmp/delete.list"
-PreviousMovieList="/usr/local/etc/srjg/prevmovies.list"
-DiffList="/tmp/diff.list"
+# Simple RSS Jukebox Generator
 
 
-ReadConfigFile()
 # Reading/parsing xml configuration file and assign variables.
-{
+
 CfgFile=./Jukebox.cfg
 if [ ! -f "${CfgFile}" ]; then
   echo "Don't found config file : ${CfgFile}"
@@ -20,7 +11,14 @@ if [ ! -f "${CfgFile}" ]; then
 fi
 sed '1d;$d;s:<\(.*\)>\(.*\)</.*>:\1=\2:' ${CfgFile} >/tmp/Jukebox.cfg
 . /tmp/Jukebox.cfg
-}
+
+# Initialize some Variables
+
+MoviesList="/tmp/movies.list"
+InsertList="/tmp/insert.list"
+DeleteList="/tmp/delete.list"
+PreviousMovieList="$Jukebox_Path/prevmovies.list"
+DiffList="/tmp/diff.list"
 
 
 usage()
@@ -34,8 +32,6 @@ All the movies/TV Episode must be in their own directory.
 
 OPTIONS:
    -h      Show this message
-   -i      This indicate the mode install and should only be used the first time 
-           you run this command on a given directory. (Optional)
    -p      This indicate the jukebox directory ex: -p /HDD/movies/
    -f      This is the filter option, movies filename containing this/those
            string(s) will be skipped.  Strings must be separated by a ","
@@ -64,12 +60,44 @@ EOF
 exit 1
 }
 
+#------------------------
+# Parsing parameters 
+#------------------------
+while getopts p:f:h OPTION 
+do
+  case $OPTION in
+     p)
+       Movies_Path=$OPTARG
+       if [ ! -d "${Movies_Path}" ]			# ctrl directory param
+       then
+         echo -e "The specified directory doesn't exist: ${Movies_Path}"
+         exit 1
+       fi
+       sed -i "s:\(Movies_Path>\)\(.*\)\(</.*\):\1${Movies_Path}\3:" ${CfgFile}	# write param in cfg file
+       ;;
+     f)
+       Movie_Filter=$OPTARG
+       sed -i "s:\(Movie_Filter>\)\(.*\)\(</.*\):\1${Movie_Filter}\3:" ${CfgFile}	# write param in cfg file
+       ;;
+     h)
+       usage
+       ;;
+   esac
+done
+
+if [ ! -d "${Movies_Path}" ]; then			# ctrl directory cfg file
+  echo -e "The Movies_Path specified directory in ${CfgFile} doesn't exist: ${Movies_Path}"
+  exit 1
+fi
+
+
+
 CreateMovieDB()
 # Create the Movie Database
 # DB as an automatic datestamp but unfortunately it relies on the player having the
 # correct date which can be trivial with some players.
 {
-/home/srjgsql/sqlite3 /home/srjgsql/movies.db "create table t1 (Movie_ID INTEGER PRIMARY KEY AUTOINCREMENT,head TEXT,genre TEXT,title TEXT,poster TEXT,info TEXT,file TEXT,footer TEXT,dateStamp DATE DEFAULT CURRENT_DATE);"
+$Jukebox_Path/sqlite3 ${Movies_Path}movies.db "create table t1 (Movie_ID INTEGER PRIMARY KEY AUTOINCREMENT,head TEXT,genre TEXT,title TEXT,poster TEXT,info TEXT,file TEXT,footer TEXT,dateStamp DATE DEFAULT CURRENT_DATE);"
 }
 
 GenerateMovieList()
@@ -163,7 +191,7 @@ dbinfo="<info>$MOVIESHEET</info>"
 dbfile="<file>$MOVIEPATH/$MOVIEFILE</file>"
 dbYear=$MovieYear
 
-/home/srjgsql/sqlite3 /home/srjgsql/movies.db "insert into t1 (head,genre,title,poster,info,file,footer) values ('<item>','$dbgenre','$dbtitle','$dbposter','$dbinfo','$dbfile','</item>');";
+$Jukebox_Path/sqlite3 ${Movies_Path}movies.db "insert into t1 (head,genre,title,poster,info,file,footer) values ('<item>','$dbgenre','$dbtitle','$dbposter','$dbinfo','$dbfile','</item>');";
 
 done < $InsertList
 }
@@ -175,17 +203,17 @@ DBMovieDelete()
 echo "Removing movies from the Database ...."
 while read LINE
 do
-/home/srjgsql/sqlite3 /home/srjgsql/movies.db  "DELETE from t1 WHERE file='<file>${LINE}</file>'";
+$Jukebox_Path/sqlite3 ${Movies_Path}movies.db  "DELETE from t1 WHERE file='<file>${LINE}</file>'";
 done < $DeleteList
-/home/srjgsql/sqlite3 /home/srjgsql/movies.db  "VACUUM";
+$Jukebox_Path/sqlite3 ${Movies_Path}movies.db  "VACUUM";
 }
 
 
 #*****************  Main Program  *****************************************
 
-ReadConfigFile;
 GenerateMovieList;
 [ -n "$MODE" ] && /usr/local/etc/srjg/imdb.sh;
+[ ! -f "${Movies_Path}movies.db" ] && CreateMovieDB;
 echo Indexing $Movies_Path;
 # if full update required then just delete (rm) $PreviousMovieList
 GenerateInsDelFiles;
