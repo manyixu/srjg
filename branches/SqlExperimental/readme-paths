@@ -1,8 +1,8 @@
-Jukebox.cfg				/usr/local/etc/srjg/
+Jukebox.cfg				<Jukebox_Path>
 jukebox.cgi 			inside of httpd /cgi-bin directory
 MainJukebox.rss			/usr/local/etc/srjg/
-movies.db				/home/srjgsql/
-sqlite3					/home/srjgsql/
+movies.db				<Movies_Path>  Now automatically created if not found
+sqlite3					<Jukebox_Path>
 mainjukebox.xml				/home/srjgsql/
 jukebox_update.sh			/home/srjgsql/  ** This should work no matter where located.
 genre_img(dir)                          /home/srjgsql/
