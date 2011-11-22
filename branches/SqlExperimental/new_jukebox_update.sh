@@ -122,7 +122,7 @@ while read LINE
      SHORT="${LINE#<title>}"
      # If it's not shorter, it didn't have <title>
      [ "${#SHORT}" = "${#LINE}" ] && continue
-     MOVIETITLE=`echo "$SHORT" | sed "s/'/''/"`
+     MOVIETITLE="$SHORT"
      break   # Found <title>, quit looking
    done <"$MOVIEPATH/$INFONAME"
         
@@ -158,12 +158,11 @@ do
    MOVIENAME="${MOVIEFILE%.*}"  # Strip off .ext       
 
    # Initialize defaults, replace later
-
    MOVIETITLE="$MOVIENAME</title>"
    MOVIESHEET=/usr/local/etc/srjg/NoMovieinfo.bmp
    MOVIEPOSTER=/usr/local/etc/srjg/nofolder.bmp
    GENRE=Unknown
-        
+		
    [ -e "$MOVIEPATH/$MOVIENAME.nfo" ] && INFONAME=$MOVIENAME.nfo;
    [ -e "$MOVIEPATH/MovieInfo.nfo" ] && INFONAME=MovieInfo.nfo;
         
@@ -185,10 +184,10 @@ do
      done
 
 dbgenre=$GENRE
-dbtitle="<title>$MOVIETITLE"
-dbposter="<poster>$MOVIEPOSTER</poster>"
-dbinfo="<info>$MOVIESHEET</info>"
-dbfile="<file>$MOVIEPATH/$MOVIEFILE</file>"
+dbtitle=`echo "<title>$MOVIETITLE" | sed "s/'/''/g"`
+dbposter=`echo "<poster>$MOVIEPOSTER</poster>" | sed "s/'/''/g"`
+dbinfo=`echo "<info>$MOVIESHEET</info>" | sed "s/'/''/g"`
+dbfile=`echo "<file>$MOVIEPATH/$MOVIEFILE</file>" | sed "s/'/''/g"`
 dbYear=$MovieYear
 
 $Jukebox_Path/sqlite3 ${Movies_Path}movies.db "insert into t1 (head,genre,title,poster,info,file,footer) values ('<item>','$dbgenre','$dbtitle','$dbposter','$dbinfo','$dbfile','</item>');";
