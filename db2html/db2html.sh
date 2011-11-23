@@ -1,14 +1,19 @@
 #!/bin/sh
-# Simple RSS Jukebox Generator: XML to HTML converter
-# Author: Snappy46 [levesque.marcel@gmail.com]
+# Simple RSS Jukebox Generator -> DB to HTML converter
+# Author: mikka [mika.hellmann@gmail.com]
+# Modified by Snappy46 [levesque.marcel@gmail.com]
 
 # Default SRJG poster and moviesheet
 DEFPOSTER="/usr/local/etc/srjg/nofolder.bmp"
 DEFSHEET="/usr/local/etc/srjg/NoMovieinfo.bmp"
+
+# Paths
+DB2HTML="/usr/local/etc/srjg/db2html"			# Main path to db2html
+SQLPATH="/usr/local/etc/srjg/sqlite3"			# Path to sqlite binary
+TMPTITLE="/tmp/title"
 TMPPOSTER="/tmp/poster"
 TMPSHEET="/tmp/sheet"
 
-APPDIR="${0%/*}"				# Main path to xml2html
 COLUMNS=10						# Number of columns to be created
 WIDTH=85						# Width of poster to be displayed
 HEIGHT=128						# Height of poster to be displayed
@@ -24,13 +29,13 @@ usage()
 {
 cat << EOF
 Usage: $0 options
-Example: xml2html.sh -j "/home/AKCJA, PRZYGODOWE, SENSACYJNE/jukebox.xml" -o /home/JukeboxHTML/ -p tar
+Example: $0 -j "/home/AKCJA, PRZYGODOWE, SENSACYJNE/movies.db" -o /home/JukeboxHTML/ -c -d -m -t -p tar
 
-This script converts SRJG jukebox.xml to HTML jukebox. 
+This script converts SRJG movies.db to HTML jukebox. 
 
 OPTIONS:
    -h      Show this message
-   -j      Input path to jukebox.xml (Required) 
+   -j      Input path to movies.db (Required) 
    -o      Output path to HTML jukebox (Optional) 
    -p      Type of archive: [tar] (Optional)
    -c	   Create alphabetical page categories (Optional, no argument needed)
@@ -48,7 +53,7 @@ exit 1
 while getopts j:o:p:cdmth OPTION 
 do
   case $OPTION in
-     j)	XMLPATH=$OPTARG		;;     
+     j)	DBFILE=$OPTARG		;;     
 	 o)	MAINPATH=$OPTARG	;;
      p)	PACK=$OPTARG		;;
      c)	USECATEG=1			;;  	   
@@ -59,23 +64,23 @@ do
    esac
 done
 
-# Check if required path to XML jukebox has been provided
-if [ -z "$XMLPATH" ]
+# Check if required path to movies.db has been provided
+if [ -z "$DBFILE" ]
 then
   echo "A filename must be specified using -o argument."
   usage
   exit 1
 fi
 
-# If output path to HTML jukebox has NOT been provided, use main path from jukebox.xml
+
+# If output path to HTML jukebox has NOT been provided, use main path from movies.db
 if [ -z "$MAINPATH" ]
 then
-  MAINPATH=`sed -n '/<Path>/,/<\/Path>/s/.*<Path>\(.*\)<\/Path>/\1/p' "$XMLPATH" | head -1`
+  MAINPATH="${DBFILE%/*}"
 fi
 
 # Initialize title and paths
-MAINTITLE=`sed -n '/<jukeboxheading>/,/<\/jukeboxheading>/s/.*<jukeboxheading>\(.*\)<\/jukeboxheading>/\1/p' "$XMLPATH" | head -1`
-HTMLPATH="$MAINPATH"HTML
+HTMLPATH="$MAINPATH"/HTML
 IMGPATH="$HTMLPATH"/images
 
 # If image path doesn't exist, create folder for HTML jukebox
@@ -88,18 +93,18 @@ fi
 # Default template header
 echo '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html><head>
-<title>'$MAINTITLE'</title>
+<title>SRJG Jukebox</title>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <link rel="StyleSheet" type="text/css" href="s.css">
 </head>
 
 <body onloadset="nextlink" focuscolor="#FDDB2B" focustext="#000000" bgproperties="fixed" style="background-position: center top; background-repeat: no-repeat;" background="images/b.jpg" bgcolor="#000000">
 <table align="center" width="1100"><tbody><tr><td>
-<div class="title" align="center"><font color="#colortitle">Jukebox '$MAINTITLE'</font></div>' > "$HTMLPATH/index.html"
+<div class="title" align="center"><font color="#colortitle">Jukebox</font></div>' > "$HTMLPATH/index.html"
 
 if [ $USEDATE = 1 ];
 then
-  echo "<br>Created on `date +"%Y-%m-%d %H:%M:%S"` with <b>xml2html</b><br>" >> "$HTMLPATH/index.html"
+  echo "<br>Created on `date +"%Y-%m-%d %H:%M:%S"` with <b>db2html</b><br>" >> "$HTMLPATH/index.html"
 fi
 
 if [ $USECATEG = 1 ];
@@ -117,20 +122,22 @@ fi
   	    
 echo '<br><br><table align="center" cellpadding="1"><tbody><tr>' >> "$HTMLPATH/index.html"
 
-# Get all links
-sed -n '/<poster>/,/<\/poster>/s/.*<poster>\(.*\)<\/poster>/\1/p' "$XMLPATH" > "$TMPPOSTER"
-sed -n '/<info>/,/<\/info>/s/.*<info>\(.*\)<\/info>/\1/p' "$XMLPATH" > "$TMPSHEET"
+# Get all titles and links
+"$SQLPATH" -separator '' "$DBFILE" "SELECT title FROM t1 ORDER BY title COLLATE NOCASE" | sed -n '/<title>/,/<\/title>/s/.*<title>\(.*\)<\/title>/\1/p' > "$TMPTITLE"
 
-echo "Movies found: `sed -n '/<title>/,/<\/title>/s/.*<title>\(.*\)<\/title>/\1/p' "$XMLPATH" | sed -n '$='`"  
+"$SQLPATH" -separator '' "$DBFILE" "SELECT poster FROM t1 ORDER BY title COLLATE NOCASE" | sed -n '/<poster>/,/<\/poster>/s/.*<poster>\(.*\)<\/poster>/\1/p' > "$TMPPOSTER"
+
+"$SQLPATH" -separator '' "$DBFILE" "SELECT info FROM t1 ORDER BY title COLLATE NOCASE" | sed -n '/<info>/,/<\/info>/s/.*<info>\(.*\)<\/info>/\1/p' > "$TMPSHEET"
+
+echo "Movies found: `sed -n '$=' "$TMPTITLE"`"  
 
 # Copy basic files
 echo "Copying basic files.."
-cp "$APPDIR/b.jpg" "$APPDIR/defposter.jpg" "$APPDIR/defsheet.jpg" "$IMGPATH"
-cp "$APPDIR/s.css" "$HTMLPATH"
-
+cp "$DB2HTML/b.jpg" "$DB2HTML/defposter.jpg" "$DB2HTML/defsheet.jpg" "$IMGPATH"
+cp "$DB2HTML/s.css" "$HTMLPATH"
 
 # Main loop
-sed -n '/<title>/,/<\/title>/s/.*<title>\(.*\)<\/title>/\1/p' "$XMLPATH"  | while read MOVIE
+while read MOVIE
 do
   echo "Processing $IDX: $MOVIE.."
   
@@ -188,7 +195,7 @@ do
   fi
   
   let IDX=$IDX+1 
-done
+done < "$TMPTITLE"
 
 
 # Default template footer
