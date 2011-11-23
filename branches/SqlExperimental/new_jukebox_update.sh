@@ -6,7 +6,7 @@
 
 CfgFile=./Jukebox.cfg
 if [ ! -f "${CfgFile}" ]; then
-  echo "Don't found config file : ${CfgFile}"
+  echo "Configuration file not found: ${CfgFile}"
   exit 1
 fi
 sed '1d;$d;s:<\(.*\)>\(.*\)</.*>:\1=\2:' ${CfgFile} >/tmp/Jukebox.cfg
@@ -19,7 +19,7 @@ InsertList="/tmp/insert.list"
 DeleteList="/tmp/delete.list"
 PreviousMovieList="$Jukebox_Path/prevmovies.list"
 DiffList="/tmp/diff.list"
-
+IMDB=""
 
 usage()
 # Display help menu
@@ -27,35 +27,18 @@ usage()
 cat << EOF
 usage: $0 options
 
-This script creates a Movie / TV Episode on a specify directory. 
-All the movies/TV Episode must be in their own directory.
+This script creates a Movie / TV Episode on a specified directory.
 
 OPTIONS:
    -h      Show this message
    -p      This indicate the jukebox directory ex: -p /HDD/movies/
    -f      This is the filter option, movies filename containing this/those
            string(s) will be skipped.  Strings must be separated by a ","
-           (Optional) ex: -f sample,trailer 
+           (Optional) ex: -f sample,trailer
+   -g      Generate moviesheets, thumbnails and NFO files. (Optional)
+           Please refer to $Jukebox_Path/imdb.sh for additional settings.
 NOTES:  If any of the arguments have spaces in them they must be surrounded by quotes: ""
-
-    The Following options are only required if you decide to use the script built-iname
-    capability to create automatically Moviesheet/Thumbnails. I suggest you consult this
-    Web site: http://playon.unixstorm.org/imdb.php if you want to know more about 
-    the various options.
-
-   -m      Generate moviesheets and thumbnails. (Optional)
-           Possible values are: moviesheet, poster, both
-   -n      name of the moviesheeet ?????????????????????????????
-   -b	   if set to "yes" random backdrop will be used (Optional)
-   -c      Possible values are: bdrip, bluray, dtheater, dvd, generic, hddvd, 
-           hdtv, itunes (works only with mode set to moviesheet) (Default generic)
-   -s      If set to "tmdb" random poster from themoviedb.org will be used
-           Otherwise default poster from IMDB will be used (works only with mode 
-           set to poster or moviesheet) (Optional)
-   -t      If set to "real" time will represented in HH:MM format
-           If set to "hours" time will be represented in HHh MMm format
-           Otherwise time will be represented in minutes (works only with mode 
-           set to moviesheet)(Optional)            
+    
 EOF
 exit 1
 }
@@ -63,7 +46,7 @@ exit 1
 #------------------------
 # Parsing parameters 
 #------------------------
-while getopts p:f:h OPTION 
+while getopts p:f:gh OPTION 
 do
   case $OPTION in
      p)
@@ -78,6 +61,9 @@ do
      f)
        Movie_Filter=$OPTARG
        sed -i "s:\(Movie_Filter>\)\(.*\)\(</.*\):\1${Movie_Filter}\3:" ${CfgFile}	# write param in cfg file
+       ;;
+     g)
+       IMDB=y
        ;;
      h)
        usage
@@ -211,7 +197,7 @@ $Jukebox_Path/sqlite3 ${Movies_Path}movies.db  "VACUUM";
 #*****************  Main Program  *****************************************
 
 GenerateMovieList;
-[ -n "$MODE" ] && /usr/local/etc/srjg/imdb.sh;
+[ -n "$IMDB" ] && $Jukebox_Path/imdb.sh;
 [ ! -f "${Movies_Path}movies.db" ] && CreateMovieDB;
 echo Indexing $Movies_Path;
 # if full update required then just delete (rm) $PreviousMovieList
