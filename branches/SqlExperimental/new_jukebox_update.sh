@@ -20,6 +20,7 @@ DeleteList="/tmp/delete.list"
 PreviousMovieList="$Jukebox_Path/prevmovies.list"
 DiffList="/tmp/diff.list"
 IMDB=""
+Force_DB_Update=""
 
 usage()
 # Display help menu
@@ -46,7 +47,7 @@ exit 1
 #------------------------
 # Parsing parameters 
 #------------------------
-while getopts p:f:gh OPTION 
+while getopts p:f:ghu OPTION 
 do
   case $OPTION in
      p)
@@ -68,6 +69,8 @@ do
      h)
        usage
        ;;
+     u)
+       Force_DB_Update=y
    esac
 done
 
@@ -83,7 +86,18 @@ CreateMovieDB()
 # DB as an automatic datestamp but unfortunately it relies on the player having the
 # correct date which can be trivial with some players.
 {
-$Jukebox_Path/sqlite3 ${Movies_Path}movies.db "create table t1 (Movie_ID INTEGER PRIMARY KEY AUTOINCREMENT,head TEXT,genre TEXT,title TEXT,poster TEXT,info TEXT,file TEXT,footer TEXT,dateStamp DATE DEFAULT CURRENT_DATE);"
+echo "Creating Database..."
+$Jukebox_Path/sqlite3 ${Movies_Path}movies.db "create table t1 (Movie_ID INTEGER PRIMARY KEY AUTOINCREMENT,head TEXT,genre TEXT,title TEXT,year TEXT,poster TEXT,info TEXT,file TEXT,footer TEXT,dateStamp DATE DEFAULT CURRENT_DATE);"
+}
+
+Force_DB_Creation()
+# Force creation of the Database using the "u" parameter option
+# This option can be use to start up with a fresh database in case of
+# Database corruption
+{
+rm $PreviousMovieList
+rm ${Movies_Path}movies.db
+CreateMovieDB;
 }
 
 GenerateMovieList()
@@ -148,6 +162,7 @@ do
    MOVIESHEET=/usr/local/etc/srjg/NoMovieinfo.bmp
    MOVIEPOSTER=/usr/local/etc/srjg/nofolder.bmp
    GENRE=Unknown
+   MovieYear=Unknown
 		
    [ -e "$MOVIEPATH/$MOVIENAME.nfo" ] && INFONAME=$MOVIENAME.nfo;
    [ -e "$MOVIEPATH/MovieInfo.nfo" ] && INFONAME=MovieInfo.nfo;
@@ -169,14 +184,14 @@ do
       break
      done
 
-dbgenre=$GENRE
+dbgenre=$GENRE 
 dbtitle=`echo "<title>$MOVIETITLE" | sed "s/'/''/g"`
 dbposter=`echo "<poster>$MOVIEPOSTER</poster>" | sed "s/'/''/g"`
 dbinfo=`echo "<info>$MOVIESHEET</info>" | sed "s/'/''/g"`
 dbfile=`echo "<file>$MOVIEPATH/$MOVIEFILE</file>" | sed "s/'/''/g"`
 dbYear=$MovieYear
 
-$Jukebox_Path/sqlite3 ${Movies_Path}movies.db "insert into t1 (head,genre,title,poster,info,file,footer) values ('<item>','$dbgenre','$dbtitle','$dbposter','$dbinfo','$dbfile','</item>');";
+$Jukebox_Path/sqlite3 ${Movies_Path}movies.db "insert into t1 (head,genre,title,year,poster,info,file,footer) values ('<item>','$dbgenre','$dbtitle','$dbYear','$dbposter','$dbinfo','$dbfile','</item>');";
 
 done < $InsertList
 }
@@ -198,6 +213,7 @@ $Jukebox_Path/sqlite3 ${Movies_Path}movies.db  "VACUUM";
 
 GenerateMovieList;
 [ -n "$IMDB" ] && $Jukebox_Path/imdb.sh;
+[ -n "$Force_DB_Update" ] && Force_DB_Creation;
 [ ! -f "${Movies_Path}movies.db" ] && CreateMovieDB;
 echo Indexing $Movies_Path;
 # if full update required then just delete (rm) $PreviousMovieList
