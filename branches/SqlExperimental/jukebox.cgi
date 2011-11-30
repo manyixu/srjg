@@ -339,7 +339,7 @@ EOF
 
 
 if [ "$GenreSearch" = "All" ]; then
-   /home/srjgsql/sqlite3 -separator ''  /home/srjgsql/movies.db  "SELECT * FROM t1 ORDER BY title COLLATE NOCASE"; # All Movies
+   /home/srjgsql/sqlite3 -separator ''  /home/srjgsql/movies.db  "SELECT head,title,poster,info,file,footer FROM t1 ORDER BY title COLLATE NOCASE"; # All Movies
 else
    /home/srjgsql/sqlite3 -separator ''  /home/srjgsql/movies.db  "SELECT head,title,poster,info,file,footer FROM t1 WHERE genre LIKE '%$GenreSearch%' ORDER BY title COLLATE NOCASE";
 fi   

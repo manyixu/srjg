@@ -132,19 +132,15 @@ MovieYear=`sed '/<year/!d;s:.*>\(.*\)</.*:\1:' "$MOVIEPATH/$INFONAME"`
 
 
 GenerateInsDelFiles()
-# Generate the working insertion and deletion files 
+# Generate insertion and deletion files
 {
 [ ! -f "$PreviousMovieList" ] && touch $PreviousMovieList;
-diff $PreviousMovieList $MoviesList | sed '1,3d' > $DiffList
-> $InsertList
-> $DeleteList
-while read LINE
-do
- if [ ${LINE:0:1} = '+' ]; then echo ${LINE:1} >> $InsertList; fi
- if [ ${LINE:0:1} = '-' ]; then echo ${LINE:1} >> $DeleteList; fi
-done < $DiffList
+sed -i -e 's/\[/\&lsqb;/g' -e 's/\]/\&rsqb;/g' $MoviesList # Conversion of [] for grep
+grep -vf $MoviesList $PreviousMovieList | sed -e 's/\&lsqb;/\[/g' -e 's/\&rsqb;/\]/g' > $DeleteList
+grep -vf $PreviousMovieList $MoviesList | sed -e 's/\&lsqb;/\[/g' -e 's/\&rsqb;/\]/g' > $InsertList
 mv $MoviesList $PreviousMovieList
 }
+
 
 DBMovieInsert()
 # Add movies to the Database and extract movies posters/folders
