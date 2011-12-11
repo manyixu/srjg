@@ -18,7 +18,6 @@ MoviesList="/tmp/movies.list"
 InsertList="/tmp/insert.list"
 DeleteList="/tmp/delete.list"
 PreviousMovieList="${Jukebox_Path}/prevmovies.list"
-DiffList="/tmp/diff.list"
 IMDB=""
 Force_DB_Update=""
 
