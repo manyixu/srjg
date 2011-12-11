@@ -141,7 +141,7 @@ echo -e '
 	<script>
 	    Jukebox_Temp = "/tmp/";
             Category_Title = "'$CategoryTitle'";
-	    Category_Background = "/usr/local/etc/srjg/background.bmp";						           
+	    Category_Background = "/home/srjgsql/images/background.bmp";						           
             setFocusItemIndex(0);
             Current_Item_index=0;
             NewView = "'$NewView'";
@@ -300,11 +300,11 @@ cat << EOF
  <script>
   if (getDrawingItemState() == "focus")
   {
-      "/usr/local/etc/srjg/focus.bmp";
+      "/home/srjgsql/images/focus.bmp";
   }
   else
   {
-      "/usr/local/etc/srjg/unfocus.bmp";
+      "/home/srjgsql/images/unfocus.bmp";
   }
  </script>
 </image>
