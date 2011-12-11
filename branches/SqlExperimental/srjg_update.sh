@@ -4,13 +4,13 @@
 
 # Reading/parsing xml configuration file and assign variables.
 
-CfgFile=./Jukebox.cfg
+CfgFile=./srjg.cfg
 if [ ! -f "${CfgFile}" ]; then
   echo "Configuration file not found: ${CfgFile}"
   exit 1
 fi
-sed '1d;$d;s:<\(.*\)>\(.*\)</.*>:\1=\2:' ${CfgFile} >/tmp/Jukebox.cfg
-. /tmp/Jukebox.cfg
+sed '1d;$d;s:<\(.*\)>\(.*\)</.*>:\1=\2:' ${CfgFile} >/tmp/srjg.cfg
+. /tmp/srjg.cfg
 
 # Initialize some Variables
 
