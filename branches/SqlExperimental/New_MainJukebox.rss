@@ -1,0 +1,189 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<rss version="2.0" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:media="http://purl.org/dc/elements/1.1/">
+
+<onEnter>showIdle();</onEnter>
+
+<script>
+    Config = "/home/srjgsql/srjg.cfg";
+    Config_ok = loadXMLFile(Config);
+    if (Config_ok == null) {
+	print("Load Config fail ", Config);
+        }
+    else {
+        Config_itemSize = getXMLElementCount("Config");
+	}
+     if (Config_itemSize > 0) {
+	Language = getXMLText("Config", "lang");
+        Jukebox_Path = getXMLText("Config", "Jukebox_Path");
+ 	Jukebox_Size = getXMLText("Config", "Jukebox_Size");
+        Movies_Path = getXMLText("Config", "Movies_Path");
+	Movie_Filter = getXMLText("Config", "Movie_Filter");
+     }
+</script>
+
+<mediaDisplay
+
+        name="photoView"
+	rowCount="5" 
+	columnCount="1" 
+	drawItemText="no" 
+	showHeader="no" 
+	showDefaultInfo="no"
+	menuBorderColor="255:255:255" 
+	sideColorBottom="-1:-1:-1"  
+	sideColorTop="-1:-1:-1"
+        itemAlignt="left"
+        itemOffsetXPC="27.2" 
+	itemOffsetYPC="33.1" 
+	itemWidthPC="17.7" 
+	itemHeightPC="6"
+        backgroundColor="-1:-1:-1" 
+	itemBackgroundColor="-1:-1:-1" 
+	sliding="no" 
+	itemGap="0"
+        idleImageXPC="90" 
+	idleImageYPC="5" 
+	idleImageWidthPC="5" 
+	idleImageHeightPC="8"
+        imageUnFocus="null" 
+	imageParentFocus="null" 
+	imageBorderPC="0" 
+	forceFocusOnItem="no" 
+	cornerRounding="yes"
+        itemBorderColor="-1:-1:-1" 
+	focusBorderColor="-1:-1:-1" 
+	unFocusBorderColor="-1:-1:-1">
+<idleImage> image/POPUP_LOADING_01.png </idleImage> 
+<idleImage> image/POPUP_LOADING_02.png </idleImage> 
+<idleImage> image/POPUP_LOADING_03.png </idleImage> 
+<idleImage> image/POPUP_LOADING_04.png </idleImage> 
+<idleImage> image/POPUP_LOADING_05.png </idleImage> 
+<idleImage> image/POPUP_LOADING_06.png </idleImage> 
+<idleImage> image/POPUP_LOADING_07.png </idleImage> 
+<idleImage> image/POPUP_LOADING_08.png </idleImage> 
+
+
+<text redraw="yes" backgroundColor="-1:-1:-1" foregroundColor="200:200:200"
+          offsetXPC="5" offsetYPC="29.4" widthPC="25" heightPC="14" fontSize="16" lines="1">Select Movies by:</text>
+
+<!-- SELECTED MENU ITEM TITLE
+    <text redraw="yes" backgroundColor="-1:-1:-1" foregroundColor="200:200:200"
+          offsetXPC="25" offsetYPC="28.4" widthPC="25" heightPC="14" fontSize="20" lines="1">
+        <script>
+            getItemInfo("title");
+        </script>
+    </text>   -->
+<onUserInput>
+    <script>
+	userInput = currentUserInput();
+				
+	if (userInput == "enter") {
+	  SelTitle=getItemInfo(-1, "title");
+	  SelTitle=urlEncode(SelTitle);
+          mode=getItemInfo(-1, "selection");
+          mode=urlEncode(mode);
+          jumpToLink("SelectionEntered");
+          "false";
+      } else if (userInput == "up" ) {
+	  redrawDisplay();
+	  "false";
+      } else if (userInput == "down") {
+	  redrawDisplay();
+	  "false";
+      } 
+     </script>
+</onUserInput>
+
+ 
+   <itemDisplay>
+<!--        <image redraw="yes" offsetXPC="0" offsetYPC="0" widthPC="100" heightPC="100" >
+            <script>
+                if( getFocusItemIndex() == getItemInfo(-1,"itemid") )
+                    getItemInfo(-1,"imageover");
+                else
+                    getItemInfo(-1,"image");
+            </script>
+        </image>  -->
+<image offsetXPC=0 offsetYPC=0 widthPC=100 heightPC=100>
+
+ <script>
+  if (getDrawingItemState() == "focus")
+  {
+      "/home/srjgsql/images/Sel_focus_on.png";
+  }
+ else
+  {
+      "/home/srjgsql/images/MenuItemNF.png";
+  }
+ </script>
+</image>
+
+      <text offsetXPC=0 offsetYPC=0 widthPC=100 heightPC=100 backgroundColor=-1:-1:-1 foregroundColor=200:200:200 fontSize=16>
+	<script>
+	getItemInfo(-1, "title");
+	</script>
+	</text>
+    </itemDisplay>  
+
+   <backgroundDisplay>
+        <image  offsetXPC="0" offsetYPC="0" widthPC="100" heightPC="100">
+                    /home/srjgsql/images/srjgMainMenu.jpg
+        </image>
+    </backgroundDisplay> 
+
+</mediaDisplay>
+
+<SelectionEntered>
+    <link>
+       <script>
+           print("http://127.0.0.1/cgi-bin/srjg.cgi?"+mode+"@"+SelTitle+"@"+Jukebox_Size);
+       </script>
+    </link>
+</SelectionEntered>
+
+<channel>
+<title>Main Menu</title>
+
+<item>
+<title>Genre</title>
+<selection>genreSelection</selection>
+<image>/home/srjgsql/images/Genre-icon_unfocus.png</image>
+<imageover>/home/srjgsql/images/Genre-icon.png</imageover>
+<itemid>0</itemid>
+</item>
+
+<item>
+<title>Year</title>
+<selection>yearSelection</selection>
+<image>/home/srjgsql/images/Year-icon_unfocus.png</image>
+<imageover>/home/srjgsql/images/Year-icon.png</imageover>
+<itemid>1</itemid>
+</item>
+
+<item>
+<title>Alphabet</title>
+<selection>alphaSelection</selection>
+<image>/home/srjgsql/images/Alpha-icon_unfocus.png</image>
+<imageover>/home/srjgsql/images/Alpha-icon.png</imageover>
+<itemid>2</itemid>
+</item>
+
+<item>
+<title>Recently Added</title>
+<selection>recent</selection>
+<image>/home/srjgsql/images/New-icon_unfocus.png</image>
+<imageover>/home/srjgsql/images/New-icon.png</imageover>
+<itemid>3</itemid>
+</item>
+
+<item>
+<title>Update Jukebox</title>
+<selection>Update</selection>
+<image>/home/srjgsql/images/New-icon_unfocus.png</image>
+<imageover>/home/srjgsql/images/New-icon.png</imageover>
+<itemid>4</itemid>
+</item>
+
+</channel>
+</rss>
+
