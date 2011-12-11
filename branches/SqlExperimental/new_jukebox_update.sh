@@ -163,8 +163,8 @@ do
    MOVIETITLE="$MOVIENAME</title>"
    MOVIESHEET=${Jukebox_Path}/NoMovieinfo.bmp
    MOVIEPOSTER=${Jukebox_Path}/nofolder.bmp
-   GENRE=Unknown
-   MovieYear=Unknown
+   GENRE="<name>Unknown</name>"
+   MovieYear="Unknown"
 		
    [ -e "$MOVIEPATH/$MOVIENAME.nfo" ] && INFONAME=$MOVIENAME.nfo
    [ -e "$MOVIEPATH/MovieInfo.nfo" ] && INFONAME=MovieInfo.nfo
