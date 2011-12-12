@@ -18,7 +18,15 @@
  	Jukebox_Size = getXMLText("Config", "Jukebox_Size");
         Movies_Path = getXMLText("Config", "Movies_Path");
 	Movie_Filter = getXMLText("Config", "Movie_Filter");
+	Port = getXMLText("Config", "Movie_Filter");
      }
+     srjgconf="/tmp/srjg.cfg";	
+     tmpconfigArray=null;
+     tmpconfigArray=pushBackStringArray(tmpconfigArray, "Language="+Language);
+     tmpconfigArray=pushBackStringArray(tmpconfigArray, "Jukebox_Path="+Jukebox_Path);
+     tmpconfigArray=pushBackStringArray(tmpconfigArray, "Movies_Path="+Movies_Path);
+     tmpconfigArray=pushBackStringArray(tmpconfigArray, "Movie_Filter="+Movie_Filter);
+     writeStringToFile(srjgconf, tmpconfigArray);
 </script>
 
 <mediaDisplay
