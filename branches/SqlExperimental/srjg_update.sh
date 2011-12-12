@@ -160,10 +160,10 @@ do
 
    # Initialize defaults, replace later
    MOVIETITLE="$MOVIENAME</title>"
-   MOVIESHEET=${Jukebox_Path}/NoMovieinfo.bmp
-   MOVIEPOSTER=${Jukebox_Path}/nofolder.bmp
+   MOVIESHEET=${Jukebox_Path}/images/NoMovieinfo.bmp
+   MOVIEPOSTER=${Jukebox_Path}/images/nofolder.bmp
    GENRE="<name>Unknown</name>"
-   MovieYear="Unknown"
+   MovieYear=""
 		
    [ -e "$MOVIEPATH/$MOVIENAME.nfo" ] && INFONAME=$MOVIENAME.nfo
    [ -e "$MOVIEPATH/MovieInfo.nfo" ] && INFONAME=MovieInfo.nfo
