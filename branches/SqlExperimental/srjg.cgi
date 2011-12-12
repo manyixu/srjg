@@ -1,6 +1,5 @@
 #!/bin/sh
 
-
 # Parsing query string provided by the server/client
 QUERY=$QUERY_STRING
 SAVEIFS=$IFS
@@ -10,28 +9,169 @@ mode=`echo $1`
 CategoryTitle=`echo $2 | sed "s/%20/ /g`
 Jukebox_Size=`echo $3`
 IFS=$SAVEIFS
-if [ "$mode" = "genre" ]; then
+if [ $mode = "genre" ]; then
 Search=`echo ${CategoryTitle} | cut -c1-3`
 else
 Search=${CategoryTitle}
 fi
 
+# Setting up variable according to srjg.cfg file
+. /tmp/srjg.cfg
+
 SetVar()
 # Settting up a few variables needed
 {
-[ "$mode" = "genreSelection" ] && nextmode="genre";
-[ "$mode" = "yearSelection" ] && nextmode="year";
-[ "$mode" = "alphaSelection" ] && nextmode="alpha";
+[ $mode = "genreSelection" ] && nextmode="genre";
+[ $mode = "yearSelection" ] && nextmode="year";
+[ $mode = "alphaSelection" ] && nextmode="alpha";
 
 if [ $mode = "genre" ] || [ $mode = "year" ] || [ $mode = "alpha" ] || [ $mode = "recent" ]; then
   nextmode="moviesheet";
 fi
 }
 
-Update()
-#Will update the Database based on the directory in <Movies_All> of srjg.cfg
+CreateMovieDB()
+# Create the Movie Database
+# DB as an automatic datestamp but unfortunately it relies on the player having the
+# correct date which can be trivial with some players.
 {
-echo 'nothing yet';
+${Jukebox_Path}/sqlite3 ${Movies_Path}movies.db "create table t1 (Movie_ID INTEGER PRIMARY KEY AUTOINCREMENT,head TEXT,genre TEXT,title TEXT,year TEXT,poster TEXT,info TEXT,file TEXT,footer TEXT,dateStamp DATE DEFAULT CURRENT_DATE);"
+}
+
+Force_DB_Creation()
+# Force creation of the Database using the "u" parameter option
+# This option can be use to start up with a fresh database in case of
+# Database corruption
+{
+rm $PreviousMovieList
+rm ${Movies_Path}movies.db
+CreateMovieDB;
+}
+
+
+Infoparsing()
+# Parse nfo file to extract movie title, genre and year
+{
+# Look for lines matching <title>
+while read LINE
+do
+  # Strip out <title> to make it shorter.
+  SHORT="${LINE#<title>}"
+  # If it's not shorter, it didn't have <title>
+  if [ "${#SHORT}" = "${#LINE}" ]; then continue ; fi
+  MOVIETITLE="$SHORT"
+  break   # Found <title>, quit looking
+done <"$MOVIEPATH/$INFONAME"
+        
+GENRE=`sed -e '/<genre/,/\/genre>/!d;/genre>/d' "$MOVIEPATH/$INFONAME"`
+MovieYear=`sed '/<year/!d;s:.*>\(.*\)</.*:\1:' "$MOVIEPATH/$INFONAME"`            
+}
+
+
+GenerateMovieList()
+# Find the movies based on movie extension and path provided.  Remove movies 
+# that contains the string(s) specified in $Movie_Filter
+{
+# Replace the comma in Movie_Filter to pipes |
+Movie_Filter=`echo $Movie_Filter | sed 's/,/|/ g'`
+echo "Searching for movies.."
+find "$Movies_Path" \
+  | egrep -i '\.(asf|avi|dat|divx|flv|img|iso|m1v|m2p|m2t|m2ts|m2v|m4v|mkv|mov|mp4|mpg|mts|qt|rm|rmp4|rmvb|tp|trp|ts|vob|wmv)$' \
+  | egrep -iv "$Movie_Filter" > $MoviesList
+echo "Found `sed -n '$=' $MoviesList` movies"
+}
+
+GenerateInsDelFiles()
+# Generate insertion and deletion files
+{
+sed -i -e 's/\[/\&lsqb;/g' -e 's/\]/\&rsqb;/g' $MoviesList # Conversion of [] for grep
+if [ -s "$PreviousMovieList" ] ; then # because the grep -f don't work with empty file
+  grep -vf $MoviesList $PreviousMovieList | sed -e 's/\&lsqb;/\[/g' -e 's/\&rsqb;/\]/g' > $DeleteList
+  grep -vf $PreviousMovieList $MoviesList | sed -e 's/\&lsqb;/\[/g' -e 's/\&rsqb;/\]/g' > $InsertList
+else
+  cat $MoviesList | sed -e 's/\&lsqb;/\[/g' -e 's/\&rsqb;/\]/g' > $InsertList
+fi
+mv $MoviesList $PreviousMovieList
+}
+
+DBMovieDelete()
+# Delete records from the movies.db database.
+{
+echo "Removing movies from the Database ...."
+while read LINE
+do
+  ${Jukebox_Path}/sqlite3 ${Movies_Path}movies.db  "DELETE from t1 WHERE file='<file>${LINE}</file>'";
+done < $DeleteList
+${Jukebox_Path}/sqlite3 ${Movies_Path}movies.db  "VACUUM";
+}
+
+DBMovieInsert()
+# Add movies to the Database and extract movies posters/folders
+{
+while read LINE
+do
+   MOVIEPATH="${LINE%/*}"  # Shell builtins instead of dirname
+   MOVIEFILE="${LINE##*/}" # Shell builtins instead of basename
+   MOVIENAME="${MOVIEFILE%.*}"  # Strip off .ext       
+
+   # Initialize defaults, replace later
+   MOVIETITLE="$MOVIENAME</title>"
+   MOVIESHEET=${Jukebox_Path}/NoMovieinfo.bmp
+   MOVIEPOSTER=${Jukebox_Path}/nofolder.bmp
+   GENRE="<name>Unknown</name>"
+   MovieYear="Unknown"
+		
+   [ -e "$MOVIEPATH/$MOVIENAME.nfo" ] && INFONAME=$MOVIENAME.nfo
+   [ -e "$MOVIEPATH/MovieInfo.nfo" ] && INFONAME=MovieInfo.nfo
+        
+   [ -e "$MOVIEPATH/$INFONAME" ] && Infoparsing
+
+   # Check for any files of known purpose inside the movie's folder.
+   for FILE in "folder.jpg" "${MOVIENAME}.jpg"
+   do
+    [ ! -e "$MOVIEPATH/$FILE" ] && continue
+    MOVIEPOSTER="$MOVIEPATH/$FILE"
+    break
+   done
+
+   for FILE in "about.jpg" "0001.jpg" "${MOVIENAME}_sheet.jpg"
+   do
+    [ ! -e "$MOVIEPATH/$FILE" ] && continue
+    MOVIESHEET="$MOVIEPATH/$FILE"
+    break
+   done
+
+dbgenre=$GENRE 
+dbtitle=`echo "<title>$MOVIETITLE" | sed "s/'/''/g"`
+dbposter=`echo "<poster>$MOVIEPOSTER</poster>" | sed "s/'/''/g"`
+dbinfo=`echo "<info>$MOVIESHEET</info>" | sed "s/'/''/g"`
+dbfile=`echo "<file>$MOVIEPATH/$MOVIEFILE</file>" | sed "s/'/''/g"`
+dbYear=$MovieYear
+
+${Jukebox_Path}/sqlite3 ${Movies_Path}movies.db "insert into t1 (head,genre,title,year,poster,info,file,footer) values('<item>','$dbgenre','$dbtitle','$dbYear','$dbposter','$dbinfo','$dbfile','</item>');";
+
+done < $InsertList
+}
+
+Update()
+# Will update the Database based on the parameters in srjg.cfg
+{
+# Initialize some Variables
+
+MoviesList="/tmp/movies.list"
+InsertList="/tmp/insert.list"
+DeleteList="/tmp/delete.list"
+PreviousMovieList="${Jukebox_Path}/prevmovies.list"
+IMDB=""
+Force_DB_Update=""
+
+GenerateMovieList;
+[ -n "$IMDB" ] &&  ${Jukebox_Path}/imdb.sh
+[ -n "$Force_DB_Update" ] && Force_DB_Creation
+[ ! -f "${Movies_Path}movies.db" ] && CreateMovieDB
+GenerateInsDelFiles;
+[[ -s $DeleteList ]] && DBMovieDelete
+[[ -s $InsertList ]] && DBMovieInsert
 }
 
 
@@ -437,7 +577,7 @@ fi
 
 #***********************Main Program*********************************
 
-if [ "$mode" = "update" ]; then
+if [ "$mode" = "Update" ]; then
   Update;
 else
   if [ "$mode" = "moviesheet" ]; then
