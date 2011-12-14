@@ -1,0 +1,5 @@
+Just uploaded the latest update; slowly getting there.  Since there are still a lot of hard coded location into the code just copy everything in the SqlExperimental directories to the /home/srjgsql/ directory of your player if you wish to try it.  Currently the movies.db is created on whatever directory you enter to scan srjg.cfg <Movies_Path> but srjg.cgi is hard coded to read the movies.db on the /home/srjgsql/ directory so you will need to move that file there until all the hard coded stuff is removed.
+
+Known problems:  moviesheet view does not work and update function still needs to be implemented (Mainly copy/paste) from the New_jukebox_update.sh to create.
+
+Happy debugging!!
