@@ -35,7 +35,9 @@ CreateMovieDB()
 # DB as an automatic datestamp but unfortunately it relies on the player having the
 # correct date which can be trivial with some players.
 {
-${Jukebox_Path}/sqlite3 ${Movies_Path}movies.db "create table t1 (Movie_ID INTEGER PRIMARY KEY AUTOINCREMENT,head TEXT,genre TEXT,title TEXT,year TEXT,poster TEXT,info TEXT,file TEXT,footer TEXT,dateStamp DATE DEFAULT CURRENT_DATE);"
+${Jukebox_Path}/sqlite3 ${Movies_Path}movies.db "create table t1 (Movie_ID INTEGER PRIMARY KEY AUTOINCREMENT,genre TEXT,title TEXT,year TEXT,poster TEXT,info TEXT,file TEXT,dateStamp DATE DEFAULT CURRENT_DATE)";
+${Jukebox_Path}/sqlite3 ${Movies_Path}movies.db "create table t2 (header TEXT, footer TEXT, IdMovhead TEXT, IdMovFoot TEXT)";
+${Jukebox_Path}/sqlite3 ${Movies_Path}movies.db "insert into t2 values ('<item>','</item>','<IdMovie>','</IdMovie>')";
 }
 
 Force_DB_Creation()
@@ -148,7 +150,7 @@ dbinfo=`echo "<info>$MOVIESHEET</info>" | sed "s/'/''/g"`
 dbfile=`echo "<file>$MOVIEPATH/$MOVIEFILE</file>" | sed "s/'/''/g"`
 dbYear=$MovieYear
 
-${Jukebox_Path}/sqlite3 ${Movies_Path}movies.db "insert into t1 (head,genre,title,year,poster,info,file,footer) values('<item>','$dbgenre','$dbtitle','$dbYear','$dbposter','$dbinfo','$dbfile','</item>');";
+${Jukebox_Path}/sqlite3 ${Movies_Path}movies.db "insert into t1 (genre,title,year,poster,info,file) values('$dbgenre','$dbtitle','$dbYear','$dbposter','$dbinfo','$dbfile');";
 
 done < $InsertList
 }
@@ -235,31 +237,29 @@ idleImageHeightPC='16'
 <idleImage> image/POPUP_LOADING_07.png </idleImage> 
 <idleImage> image/POPUP_LOADING_08.png </idleImage> 
 <backgroundDisplay> 
-<image offsetXPC='0' offsetYPC='0' widthPC='100' heightPC='100' >
-    <script>
-      Current_Movie_Info=getItemInfo('info');
-      print('Current_Movie_Info');
-    </script>
-</image> 
+<image offsetXPC='0' offsetYPC='0' widthPC='100' heightPC='100' >"
+/home/srjgsql/sqlite3 -separator ''  /home/srjgsql/movies.db  "SELECT info FROM t1 WHERE Movie_ID like '$Search'" | sed '/<info/!d;s:.*>\(.*\)</.*:\1:'| grep "[!-~]";
+echo -e '</image> 
 </backgroundDisplay> 
 <onUserInput>
 <script> 
 userInput = currentUserInput();
-if (userInput == 'enter') { 
-    Current_Movie_File=getItemInfo('file');
+if (userInput == "enter") { 
+    Current_Movie_File=getItemInfo(-1, "file");
     playItemURL(Current_Movie_File, 10);
-    'true';
+    "true";
 } 
-else if (userInput == 'left') {'true'; } 
-else if (userInput == 'right') {'true'; }
+else if (userInput == "left") {"true"; } 
+else if (userInput == "right") {"true"; }
 
 </script> 
 </onUserInput>
 </mediaDisplay> 
 <channel> 
-<title>Movies</title>"
-
-/home/srjgsql/sqlite3 -separator ''  /home/srjgsql/movies.db  "SELECT head,title,poster,info,file,footer FROM t1 WHERE title like '<title>$Search%'";
+<item>
+<title>Movies</title>'
+/home/srjgsql/sqlite3 -separator ''  /home/srjgsql/movies.db  "SELECT file FROM t1 WHERE Movie_ID like '$Search'";
+echo -e "</item>"
 }
 
 
@@ -349,17 +349,8 @@ cat <<EOF
 		  	</image>      
 		</backgroundDisplay>   
 
-                <text redraw="no" align="left" offsetXPC="3" offsetYPC="1" widthPC="100" heightPC="3" fontSize="12" backgroundColor="-1:-1:-1" foregroundColor="130:130:130">1 = Switch View |		
+                <text redraw="no" align="left" offsetXPC="15" offsetYPC="1" widthPC="100" heightPC="3" fontSize="12" backgroundColor="-1:-1:-1" foregroundColor="130:130:130">1 = Switch View | Enter = Select | Rtn = Previous Menu/View | Play = Play Video/Movie 		
 		</text>
-
-                <text redraw="no" align="left" offsetXPC="17" offsetYPC="1" widthPC="90" heightPC="3" fontSize="12" backgroundColor="-1:-1:-1" foregroundColor="130:130:130">Enter = Moviesheet |			
-		</text>                
-
-                <text redraw="no" align="left" offsetXPC="34" offsetYPC="1" widthPC="90" heightPC="3" fontSize="12" backgroundColor="-1:-1:-1" foregroundColor="130:130:130">Rtn = Previous Menu/View |			
-		</text>     
-
-                <text redraw="no" align="left" offsetXPC="56" offsetYPC="1" widthPC="90" heightPC="3" fontSize="12" backgroundColor="-1:-1:-1" foregroundColor="130:130:130">Play = Play Video/Movie |			
-		</text> 
    
 		<text redraw="no" align="center" offsetXPC="2.5" offsetYPC="3" widthPC="90" heightPC="10" fontSize="20" backgroundColor="-1:-1:-1" foregroundColor="192:192:192">
 			<script>
@@ -390,9 +381,12 @@ cat <<EOF
 				} else if (userInput == "right") {
 					"false";                                 
                                 } else if (userInput == "enter") {
-					Genre_Title=urlencode(getItemInfo(-1, "title"));
-					jumpToLink("NextView");
-					"false";
+					if (nextmode == "moviesheet") {
+					   Genre_Title=getItemInfo(-1, "IdMovie");}
+					else {
+					   Genre_Title=urlencode(getItemInfo(-1, "title"));}
+					   jumpToLink("NextView");
+					   "false";
 				} else if (userInput == "one") {
                                         Genre_Title=urlEncode(Genre_Title); 
 					jumpToLink("SwitchView");
@@ -512,22 +506,22 @@ EOF
 
 if [ "$mode" = "genre" ]; then
    if [ "$Search" = "All" ]; then
-      /home/srjgsql/sqlite3 -separator ''  /home/srjgsql/movies.db  "SELECT head,title,poster,info,file,footer FROM t1 ORDER BY title COLLATE NOCASE"; # All Movies
+     /home/srjgsql/sqlite3 -separator ''  /home/srjgsql/movies.db  "SELECT header,IdMovhead,Movie_ID,IdMovFoot,title,poster,info,file,footer FROM t1,t2 ORDER BY title COLLATE NOCASE"; # All Movies
    else
-      /home/srjgsql/sqlite3 -separator ''  /home/srjgsql/movies.db  "SELECT head,title,poster,info,file,footer FROM t1 WHERE genre LIKE '%$Search%' ORDER BY title COLLATE NOCASE";
+      /home/srjgsql/sqlite3 -separator ''  /home/srjgsql/movies.db  "SELECT header,IdMovhead,Movie_ID,IdMovFoot,title,poster,info,file,footer FROM t1,t2 WHERE genre LIKE '%$Search%' ORDER BY title COLLATE NOCASE";
    fi   
 fi
 
 if [ "$mode" = "alpha" ]; then
-/home/srjgsql/sqlite3 -separator ''  /home/srjgsql/movies.db  "SELECT head,title,poster,info,file,footer FROM t1 WHERE title LIKE '<title>$Search%' ORDER BY title COLLATE NOCASE";
+/home/srjgsql/sqlite3 -separator ''  /home/srjgsql/movies.db  "SELECT header,IdMovhead,Movie_ID,IdMovFoot,title,poster,info,file,footer FROM t1,t2 WHERE title LIKE '<title>$Search%' ORDER BY title COLLATE NOCASE";
 fi
 
 if [ "$mode" = "year" ]; then
-/home/srjgsql/sqlite3 -separator ''  /home/srjgsql/movies.db  "SELECT head,title,poster,info,file,footer FROM t1 WHERE year ='$Search' ORDER BY title COLLATE NOCASE";
+/home/srjgsql/sqlite3 -separator ''  /home/srjgsql/movies.db  "SELECT header,IdMovhead,Movie_ID,IdMovFoot,title,poster,info,file,footer FROM t1,t2 WHERE year ='$Search' ORDER BY title COLLATE NOCASE";
 fi
 
 if [ "$mode" = "recent" ]; then
-/home/srjgsql/sqlite3 -separator ''  /home/srjgsql/movies.db  "SELECT head,title,poster,info,file,footer FROM t1 ORDER BY datestamp DESC LIMIT 12";
+/home/srjgsql/sqlite3 -separator ''  /home/srjgsql/movies.db  "SELECT header,IdMovhead,Movie_ID,IdMovFoot,title,poster,info,file,footer FROM t1,t2 ORDER BY datestamp DESC LIMIT 12";
 fi
 
 if [ "$mode" = "yearSelection" ]; then

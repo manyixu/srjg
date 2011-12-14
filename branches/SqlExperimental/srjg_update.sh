@@ -87,7 +87,11 @@ CreateMovieDB()
 {
 echo "Creating Database..."
 ${Jukebox_Path}/sqlite3 ${Movies_Path}movies.db \
-   "create table t1 (Movie_ID INTEGER PRIMARY KEY AUTOINCREMENT,head TEXT,genre TEXT,title TEXT,year TEXT,poster TEXT,info TEXT,file TEXT,footer TEXT,dateStamp DATE DEFAULT CURRENT_DATE);"
+   "create table t1 (Movie_ID INTEGER PRIMARY KEY AUTOINCREMENT,genre TEXT,title TEXT,year TEXT,poster TEXT,info TEXT,file TEXT,dateStamp DATE DEFAULT CURRENT_DATE)";
+${Jukebox_Path}/sqlite3 ${Movies_Path}movies.db "create table t2 (header TEXT, footer TEXT, IdMovhead TEXT, IdMovFoot TEXT)";
+${Jukebox_Path}/sqlite3 ${Movies_Path}movies.db "insert into t2 values ('<item>','</item>','<IdMovie>','</IdMovie>')";
+
+#/home/srjgsql/sqlite3 -separator ''  /home/srjgsql/movies.db  "SELECT t2.header,head,title,poster,info,file,t1.footer,t2.footer FROM t1,T2 ORDER BY title COLLATE NOCASE";
 }
 
 Force_DB_Creation()
@@ -193,8 +197,8 @@ dbfile=`echo "<file>$MOVIEPATH/$MOVIEFILE</file>" | sed "s/'/''/g"`
 dbYear=$MovieYear
 
 ${Jukebox_Path}/sqlite3 ${Movies_Path}movies.db \
-  "insert into t1 (head,genre,title,year,poster,info,file,footer) \
-  values ('<item>','$dbgenre','$dbtitle','$dbYear','$dbposter','$dbinfo','$dbfile','</item>');";
+  "insert into t1 (genre,title,year,poster,info,file) \
+  values ('$dbgenre','$dbtitle','$dbYear','$dbposter','$dbinfo','$dbfile');";
 
 done < $InsertList
 }
