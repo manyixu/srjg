@@ -18,6 +18,11 @@ fi
 # Setting up variable according to srjg.cfg file
 . /tmp/srjg.cfg
 
+# Setting up other variable
+
+Database=${Jukebox_Path}"/movies.db"
+Sqlite=${Jukebox_Path}"/sqlite3"
+
 SetVar()
 # Settting up a few variables needed
 {
@@ -35,9 +40,9 @@ CreateMovieDB()
 # DB as an automatic datestamp but unfortunately it relies on the player having the
 # correct date which can be trivial with some players.
 {
-${Jukebox_Path}/sqlite3 ${Movies_Path}movies.db "create table t1 (Movie_ID INTEGER PRIMARY KEY AUTOINCREMENT,genre TEXT,title TEXT,year TEXT,poster TEXT,info TEXT,file TEXT,dateStamp DATE DEFAULT CURRENT_DATE)";
-${Jukebox_Path}/sqlite3 ${Movies_Path}movies.db "create table t2 (header TEXT, footer TEXT, IdMovhead TEXT, IdMovFoot TEXT)";
-${Jukebox_Path}/sqlite3 ${Movies_Path}movies.db "insert into t2 values ('<item>','</item>','<IdMovie>','</IdMovie>')";
+${Sqlite} ${Database} "create table t1 (Movie_ID INTEGER PRIMARY KEY AUTOINCREMENT,genre TEXT,title TEXT,year TEXT,poster TEXT,info TEXT,file TEXT,dateStamp DATE DEFAULT CURRENT_DATE)";
+${Sqlite} ${Database} "create table t2 (header TEXT, footer TEXT, IdMovhead TEXT, IdMovFoot TEXT)";
+${Sqlite} ${Database} "insert into t2 values ('<item>','</item>','<IdMovie>','</IdMovie>')";
 }
 
 Force_DB_Creation()
@@ -46,7 +51,7 @@ Force_DB_Creation()
 # Database corruption
 {
 rm $PreviousMovieList
-rm ${Movies_Path}movies.db
+rm ${Database}
 CreateMovieDB;
 }
 
@@ -102,9 +107,9 @@ DBMovieDelete()
 echo "Removing movies from the Database ...."
 while read LINE
 do
-  ${Jukebox_Path}/sqlite3 ${Movies_Path}movies.db  "DELETE from t1 WHERE file='<file>${LINE}</file>'";
+  ${Sqlite} ${Database}  "DELETE from t1 WHERE file='<file>${LINE}</file>'";
 done < $DeleteList
-${Jukebox_Path}/sqlite3 ${Movies_Path}movies.db  "VACUUM";
+${Sqlite} ${Database}  "VACUUM";
 }
 
 DBMovieInsert()
@@ -150,7 +155,7 @@ dbinfo=`echo "<info>$MOVIESHEET</info>" | sed "s/'/''/g"`
 dbfile=`echo "<file>$MOVIEPATH/$MOVIEFILE</file>" | sed "s/'/''/g"`
 dbYear=$MovieYear
 
-${Jukebox_Path}/sqlite3 ${Movies_Path}movies.db "insert into t1 (genre,title,year,poster,info,file) values('$dbgenre','$dbtitle','$dbYear','$dbposter','$dbinfo','$dbfile');";
+${Sqlite} ${Database} "insert into t1 (genre,title,year,poster,info,file) values('$dbgenre','$dbtitle','$dbYear','$dbposter','$dbinfo','$dbfile');";
 
 done < $InsertList
 }
@@ -170,7 +175,7 @@ Force_DB_Update=""
 GenerateMovieList;
 [ -n "$IMDB" ] &&  ${Jukebox_Path}/imdb.sh
 [ -n "$Force_DB_Update" ] && Force_DB_Creation
-[ ! -f "${Movies_Path}movies.db" ] && CreateMovieDB
+[ ! -f "${Database}" ] && CreateMovieDB
 GenerateInsDelFiles;
 [[ -s $DeleteList ]] && DBMovieDelete
 [[ -s $InsertList ]] && DBMovieInsert
@@ -238,7 +243,7 @@ idleImageHeightPC='16'
 <idleImage> image/POPUP_LOADING_08.png </idleImage> 
 <backgroundDisplay> 
 <image offsetXPC='0' offsetYPC='0' widthPC='100' heightPC='100' >"
-/home/srjgsql/sqlite3 -separator ''  /home/srjgsql/movies.db  "SELECT info FROM t1 WHERE Movie_ID like '$Search'" | sed '/<info/!d;s:.*>\(.*\)</.*:\1:'| grep "[!-~]";
+${Sqlite} -separator ''  ${Database}  "SELECT info FROM t1 WHERE Movie_ID like '$Search'" | sed '/<info/!d;s:.*>\(.*\)</.*:\1:'| grep "[!-~]";
 echo -e '</image> 
 </backgroundDisplay> 
 <onUserInput>
@@ -258,7 +263,7 @@ else if (userInput == "right") {"true"; }
 <channel> 
 <item>
 <title>Movies</title>'
-/home/srjgsql/sqlite3 -separator ''  /home/srjgsql/movies.db  "SELECT file FROM t1 WHERE Movie_ID like '$Search'";
+${Sqlite} -separator ''  ${Database}  "SELECT file FROM t1 WHERE Movie_ID like '$Search'";
 echo -e "</item>"
 }
 
@@ -506,27 +511,27 @@ EOF
 
 if [ "$mode" = "genre" ]; then
    if [ "$Search" = "All" ]; then
-     /home/srjgsql/sqlite3 -separator ''  /home/srjgsql/movies.db  "SELECT header,IdMovhead,Movie_ID,IdMovFoot,title,poster,info,file,footer FROM t1,t2 ORDER BY title COLLATE NOCASE"; # All Movies
+     ${Sqlite} -separator ''  ${Database}  "SELECT header,IdMovhead,Movie_ID,IdMovFoot,title,poster,info,file,footer FROM t1,t2 ORDER BY title COLLATE NOCASE"; # All Movies
    else
-      /home/srjgsql/sqlite3 -separator ''  /home/srjgsql/movies.db  "SELECT header,IdMovhead,Movie_ID,IdMovFoot,title,poster,info,file,footer FROM t1,t2 WHERE genre LIKE '%$Search%' ORDER BY title COLLATE NOCASE";
+      ${Sqlite} -separator ''  ${Database}  "SELECT header,IdMovhead,Movie_ID,IdMovFoot,title,poster,info,file,footer FROM t1,t2 WHERE genre LIKE '%$Search%' ORDER BY title COLLATE NOCASE";
    fi   
 fi
 
 if [ "$mode" = "alpha" ]; then
-/home/srjgsql/sqlite3 -separator ''  /home/srjgsql/movies.db  "SELECT header,IdMovhead,Movie_ID,IdMovFoot,title,poster,info,file,footer FROM t1,t2 WHERE title LIKE '<title>$Search%' ORDER BY title COLLATE NOCASE";
+${Sqlite} -separator ''  ${Database}  "SELECT header,IdMovhead,Movie_ID,IdMovFoot,title,poster,info,file,footer FROM t1,t2 WHERE title LIKE '<title>$Search%' ORDER BY title COLLATE NOCASE";
 fi
 
 if [ "$mode" = "year" ]; then
-/home/srjgsql/sqlite3 -separator ''  /home/srjgsql/movies.db  "SELECT header,IdMovhead,Movie_ID,IdMovFoot,title,poster,info,file,footer FROM t1,t2 WHERE year ='$Search' ORDER BY title COLLATE NOCASE";
+${Sqlite} -separator ''  ${Database}  "SELECT header,IdMovhead,Movie_ID,IdMovFoot,title,poster,info,file,footer FROM t1,t2 WHERE year ='$Search' ORDER BY title COLLATE NOCASE";
 fi
 
 if [ "$mode" = "recent" ]; then
-/home/srjgsql/sqlite3 -separator ''  /home/srjgsql/movies.db  "SELECT header,IdMovhead,Movie_ID,IdMovFoot,title,poster,info,file,footer FROM t1,t2 ORDER BY datestamp DESC LIMIT 12";
+${Sqlite} -separator ''  ${Database}  "SELECT header,IdMovhead,Movie_ID,IdMovFoot,title,poster,info,file,footer FROM t1,t2 ORDER BY datestamp DESC LIMIT 12";
 fi
 
 if [ "$mode" = "yearSelection" ]; then
 # pulls out the years of the movies
-/home/srjgsql/sqlite3 -separator ''  /tmp/usbmounts/sdb1/movies.db  "SELECT DISTINCT year FROM t1 ORDER BY year COLLATE NOCASE" > /tmp/year.list
+${Sqlite} -separator ''  ${Database}  "SELECT DISTINCT year FROM t1 ORDER BY year COLLATE NOCASE" > /tmp/year.list
 while read LINE
 do
 echo "<item>"
@@ -541,7 +546,7 @@ if [ "$mode" = "genreSelection" ]; then
 # The first line does the following: Pull data from database; remove all leading/trailing white spaces; sort and remove duplicate
 # remove possible empty line that may exist; remove <name>Sci-fi</name> keeps Science fiction instead; remove any blank line
 # that may be still present.
-/home/srjgsql/sqlite3 -separator ''  /tmp/usbmounts/sdb1/movies.db  "SELECT genre FROM t1" | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//' | sort -u | sed '/<name/!d;s:.*>\(.*\)</.*:\1:' | grep "[!-~]" | egrep -v "Sci-Fi" > /tmp/genre.list
+${Sqlite} -separator ''  ${Database}  "SELECT genre FROM t1" | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//' | sort -u | sed '/<name/!d;s:.*>\(.*\)</.*:\1:' | grep "[!-~]" | egrep -v "Sci-Fi" > /tmp/genre.list
 sed -i 1i"All Movies" /tmp/genre.list
 while read LINE
 do
@@ -557,7 +562,7 @@ if [ "$mode" = "alphaSelection" ]; then
 # pulls out the first letter of alphabet of the movie title
 # The first line does the following: Pull data from database; remove the leading and trailing <title></title>; cut the title first 
 # Character; remove anything that is not A-Z ex: a number; sort and remove duplicate.
-/home/srjgsql/sqlite3 -separator ''  /tmp/usbmounts/sdb1/movies.db  "SELECT title FROM t1" | sed '/<title/!d;s:.*>\(.*\)</.*:\1:' | cut -c 1 | grep '[A-Z]' | sort -u > /tmp/alpha.list
+${Sqlite} -separator ''  ${Database}  "SELECT title FROM t1" | sed '/<title/!d;s:.*>\(.*\)</.*:\1:' | cut -c 1 | grep '[A-Z]' | sort -u > /tmp/alpha.list
 while read LINE
 do
 echo "<item>"

@@ -20,6 +20,8 @@ DeleteList="/tmp/delete.list"
 PreviousMovieList="${Jukebox_Path}/prevmovies.list"
 IMDB=""
 Force_DB_Update=""
+Database=${Jukebox_Path}"/movies.db"
+Sqlite=${Jukebox_Path}"/sqlite3"
 
 usage()
 # Display help menu
@@ -86,12 +88,10 @@ CreateMovieDB()
 # correct date which can be trivial with some players.
 {
 echo "Creating Database..."
-${Jukebox_Path}/sqlite3 ${Movies_Path}movies.db \
+${Sqlite} ${Database} \
    "create table t1 (Movie_ID INTEGER PRIMARY KEY AUTOINCREMENT,genre TEXT,title TEXT,year TEXT,poster TEXT,info TEXT,file TEXT,dateStamp DATE DEFAULT CURRENT_DATE)";
-${Jukebox_Path}/sqlite3 ${Movies_Path}movies.db "create table t2 (header TEXT, footer TEXT, IdMovhead TEXT, IdMovFoot TEXT)";
-${Jukebox_Path}/sqlite3 ${Movies_Path}movies.db "insert into t2 values ('<item>','</item>','<IdMovie>','</IdMovie>')";
-
-#/home/srjgsql/sqlite3 -separator ''  /home/srjgsql/movies.db  "SELECT t2.header,head,title,poster,info,file,t1.footer,t2.footer FROM t1,T2 ORDER BY title COLLATE NOCASE";
+${Sqlite} ${Database} "create table t2 (header TEXT, footer TEXT, IdMovhead TEXT, IdMovFoot TEXT)";
+${Sqlite} ${Database} "insert into t2 values ('<item>','</item>','<IdMovie>','</IdMovie>')";
 }
 
 Force_DB_Creation()
@@ -100,7 +100,7 @@ Force_DB_Creation()
 # Database corruption
 {
 rm $PreviousMovieList
-rm ${Movies_Path}movies.db
+rm ${Database}
 CreateMovieDB;
 }
 
@@ -196,7 +196,7 @@ dbinfo=`echo "<info>$MOVIESHEET</info>" | sed "s/'/''/g"`
 dbfile=`echo "<file>$MOVIEPATH/$MOVIEFILE</file>" | sed "s/'/''/g"`
 dbYear=$MovieYear
 
-${Jukebox_Path}/sqlite3 ${Movies_Path}movies.db \
+${Sqlite} ${Database} \
   "insert into t1 (genre,title,year,poster,info,file) \
   values ('$dbgenre','$dbtitle','$dbYear','$dbposter','$dbinfo','$dbfile');";
 
@@ -210,9 +210,9 @@ DBMovieDelete()
 echo "Removing movies from the Database ...."
 while read LINE
 do
-  ${Jukebox_Path}/sqlite3 ${Movies_Path}movies.db  "DELETE from t1 WHERE file='<file>${LINE}</file>'";
+  ${Sqlite} ${Database}  "DELETE from t1 WHERE file='<file>${LINE}</file>'";
 done < $DeleteList
-${Jukebox_Path}/sqlite3 ${Movies_Path}movies.db  "VACUUM";
+${Sqlite} ${Database}  "VACUUM";
 }
 
 
@@ -221,7 +221,7 @@ ${Jukebox_Path}/sqlite3 ${Movies_Path}movies.db  "VACUUM";
 GenerateMovieList;
 [ -n "$IMDB" ] &&  ${Jukebox_Path}/imdb.sh
 [ -n "$Force_DB_Update" ] && Force_DB_Creation
-[ ! -f "${Movies_Path}movies.db" ] && CreateMovieDB
+[ ! -f "${Database}" ] && CreateMovieDB
 echo Indexing $Movies_Path;
 # if full update required then just delete (rm) $PreviousMovieList
 GenerateInsDelFiles;
