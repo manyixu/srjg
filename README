@@ -24,4 +24,4 @@ mount -o remount,rw /
 
 Step 4) Create a new entry in your /usr/local/bin/script/menu.rss to be able to launch <Jukebox_Path>/srjgMainMenu.rss from there.
 
-More detail explanation will be available one srjg is ready to be release.
+More detail explanation will be available once srjg is ready to be release.
