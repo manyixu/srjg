@@ -4,7 +4,7 @@
 <onEnter>showIdle();</onEnter>
 
 <script>
-    Config = "/home/srjgsql/srjg.cfg";
+    Config = "/usr/local/etc/srjg.cfg";
     Config_ok = loadXMLFile(Config);
     if (Config_ok == null) {
 	print("Load Config fail ", Config);
