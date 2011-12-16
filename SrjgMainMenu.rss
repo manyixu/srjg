@@ -18,7 +18,7 @@
  	Jukebox_Size = getXMLText("Config", "Jukebox_Size");
         Movies_Path = getXMLText("Config", "Movies_Path");
 	Movie_Filter = getXMLText("Config", "Movie_Filter");
-	Port = getXMLText("Config", "Movie_Filter");
+	Port = getXMLText("Config", "Port");
      }
      srjgconf="/tmp/srjg.cfg";	
      tmpconfigArray=null;
@@ -26,6 +26,7 @@
      tmpconfigArray=pushBackStringArray(tmpconfigArray, "Jukebox_Path="+Jukebox_Path);
      tmpconfigArray=pushBackStringArray(tmpconfigArray, "Movies_Path="+Movies_Path);
      tmpconfigArray=pushBackStringArray(tmpconfigArray, "Movie_Filter="+Movie_Filter);
+     tmpconfigArray=pushBackStringArray(tmpconfigArray, "Port="+Port);
      writeStringToFile(srjgconf, tmpconfigArray);
 </script>
 
@@ -74,13 +75,6 @@
 <text redraw="yes" backgroundColor="-1:-1:-1" foregroundColor="200:200:200"
           offsetXPC="5" offsetYPC="29.4" widthPC="25" heightPC="14" fontSize="16" lines="1">Select Movies by:</text>
 
-<!-- SELECTED MENU ITEM TITLE
-    <text redraw="yes" backgroundColor="-1:-1:-1" foregroundColor="200:200:200"
-          offsetXPC="25" offsetYPC="28.4" widthPC="25" heightPC="14" fontSize="20" lines="1">
-        <script>
-            getItemInfo("title");
-        </script>
-    </text>   -->
 <onUserInput>
     <script>
 	userInput = currentUserInput();
@@ -103,39 +97,34 @@
 </onUserInput>
 
  
-   <itemDisplay>
-<!--        <image redraw="yes" offsetXPC="0" offsetYPC="0" widthPC="100" heightPC="100" >
-            <script>
-                if( getFocusItemIndex() == getItemInfo(-1,"itemid") )
-                    getItemInfo(-1,"imageover");
-                else
-                    getItemInfo(-1,"image");
-            </script>
-        </image>  -->
+<itemDisplay>
+
 <image offsetXPC=0 offsetYPC=0 widthPC=100 heightPC=100>
 
  <script>
   if (getDrawingItemState() == "focus")
   {
-      "/home/srjgsql/images/Sel_focus_on.png";
+      print(Jukebox_Path+"/images/Sel_focus_on.png");
   }
  else
   {
-      "/home/srjgsql/images/MenuItemNF.png";
+      print(Jukebox_Path+"/images/MenuItemNF.png");
   }
  </script>
 </image>
 
-      <text offsetXPC=0 offsetYPC=0 widthPC=100 heightPC=100 backgroundColor=-1:-1:-1 foregroundColor=200:200:200 fontSize=16>
-	<script>
-	getItemInfo(-1, "title");
-	</script>
-	</text>
-    </itemDisplay>  
+<text offsetXPC=0 offsetYPC=0 widthPC=100 heightPC=100 backgroundColor=-1:-1:-1 foregroundColor=200:200:200 fontSize=16>
+ <script>
+    getItemInfo(-1, "title");
+ </script>
+</text>
+</itemDisplay>  
 
    <backgroundDisplay>
         <image  offsetXPC="0" offsetYPC="0" widthPC="100" heightPC="100">
-                    /home/srjgsql/images/srjgMainMenu.jpg
+	     <script>
+                 print(Jukebox_Path+"/images/srjgMainMenu.jpg");
+             </script>
         </image>
     </backgroundDisplay> 
 
@@ -144,7 +133,7 @@
 <SelectionEntered>
     <link>
        <script>
-           print("http://127.0.0.1/cgi-bin/srjg.cgi?"+mode+"@"+SelTitle+"@"+Jukebox_Size);
+           print("http://127.0.0.1:"+Port+"/cgi-bin/srjg.cgi?"+mode+"@"+SelTitle+"@"+Jukebox_Size);
        </script>
     </link>
 </SelectionEntered>
@@ -155,41 +144,26 @@
 <item>
 <title>Genre</title>
 <selection>genreSelection</selection>
-<image>/home/srjgsql/images/Genre-icon_unfocus.png</image>
-<imageover>/home/srjgsql/images/Genre-icon.png</imageover>
-<itemid>0</itemid>
 </item>
 
 <item>
 <title>Year</title>
 <selection>yearSelection</selection>
-<image>/home/srjgsql/images/Year-icon_unfocus.png</image>
-<imageover>/home/srjgsql/images/Year-icon.png</imageover>
-<itemid>1</itemid>
 </item>
 
 <item>
 <title>Alphabet</title>
 <selection>alphaSelection</selection>
-<image>/home/srjgsql/images/Alpha-icon_unfocus.png</image>
-<imageover>/home/srjgsql/images/Alpha-icon.png</imageover>
-<itemid>2</itemid>
 </item>
 
 <item>
 <title>Recently Added</title>
 <selection>recent</selection>
-<image>/home/srjgsql/images/New-icon_unfocus.png</image>
-<imageover>/home/srjgsql/images/New-icon.png</imageover>
-<itemid>3</itemid>
 </item>
 
 <item>
 <title>Update Jukebox</title>
 <selection>Update</selection>
-<image>/home/srjgsql/images/New-icon_unfocus.png</image>
-<imageover>/home/srjgsql/images/New-icon.png</imageover>
-<itemid>4</itemid>
 </item>
 
 </channel>

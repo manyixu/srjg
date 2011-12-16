@@ -286,7 +286,7 @@ echo -e '
 	<script>
 	    Jukebox_Temp = "/tmp/";
             Category_Title = "'$CategoryTitle'";
-	    Category_Background = "/home/srjgsql/images/background.bmp";						           
+	    Category_Background = "'${Jukebox_Path}'/images/background.bmp";						           
             setFocusItemIndex(0);
             Current_Item_index=0;
             NewView = "'$NewView'";
@@ -439,23 +439,23 @@ cat << EOF
  <script>
   if (getDrawingItemState() == "focus")
   {
-      "/home/srjgsql/images/focus.bmp";
+EOF
+echo -e '"'${Jukebox_Path}'/images/focus.bmp";
   }
   else
   {
-      "/home/srjgsql/images/unfocus.bmp";
+      "'${Jukebox_Path}'/images/unfocus.bmp";
   }
  </script>
-</image>
+</image>'
 
-EOF
 
 if [ "$mode" = "yearSelection" ]; then
-cat << EOF
+echo -e '
 <!-- Top Layer folder.jpg -->
 <image offsetXPC=8.2 offsetYPC=5.5 widthPC=84.25 heightPC=89.25>
  <script>
-  thumbnailPath = "/home/srjgsql/images/yearfolder.jpg";
+  thumbnailPath = "'${Jukebox_Path}'/images/yearfolder.jpg";
   thumbnailPath;
  </script>
 </image>
@@ -463,8 +463,7 @@ cat << EOF
 <script>
 	getItemInfo(-1, "title");
 </script>
-</text>
-EOF
+</text>'
 
 
 else
@@ -486,19 +485,16 @@ cat << EOF
 <NextView>
     <link>
        <script>
-	print("http://127.0.0.1/cgi-bin/srjg.cgi?"+nextmode+"@"+Genre_Title+"@"+Jukebox_Size);
+	print("http://127.0.0.1:$Port/cgi-bin/srjg.cgi?"+nextmode+"@"+Genre_Title+"@"+Jukebox_Size);
        </script>
     </link>
 </NextView>
 
-<cgiscript>
-  <link>http://127.0.0.1/cgi-bin/jukebox_update.cgi</link>  
-</cgiscript>
 
 <SwitchView>
     <link>
        <script>
-           print("http://127.0.0.1/cgi-bin/srjg.cgi?"+mode+"@"+Genre_Title+"@"+NewView);
+           print("http://127.0.0.1:$Port/cgi-bin/srjg.cgi?"+mode+"@"+Genre_Title+"@"+NewView);
        </script>
     </link>
 </SwitchView>
@@ -552,7 +548,7 @@ while read LINE
 do
 echo -e '<item>
      <title>'$LINE'</title>
-     <poster>/home/srjgsql/images/genre/'$LINE'.jpg</poster>
+     <poster>'${Jukebox_Path}'/images/genre/'$LINE'.jpg</poster>
      </item>'
 done < /tmp/genre.list
 fi
@@ -567,7 +563,7 @@ while read LINE
 do
 echo "<item>"
 echo "<title>"$LINE"</title>"
-echo "<poster>/home/srjgsql/images/alpha/JukeMenu_"$LINE".jpg</poster>"
+echo "<poster>"${Jukebox_Path}"/images/alpha/JukeMenu_"$LINE".jpg</poster>"
 echo "</item>"
 done < /tmp/alpha.list
 fi
