@@ -4,7 +4,7 @@
 
 # Reading/parsing xml configuration file and assign variables.
 
-CfgFile=./srjg.cfg
+CfgFile=/usr/local/etc/srjg.cfg
 if [ ! -f "${CfgFile}" ]; then
   echo "Configuration file not found: ${CfgFile}"
   exit 1
