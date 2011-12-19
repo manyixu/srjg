@@ -19,6 +19,7 @@
         Movies_Path = getXMLText("Config", "Movies_Path");
 	Movie_Filter = getXMLText("Config", "Movie_Filter");
 	Port = getXMLText("Config", "Port");
+	Recent_Max = getXMLText("Config", "Recent_Max");
      }
      srjgconf="/tmp/srjg.cfg";	
      tmpconfigArray=null;
@@ -27,6 +28,7 @@
      tmpconfigArray=pushBackStringArray(tmpconfigArray, "Movies_Path="+Movies_Path);
      tmpconfigArray=pushBackStringArray(tmpconfigArray, "Movie_Filter="+Movie_Filter);
      tmpconfigArray=pushBackStringArray(tmpconfigArray, "Port="+Port);
+     tmpconfigArray=pushBackStringArray(tmpconfigArray, "Recent_Max="+Recent_Max);
      writeStringToFile(srjgconf, tmpconfigArray);
 </script>
 
