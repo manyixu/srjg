@@ -522,7 +522,7 @@ ${Sqlite} -separator ''  ${Database}  "SELECT header,IdMovhead,Movie_ID,IdMovFoo
 fi
 
 if [ "$mode" = "recent" ]; then
-${Sqlite} -separator ''  ${Database}  "SELECT header,IdMovhead,Movie_ID,IdMovFoot,title,poster,info,file,footer FROM t1,t2 ORDER BY datestamp DESC LIMIT 12";
+${Sqlite} -separator ''  ${Database}  "SELECT header,IdMovhead,Movie_ID,IdMovFoot,title,poster,info,file,footer FROM t1,t2 ORDER BY datestamp DESC LIMIT "$Recent_Max;
 fi
 
 if [ "$mode" = "yearSelection" ]; then
