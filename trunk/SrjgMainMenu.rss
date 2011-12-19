@@ -30,38 +30,7 @@
      writeStringToFile(srjgconf, tmpconfigArray);
 </script>
 
-<mediaDisplay
-
-        name="photoView"
-	rowCount="5" 
-	columnCount="1" 
-	drawItemText="no" 
-	showHeader="no" 
-	showDefaultInfo="no"
-	menuBorderColor="255:255:255" 
-	sideColorBottom="-1:-1:-1"  
-	sideColorTop="-1:-1:-1"
-        itemAlignt="left"
-        itemOffsetXPC="27.2" 
-	itemOffsetYPC="33.1" 
-	itemWidthPC="17.7" 
-	itemHeightPC="6"
-        backgroundColor="-1:-1:-1" 
-	itemBackgroundColor="-1:-1:-1" 
-	sliding="no" 
-	itemGap="0"
-        idleImageXPC="90" 
-	idleImageYPC="5" 
-	idleImageWidthPC="5" 
-	idleImageHeightPC="8"
-        imageUnFocus="null" 
-	imageParentFocus="null" 
-	imageBorderPC="0" 
-	forceFocusOnItem="no" 
-	cornerRounding="yes"
-        itemBorderColor="-1:-1:-1" 
-	focusBorderColor="-1:-1:-1" 
-	unFocusBorderColor="-1:-1:-1">
+<mediaDisplay name="photoView" rowCount="5" columnCount="1" drawItemText="no" showHeader="no" showDefaultInfo="no" menuBorderColor="255:255:255" sideColorBottom="-1:-1:-1" sideColorTop="-1:-1:-1" itemAlignt="left" itemOffsetXPC="24" itemOffsetYPC="30" itemWidthPC="25" itemHeightPC="7.2" backgroundColor="-1:-1:-1" itemBackgroundColor="-1:-1:-1" sliding="no" itemGap="0" idleImageXPC="90" idleImageYPC="5" idleImageWidthPC="5" idleImageHeightPC="8" imageUnFocus="null" imageParentFocus="null" imageBorderPC="0" forceFocusOnItem="no" cornerRounding="yes" itemBorderColor="-1:-1:-1" focusBorderColor="-1:-1:-1" unFocusBorderColor="-1:-1:-1">
 <idleImage> image/POPUP_LOADING_01.png </idleImage> 
 <idleImage> image/POPUP_LOADING_02.png </idleImage> 
 <idleImage> image/POPUP_LOADING_03.png </idleImage> 
@@ -71,9 +40,7 @@
 <idleImage> image/POPUP_LOADING_07.png </idleImage> 
 <idleImage> image/POPUP_LOADING_08.png </idleImage> 
 
-
-<text redraw="yes" backgroundColor="-1:-1:-1" foregroundColor="200:200:200"
-          offsetXPC="5" offsetYPC="29.4" widthPC="25" heightPC="14" fontSize="16" lines="1">Select Movies by:</text>
+<text redraw="no" backgroundColor="-1:-1:-1" foregroundColor="200:200:200" offsetXPC="5" offsetYPC="27" widthPC="25" heightPC="14" fontSize="16" lines="1">Select Movies by:</text>
 
 <onUserInput>
     <script>
@@ -86,34 +53,27 @@
           mode=urlEncode(mode);
           jumpToLink("SelectionEntered");
           "false";
-      } else if (userInput == "up" ) {
-	  redrawDisplay();
-	  "false";
-      } else if (userInput == "down") {
-	  redrawDisplay();
-	  "false";
-      } 
+      }
      </script>
 </onUserInput>
 
  
 <itemDisplay>
 
-<image offsetXPC=0 offsetYPC=0 widthPC=100 heightPC=100>
-
+<image offsetXPC="0" offsetYPC="0" widthPC="100" heightPC="100">
  <script>
   if (getDrawingItemState() == "focus")
   {
-      print(Jukebox_Path+"/images/Sel_focus_on.png");
+      print(Jukebox_Path+"/images/focus_on.png");
   }
  else
   {
-      print(Jukebox_Path+"/images/MenuItemNF.png");
+      print(Jukebox_Path+"/images/focus_off.png");
   }
  </script>
 </image>
 
-<text offsetXPC=0 offsetYPC=0 widthPC=100 heightPC=100 backgroundColor=-1:-1:-1 foregroundColor=200:200:200 fontSize=16>
+<text redraw="no" offsetXPC="0" offsetYPC="0" widthPC="94" heightPC="100" backgroundColor="-1:-1:-1" foregroundColor="200:200:200" fontSize="16" align="center">
  <script>
     getItemInfo(-1, "title");
  </script>
@@ -121,7 +81,7 @@
 </itemDisplay>  
 
    <backgroundDisplay>
-        <image  offsetXPC="0" offsetYPC="0" widthPC="100" heightPC="100">
+        <image redraw="no" offsetXPC="0" offsetYPC="0" widthPC="100" heightPC="100">
 	     <script>
                  print(Jukebox_Path+"/images/srjgMainMenu.jpg");
              </script>
@@ -168,4 +128,3 @@
 
 </channel>
 </rss>
-
