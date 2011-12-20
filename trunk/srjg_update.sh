@@ -39,6 +39,8 @@ OPTIONS:
            (Optional) ex: -f sample,trailer
    -g      Generate moviesheets, thumbnails and NFO files. (Optional)
            Please refer to ${Jukebox_Path}/imdb.sh for additional settings.
+   -u      Forces the rebuild of the movies database.  If you suspect that your movies.db
+           is corrupted or made changes that require a full database update use -u.
 NOTES:  If any of the arguments have spaces in them they must be surrounded by quotes: ""
     
 EOF
