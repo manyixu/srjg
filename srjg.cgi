@@ -40,9 +40,9 @@ CreateMovieDB()
 # DB as an automatic datestamp but unfortunately it relies on the player having the
 # correct date which can be trivial with some players.
 {
-${Sqlite} ${Database} "create table t1 (Movie_ID INTEGER PRIMARY KEY AUTOINCREMENT,genre TEXT,title TEXT,year TEXT,poster TEXT,info TEXT,file TEXT,dateStamp DATE DEFAULT CURRENT_DATE)";
-${Sqlite} ${Database} "create table t2 (header TEXT, footer TEXT, IdMovhead TEXT, IdMovFoot TEXT)";
-${Sqlite} ${Database} "insert into t2 values ('<item>','</item>','<IdMovie>','</IdMovie>')";
+${Sqlite} ${Database} "create table t1 (Movie_ID INTEGER PRIMARY KEY AUTOINCREMENT,genre TEXT,title TEXT,year TEXT,poster TEXT,info TEXT,file TEXT,watched INTEGER,dateStamp DATE DEFAULT CURRENT_DATE)";
+${Sqlite} ${Database} "create table t2 (header TEXT, footer TEXT, IdMovhead TEXT, IdMovFoot TEXT,WatchedHead TEXT, WatchedFoot TEXT)";
+${Sqlite} ${Database} "insert into t2 values ('<item>','</item>','<IdMovie>','</IdMovie>','<Watched>','</Watched>')";
 }
 
 Force_DB_Creation()
@@ -397,7 +397,7 @@ cat <<EOF
 					jumpToLink("SwitchView");
 					"false";
 					redrawDisplay();
-				}
+				} 
 EOF
 
 	if [ $mode = "genre" ] || [ $mode = "year" ] || [ $mode = "alpha" ] || [ $mode = "recent" ]; then
@@ -406,7 +406,11 @@ EOF
                                         Current_Movie_File=getItemInfo(-1, "file");
                                         playItemURL(Current_Movie_File, 10);
 					"false";
-				} 
+				} else if (userInput == "two") {
+                                        MovieID=getItemInfo(-1, "IdMovie"); 
+					jumpToLink("Watchcgi");
+					"false";
+				}
 EOF
 	fi
 
@@ -467,7 +471,8 @@ echo -e '
 
 
 else
-cat << EOF
+echo -e '
+
 <!-- Top Layer folder.jpg -->
 <image offsetXPC=8.2 offsetYPC=5.5 widthPC=84.25 heightPC=89.25>
  <script>
@@ -475,7 +480,18 @@ cat << EOF
   thumbnailPath;
  </script>
 </image>
-EOF
+
+<!-- Display watched icon -->
+<image offsetXPC=3.2 offsetYPC=3.0 widthPC=20 heightPC=15>
+<script>
+   if (getItemInfo(-1, "Watched") == "1") {
+      "'${Jukebox_Path}'/images/watched.png";
+      }
+   else {
+      "'${Jukebox_Path}'/images/notwatched.png"; }
+</script>
+</image>'
+     
 fi
 
 cat << EOF
@@ -499,6 +515,14 @@ cat << EOF
     </link>
 </SwitchView>
 
+<Watchcgi>
+    <link>
+       <script>
+           print("http://127.0.0.1:$Port/cgi-bin/watch.cgi?"+MovieID);
+       </script>
+    </link>
+</Watchcgi>
+
 <channel>
 	<title><script>Category_Title;</script></title>
 	<link><script>Category_RSS;</script></link>
@@ -507,22 +531,22 @@ EOF
 
 if [ "$mode" = "genre" ]; then
    if [ "$Search" = "All" ]; then
-     ${Sqlite} -separator ''  ${Database}  "SELECT header,IdMovhead,Movie_ID,IdMovFoot,title,poster,info,file,footer FROM t1,t2 ORDER BY title COLLATE NOCASE"; # All Movies
+     ${Sqlite} -separator ''  ${Database}  "SELECT header,IdMovhead,Movie_ID,IdMovFoot,title,poster,info,file,WatchedHead,watched,WatchedFoot,footer FROM t1,t2 ORDER BY title COLLATE NOCASE"; # All Movies
    else
-      ${Sqlite} -separator ''  ${Database}  "SELECT header,IdMovhead,Movie_ID,IdMovFoot,title,poster,info,file,footer FROM t1,t2 WHERE genre LIKE '%$Search%' ORDER BY title COLLATE NOCASE";
+      ${Sqlite} -separator ''  ${Database}  "SELECT header,IdMovhead,Movie_ID,IdMovFoot,title,poster,info,file,WatchedHead,watched,WatchedFoot,footer FROM t1,t2 WHERE genre LIKE '%$Search%' ORDER BY title COLLATE NOCASE";
    fi   
 fi
 
 if [ "$mode" = "alpha" ]; then
-${Sqlite} -separator ''  ${Database}  "SELECT header,IdMovhead,Movie_ID,IdMovFoot,title,poster,info,file,footer FROM t1,t2 WHERE title LIKE '<title>$Search%' ORDER BY title COLLATE NOCASE";
+${Sqlite} -separator ''  ${Database}  "SELECT header,IdMovhead,Movie_ID,IdMovFoot,title,poster,info,file,WatchedHead,watched,WatchedFoot,footer FROM t1,t2 WHERE title LIKE '<title>$Search%' ORDER BY title COLLATE NOCASE";
 fi
 
 if [ "$mode" = "year" ]; then
-${Sqlite} -separator ''  ${Database}  "SELECT header,IdMovhead,Movie_ID,IdMovFoot,title,poster,info,file,footer FROM t1,t2 WHERE year ='$Search' ORDER BY title COLLATE NOCASE";
+${Sqlite} -separator ''  ${Database}  "SELECT header,IdMovhead,Movie_ID,IdMovFoot,title,poster,info,file,WatchedHead,watched,WatchedFoot,footer FROM t1,t2 WHERE year ='$Search' ORDER BY title COLLATE NOCASE";
 fi
 
 if [ "$mode" = "recent" ]; then
-${Sqlite} -separator ''  ${Database}  "SELECT header,IdMovhead,Movie_ID,IdMovFoot,title,poster,info,file,footer FROM t1,t2 ORDER BY datestamp DESC LIMIT "$Recent_Max;
+${Sqlite} -separator ''  ${Database}  "SELECT header,IdMovhead,Movie_ID,IdMovFoot,title,poster,info,file,WatchedHead,watched,WatchedFoot,footer FROM t1,t2 ORDER BY datestamp DESC LIMIT "$Recent_Max;
 fi
 
 if [ "$mode" = "yearSelection" ]; then
