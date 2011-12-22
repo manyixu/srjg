@@ -22,6 +22,8 @@ ln -sf <Jukebox_Path>/srjg.cgi /tmp_orig/www/cgi-bin/srjg.cgi   ..... Probably w
 
 mount -o remount,rw /
 
-Step 4) Create a new entry in your /usr/local/bin/script/menu.rss to be able to launch <Jukebox_Path>/srjgMainMenu.rss from there.
+Step 4) Create a symbolic link for the watch.cgi under your web server cgi-bin directory. Same as step 3) but using watch.cgi instead of srjg.cgi.
+
+Step 5) Create a new entry in your /usr/local/bin/script/menu.rss to be able to launch <Jukebox_Path>/srjgMainMenu.rss from there.
 
 More detail explanation will be available once srjg is ready to be release.
