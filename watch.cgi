@@ -12,8 +12,10 @@ Sqlite=${Jukebox_Path}"/sqlite3"
 echo -e '
 <?xml version="1.0" ?>
 <rss version="2.0" xmlns:dc="http://purl.org/dc/elements/1.1/">
+<onEnter>
 redrawDisplay();
-postMessage("return");'
+postMessage("return");
+</onEnter>'
 
 watch="`${Sqlite} -separator ''  ${Database}  "SELECT Watched FROM t1 WHERE Movie_ID like '$QUERY'";`"
 
