@@ -297,39 +297,39 @@ echo -e '
 	</script>
 
 <mediaDisplay
-    	name=photoView
+    	name="photoView"
 
-	rowCount='$row'
-	columnCount='$col'
-	imageFocus=null
-	showHeader=no
-	showDefaultInfo=no
-	drawItemBorder=no
+	rowCount="'$row'"
+	columnCount="'$col'"
+	imageFocus="null"
+	showHeader="no"
+	showDefaultInfo="no"
+	drawItemBorder="no"
 
-	viewAreaXPC=0
-	viewAreaYPC=0
-	viewAreaWidthPC=100
-	viewAreaHeightPC=100
+	viewAreaXPC="0"
+	viewAreaYPC="0"
+	viewAreaWidthPC="100"
+	viewAreaHeightPC="100"
 
-	itemGapXPC=0.7
-	itemGapYPC=1
-	itemWidthPC='$itemWidth'
-	itemHeightPC='$itemHeight'
-	itemOffsetXPC=5.5
-	itemOffsetYPC=12.75
-	itemBorderPC=0
-	itemBorderColor=7:99:176
-	itemBackgroundColor=-1:-1:-1
+	itemGapXPC="0.7"
+	itemGapYPC="1"
+	itemWidthPC="'$itemWidth'"
+	itemHeightPC="'$itemHeight'"
+	itemOffsetXPC="5.5"
+	itemOffsetYPC="12.75"
+	itemBorderPC="0"
+	itemBorderColor="7:99:176"
+	itemBackgroundColor="-1:-1:-1"
 
-	sideTopHeightPC=0
-	sideBottomHeightPC=0
-	bottomYPC=100
+	sideTopHeightPC="0"
+	sideBottomHeightPC="0"
+	bottomYPC="100"
 
-	idleImageXPC=67.81
-	idleImageYPC=89.17
-	idleImageWidthPC=4.69
-	idleImageHeightPC=4.17
-	backgroundColor=0:0:0
+	idleImageXPC="67.81"
+	idleImageYPC="89.17"
+	idleImageWidthPC="4.69"
+	idleImageHeightPC="4.17"
+	backgroundColor="0:0:0"
 
      >
 
@@ -419,7 +419,7 @@ cat << EOF
 		</onUserInput>
 
 <!-- Show Folder Name -->
-<text offsetXPC=7 offsetYPC=88.8 widthPC=60 heightPC=5 fontSize=14 useBackgroundSurface=yes foregroundColor=195:196:195 redraw=yes lines=1>
+<text offsetXPC="7" offsetYPC="88.8" widthPC="60" heightPC="5" fontSize="14" useBackgroundSurface="yes" foregroundColor="195:196:195" redraw="yes" lines="1">
  <script>
     displayTitle = getItemInfo(-1, "title"); 
     displayTitle;
@@ -428,7 +428,7 @@ cat << EOF
 
 
 <!-- Show Page Info -->
-<text offsetXPC=85 offsetYPC=88.8 widthPC=8 heightPC=5 fontSize=14 foregroundColor=195:196:195 useBackgroundSurface=yes redraw=yes lines=1>
+<text offsetXPC="85" offsetYPC="88.8" widthPC="8" heightPC="5" fontSize="14" foregroundColor="195:196:195" useBackgroundSurface="yes" redraw="yes" lines="1">
  <script>
   pageInfo = Add(getFocusItemIndex(),1) + "/" + Jukebox_itemSize;
   pageInfo;
@@ -438,7 +438,7 @@ cat << EOF
 <itemDisplay>
 
 <!-- Bottom Layer focus/unfocus -->
-<image offsetXPC=0 offsetYPC=0 widthPC=100 heightPC=100>
+<image offsetXPC="0" offsetYPC="0" widthPC="100" heightPC="100">
 
  <script>
   if (getDrawingItemState() == "focus")
@@ -457,13 +457,13 @@ echo -e '"'${Jukebox_Path}'/images/focus.bmp";
 if [ "$mode" = "yearSelection" ]; then
 echo -e '
 <!-- Top Layer folder.jpg -->
-<image offsetXPC=8.2 offsetYPC=5.5 widthPC=84.25 heightPC=89.25>
+<image offsetXPC="8.2" offsetYPC="5.5" widthPC="84.25" heightPC="89.25">
  <script>
   thumbnailPath = "'${Jukebox_Path}'/images/yearfolder.jpg";
   thumbnailPath;
  </script>
 </image>
-<text offsetXPC="4" offsetYPC="16" widthPC="105" heightPC="20" fontSize="12" align="center"foregroundColor="0:0:0">
+<text offsetXPC="4" offsetYPC="16" widthPC="105" heightPC="20" fontSize="12" align="center" foregroundColor="0:0:0">
 <script>
 	getItemInfo(-1, "title");
 </script>
@@ -474,7 +474,7 @@ else
 echo -e '
 
 <!-- Top Layer folder.jpg -->
-<image offsetXPC=8.2 offsetYPC=5.5 widthPC=84.25 heightPC=89.25>
+<image offsetXPC="8.2" offsetYPC="5.5" widthPC="84.25" heightPC="89.25">
  <script>
   thumbnailPath = getItemInfo(-1, "poster");
   thumbnailPath;
@@ -482,7 +482,7 @@ echo -e '
 </image>
 
 <!-- Display watched icon -->
-<image offsetXPC=3.2 offsetYPC=3.0 widthPC=20 heightPC=15>
+<image offsetXPC="3.2" offsetYPC="3.0" widthPC="20" heightPC="15">
 <script>
    if (getItemInfo(-1, "Watched") == "1") {
       "'${Jukebox_Path}'/images/watched.png";
@@ -611,7 +611,4 @@ else
   fi
 fi
 exit 0
-
-
-
 
