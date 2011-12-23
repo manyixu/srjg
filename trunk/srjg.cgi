@@ -439,16 +439,24 @@ cat << EOF
 
 <!-- Bottom Layer focus/unfocus -->
 <image offsetXPC="0" offsetYPC="0" widthPC="100" heightPC="100">
-
+EOF
+echo -e'
  <script>
   if (getDrawingItemState() == "focus")
-  {
-EOF
-echo -e '"'${Jukebox_Path}'/images/focus.bmp";
+  { if (getItemInfo(-1, "Watched") == "1") {
+      "'${Jukebox_Path}'/images/focus_watched.jpg";
+      }
+    else {
+      "'${Jukebox_Path}'/images/focus.bmp";
+      }
   }
   else
-  {
+  { if (getItemInfo(-1, "Watched") == "1") {
+      "'${Jukebox_Path}'/images/unfocus_watched.jpg";
+      }
+    else {
       "'${Jukebox_Path}'/images/unfocus.bmp";
+      }
   }
  </script>
 </image>'
