@@ -32,7 +32,7 @@
      writeStringToFile(srjgconf, tmpconfigArray);
 </script>
 
-<mediaDisplay name="photoView" rowCount="5" columnCount="1" drawItemText="no" showHeader="no" showDefaultInfo="no" menuBorderColor="255:255:255" sideColorBottom="-1:-1:-1" sideColorTop="-1:-1:-1" itemAlignt="left" itemOffsetXPC="24" itemOffsetYPC="30" itemWidthPC="25" itemHeightPC="7.2" backgroundColor="-1:-1:-1" itemBackgroundColor="-1:-1:-1" sliding="no" itemGap="0" idleImageXPC="90" idleImageYPC="5" idleImageWidthPC="5" idleImageHeightPC="8" imageUnFocus="null" imageParentFocus="null" imageBorderPC="0" forceFocusOnItem="no" cornerRounding="yes" itemBorderColor="-1:-1:-1" focusBorderColor="-1:-1:-1" unFocusBorderColor="-1:-1:-1">
+<mediaDisplay name="photoView" rowCount="6" columnCount="1" drawItemText="no" showHeader="no" showDefaultInfo="no" menuBorderColor="255:255:255" sideColorBottom="-1:-1:-1" sideColorTop="-1:-1:-1" itemAlignt="left" itemOffsetXPC="24" itemOffsetYPC="30" itemWidthPC="25" itemHeightPC="7.2" backgroundColor="-1:-1:-1" itemBackgroundColor="-1:-1:-1" sliding="no" itemGap="0" idleImageXPC="90" idleImageYPC="5" idleImageWidthPC="5" idleImageHeightPC="8" imageUnFocus="null" imageParentFocus="null" imageBorderPC="0" forceFocusOnItem="no" cornerRounding="yes" itemBorderColor="-1:-1:-1" focusBorderColor="-1:-1:-1" unFocusBorderColor="-1:-1:-1">
 <idleImage> image/POPUP_LOADING_01.png </idleImage> 
 <idleImage> image/POPUP_LOADING_02.png </idleImage> 
 <idleImage> image/POPUP_LOADING_03.png </idleImage> 
@@ -121,6 +121,11 @@
 <item>
 <title>Recently Added</title>
 <selection>recent</selection>
+</item>
+
+<item>
+<title>Not Watched</title>
+<selection>notwatched</selection>
 </item>
 
 <item>

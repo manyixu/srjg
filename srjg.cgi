@@ -30,7 +30,7 @@ SetVar()
 [ $mode = "yearSelection" ] && nextmode="year";
 [ $mode = "alphaSelection" ] && nextmode="alpha";
 
-if [ $mode = "genre" ] || [ $mode = "year" ] || [ $mode = "alpha" ] || [ $mode = "recent" ]; then
+if [ $mode = "genre" ] || [ $mode = "year" ] || [ $mode = "alpha" ] || [ $mode = "recent" ] || [ $mode = "notwatched" ]; then
   nextmode="moviesheet";
 fi
 }
@@ -201,7 +201,7 @@ echo -e '
 
 
 MoviesheetView()
-#Display moviesheet  (Currently does not work)
+#Display moviesheet
 {
 echo -e "
 <onEnter>showIdle();</onEnter> 
@@ -400,7 +400,7 @@ cat <<EOF
 				} 
 EOF
 
-	if [ $mode = "genre" ] || [ $mode = "year" ] || [ $mode = "alpha" ] || [ $mode = "recent" ]; then
+	if [ $mode = "genre" ] || [ $mode = "year" ] || [ $mode = "alpha" ] || [ $mode = "recent" ] || [ $mode = "notwatched" ]; then
 	  cat <<EOF     
 				  else if (userInput == "video_play") {
                                         Current_Movie_File=getItemInfo(-1, "file");
@@ -555,6 +555,10 @@ fi
 
 if [ "$mode" = "recent" ]; then
 ${Sqlite} -separator ''  ${Database}  "SELECT header,IdMovhead,Movie_ID,IdMovFoot,title,poster,info,file,WatchedHead,watched,WatchedFoot,footer FROM t1,t2 ORDER BY datestamp DESC LIMIT "$Recent_Max;
+fi
+
+if [ "$mode" = "notwatched" ]; then
+${Sqlite} -separator ''  ${Database}  "SELECT header,IdMovhead,Movie_ID,IdMovFoot,title,poster,info,file,WatchedHead,watched,WatchedFoot,footer FROM t1,t2 WHERE watched <>'1' OR watched IS NULL ORDER BY title COLLATE NOCASE";
 fi
 
 if [ "$mode" = "yearSelection" ]; then
