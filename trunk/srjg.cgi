@@ -181,6 +181,36 @@ GenerateInsDelFiles;
 [[ -s $InsertList ]] && DBMovieInsert
 }
 
+WatchedToggle()
+# Toggle the state of the watched field in the Database.
+{
+echo -e '
+<?xml version="1.0" ?>
+<rss version="2.0" xmlns:dc="http://purl.org/dc/elements/1.1/">
+<onEnter>
+showIdle();
+postMessage("return");
+</onEnter>'
+
+watch="`${Sqlite} -separator ''  ${Database}  "SELECT Watched FROM t1 WHERE Movie_ID like '$CategoryTitle'";`"
+
+if [ $watch == "1" ]; then
+      watch="0";
+else
+     watch="1";
+fi
+
+${Sqlite} ${Database} "UPDATE t1 set Watched=$watch WHERE Movie_ID like '$CategoryTitle'";
+
+echo -e '
+<channel>
+<item>
+</item>
+</channel>
+</rss>'
+
+exit 0
+}
 
 Header()
 #Insert RSS Header
@@ -526,7 +556,7 @@ cat << EOF
 <Watchcgi>
     <link>
        <script>
-           print("http://127.0.0.1:$Port/cgi-bin/watch.cgi?"+MovieID);
+           print("http://127.0.0.1:$Port/cgi-bin/srjg.cgi?togglewatch@"+MovieID+"@"+Jukebox_Size);
        </script>
     </link>
 </Watchcgi>
@@ -608,6 +638,9 @@ fi
 
 #***********************Main Program*********************************
 
+if [ "$mode" = "togglewatch" ]; then
+   WatchedToggle;
+fi
 if [ "$mode" = "Update" ]; then
   Update;
 else
