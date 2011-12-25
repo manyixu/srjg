@@ -16,7 +16,7 @@ IMDB_MODE="all"							# all: Generate everything (moviesheet, nfo, poster)
 										# nfo: Generate .nfo file only
 										# poster: Generate only poster
 										
-IMDB_TITLE="directory"					# directory: Use directory name for IMDB search
+IMDB_TITLE="filename"					# directory: Use directory name for IMDB search
 										# filename: Use filename for IMDB search
 
 
@@ -61,49 +61,55 @@ do
 	fi
 	
 	
-	# Replace special characters with plus sign
-    MOVIENAME=`echo $MOVIENAMETEMP | sed "s/[ &']/+/g"`
+	# Remove CD parts and replace special characters with plus sign
+    MOVIENAME=`echo $MOVIENAMETEMP | sed "s/[cC][dD]*[1-9]//g" | sed "s/[ &']/+/g"`
 	
 	# Download poster
 	if ( [ -n $POSTER ] && [ ! -e "$MOVIEPATH/folder.jpg" ] && [ ! -e "$MOVIEPATH/${MOVIEFILE}.jpg" ] )
 	then
 		echo "Processing $MOVIENAMETEMP poster.."
-		wget -q "$IMDB_LINK$MOVIENAME$IMDB_POSTER" -O "$MOVIEPATH/${MOVIEFILE}.jpg" ;
-		
-		# TODO: Check generated poster
-		#if ( [ -e "$MOVIEPATH/$IMDB_DEFPOSTER" ] && [ "`du "$MOVIEPATH/$IMDB_DEFPOSTER" | cut -f1`" -lt 2000 ] )
-		#then
-		#	cat "$MOVIEPATH/$IMDB_DEFPOSTER"
-		#	rm -f "$MOVIEPATH/$IMDB_DEFPOSTER"
-		#fi
+		NAME="$MOVIEPATH/${MOVIEFILE}.jpg"
+		wget -q "$IMDB_LINK$MOVIENAME$IMDB_POSTER" -O "$NAME";
+
+		# Check generated poster
+		SIZE=`du "$NAME" | cut -f1`
+		if ( [ -e "$NAME" ] && [ $SIZE -lt 9 ] )
+		then
+			echo `cat "$NAME"`
+			rm -f "$NAME"
+		fi
 	fi
 
 	# Download moviesheet
 	if ( [ -n $MOVIESHEET ] && [ ! -e "$MOVIEPATH/about.jpg" ] && [ ! -e "$MOVIEPATH/0001.jpg" ] && [ ! -e "$MOVIEPATH/${MOVIEFILE}_sheet.jpg" ] )
 	then
 		echo "Processing $MOVIENAMETEMP moviesheet.."
-		wget -q "$IMDB_LINK$MOVIENAME$IMDB_MOVIE" -O "$MOVIEPATH/${MOVIEFILE}_sheet.jpg" ;
+		NAME="$MOVIEPATH/${MOVIEFILE}_sheet.jpg"
+		wget -q "$IMDB_LINK$MOVIENAME$IMDB_MOVIE" -O "$NAME" ;
 		
-		# TODO: Check generated moviesheet
-		#if ( [ -e "$MOVIEPATH/$IMDB_DEFMOVIE" ] && [ "`du "$MOVIEPATH/$IMDB_DEFMOVIE" | cut -f1`" -lt 2000 ] )
-		#then
-		#	cat "$MOVIEPATH/$IMDB_DEFMOVIE"
-		#	rm -f "$MOVIEPATH/$IMDB_DEFMOVIE"
-		#fi
+		# Check generated moviesheet
+		SIZE=`du "$NAME" | cut -f1`
+		if ( [ -e "$NAME" ] && [ $SIZE -lt 9 ] )
+		then
+			echo `cat "$NAME"`
+			rm -f "$NAME"
+		fi
 	fi
 	
 	# Download NFO file
 	if ( [ -n $INFO ] && [ ! -e "$MOVIEPATH/$MOVIEFILE.nfo" ] && [ ! -e "$MOVIEPATH/MovieInfo.nfo" ] )
 	then
 		echo "Processing $MOVIENAMETEMP nfo file.."
-		wget -q "$IMDB_LINK$MOVIENAME$IMDB_INFO" -O "$MOVIEPATH/${MOVIEFILE}.nfo" ;
+		NAME="$MOVIEPATH/${MOVIEFILE}.nfo"
+		wget -q "$IMDB_LINK$MOVIENAME$IMDB_INFO" -O "$NAME" ;
 		
-		# TODO: Check generated nfo file (at least if <title> section exists)
-		#if ( [ -e "$MOVIEPATH/$IMDB_DEFMOVIE" ] && [ "`du "$MOVIEPATH/$IMDB_DEFMOVIE" | cut -f1`" -lt 2000 ] )
-		#then
-		#	cat "$MOVIEPATH/$IMDB_DEFMOVIE"
-		#	rm -f "$MOVIEPATH/$IMDB_DEFMOVIE"
-		#fi
+		# Check generated nfo file
+		PATT=`grep title "$NAME"`
+		if ( [ -e "$NAME" ] && [ -z "$PATT" ] )
+		then
+			echo `cat "$NAME"`
+			rm -f "$NAME"
+		fi
 	fi
 	
 done < "$IMDB_TMP"
