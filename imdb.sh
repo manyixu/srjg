@@ -72,8 +72,8 @@ do
 		wget -q "$IMDB_LINK$MOVIENAME$IMDB_POSTER" -O "$NAME";
 
 		# Check generated poster
-		SIZE=`du "$NAME" | cut -f1`
-		if ( [ -e "$NAME" ] && [ $SIZE -lt 9 ] )
+		PATT=`grep Movie "$NAME"`
+		if ( [ -e "$NAME" ] && [ -n "$PATT" ] )
 		then
 			echo `cat "$NAME"`
 			rm -f "$NAME"
@@ -88,8 +88,8 @@ do
 		wget -q "$IMDB_LINK$MOVIENAME$IMDB_MOVIE" -O "$NAME" ;
 		
 		# Check generated moviesheet
-		SIZE=`du "$NAME" | cut -f1`
-		if ( [ -e "$NAME" ] && [ $SIZE -lt 9 ] )
+		PATT=`grep Movie "$NAME"`
+		if ( [ -e "$NAME" ] && [ -n "$PATT" ] )
 		then
 			echo `cat "$NAME"`
 			rm -f "$NAME"
