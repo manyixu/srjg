@@ -6,7 +6,7 @@ SAVEIFS=$IFS
 IFS="@"
 set -- $QUERY
 mode=`echo $1`
-CategoryTitle=`echo $2 | sed "s/%20/ /g`
+CategoryTitle=`echo $2 | sed "s/%2d/-/g" | sed "s/%20/ /g"`
 Jukebox_Size=`echo $3`
 IFS=$SAVEIFS
 if [ $mode = "genre" ]; then
