@@ -2,6 +2,7 @@
 # Simple RSS Jukebox Generator -> DB to HTML converter
 # Author: mikka [mika.hellmann@gmail.com]
 # Modified by Snappy46 [levesque.marcel@gmail.com]
+# Demo: http://members.home.nl/hellmann/
 
 # Default SRJG poster and moviesheet
 DEFPOSTER="/usr/local/etc/srjg/nofolder.bmp"
