@@ -1,0 +1,10 @@
+<?xml encoding="UTF-8" version="1.0"?>
+<main>
+	<alphabet>Alphabet</alphabet>
+	<genre>Genre</genre>
+	<recent>Recently Added</recent>
+	<select>Select Movies by:</select>
+	<update>Update Jukebox</update>
+	<watched>Not Watched</watched>
+	<year>Year</year>
+</main>

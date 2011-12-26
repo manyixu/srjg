@@ -13,7 +13,7 @@
         Config_itemSize = getXMLElementCount("Config");
 	}
      if (Config_itemSize > 0) {
-	Language = getXMLText("Config", "lang");
+	Language = getXMLText("Config", "Lang");
         Jukebox_Path = getXMLText("Config", "Jukebox_Path");
  	Jukebox_Size = getXMLText("Config", "Jukebox_Size");
         Movies_Path = getXMLText("Config", "Movies_Path");
@@ -21,6 +21,20 @@
 	Port = getXMLText("Config", "Port");
 	Recent_Max = getXMLText("Config", "Recent_Max");
      }
+	 
+	 langpath = Jukebox_Path + "/lang/" + Language;
+	 langfile = loadXMLFile(langpath);
+	 if (langfile != null)
+	 {
+		main_alphabet = getXMLText("main", "alphabet");
+		main_genre = getXMLText("main", "genre");
+		main_recent = getXMLText("main", "recent");
+		main_select = getXMLText("main", "select");
+		main_update = getXMLText("main", "update");
+		main_watched = getXMLText("main", "watched");
+		main_year = getXMLText("main", "year");
+	 }
+	 
      srjgconf="/tmp/srjg.cfg";	
      tmpconfigArray=null;
      tmpconfigArray=pushBackStringArray(tmpconfigArray, "Language="+Language);
@@ -42,7 +56,11 @@
 <idleImage> image/POPUP_LOADING_07.png </idleImage> 
 <idleImage> image/POPUP_LOADING_08.png </idleImage> 
 
-<text redraw="no" backgroundColor="-1:-1:-1" foregroundColor="200:200:200" offsetXPC="5" offsetYPC="27" widthPC="25" heightPC="14" fontSize="16" lines="1">Select Movies by:</text>
+<text redraw="no" backgroundColor="-1:-1:-1" foregroundColor="200:200:200" offsetXPC="5" offsetYPC="27" widthPC="19" heightPC="14" fontSize="16" lines="1" align="right">
+	<script>
+		print(main_select);
+	</script>
+</text>
 
 <onUserInput>
     <script>
@@ -101,35 +119,59 @@
 </SelectionEntered>
 
 <channel>
-<title>Main Menu</title>
+<title>Main menu</title>
 
 <item>
-<title>Genre</title>
+<title>
+	<script>
+		print(main_genre);
+	</script>
+</title>
 <selection>genreSelection</selection>
 </item>
 
 <item>
-<title>Year</title>
+<title>
+	<script>
+		print(main_year);
+	</script>
+</title>
 <selection>yearSelection</selection>
 </item>
 
 <item>
-<title>Alphabet</title>
+<title>
+	<script>
+		print(main_alphabet);
+	</script>
+</title>
 <selection>alphaSelection</selection>
 </item>
 
 <item>
-<title>Recently Added</title>
+<title>
+	<script>
+		print(main_recent);
+	</script>
+</title>
 <selection>recent</selection>
 </item>
 
 <item>
-<title>Not Watched</title>
+<title>
+	<script>
+		print(main_watched);
+	</script>
+</title>
 <selection>notwatched</selection>
 </item>
 
 <item>
-<title>Update Jukebox</title>
+<title>
+	<script>
+		print(main_update);
+	</script>
+</title>
 <selection>Update</selection>
 </item>
 
