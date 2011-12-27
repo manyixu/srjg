@@ -1,0 +1,10 @@
+<?xml encoding="UTF-8" version="1.0"?>
+<main>
+	<alphabet>Alphabet</alphabet>
+	<genre>Genre</genre>
+	<recent>Ajouter Récemment</recent>
+	<select>Sélection par:</select>
+	<update>Mise à Jour</update>
+	<watched>Pas Regardé</watched>
+	<year>Année</year>
+</main>
