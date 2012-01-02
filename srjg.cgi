@@ -303,10 +303,19 @@ DisplayRss()
 #Display many of the RSS required based on various parameters/variables
 {
 if [ $Jukebox_Size = "2x6" ]; then
-   row="2"; col="6"; itemWidth="14.06"; itemHeight="35.42";
+   row="2"; col="6"; itemWidth="14.06"; itemHeight="35.42"; itemXPC="5.5"; itemYPC="12.75";
+   NewView="sheetwall";
+   
+elif [ $Jukebox_Size = "sheetwall" ]; then
+   row="1"; col="8"; itemWidth="10.3"; itemHeight="20"; itemXPC="5.5"; itemYPC="80";
+   NewView="sheetmovie";
+   
+ elif [ $Jukebox_Size = "sheetmovie" ]; then
+   row="1"; col="8"; itemWidth="10.3"; itemHeight="20"; itemXPC="5.5"; itemYPC="20";
    NewView="3x8";
+   
 else
-   row="3"; col="8"; itemWidth="10.3"; itemHeight="23.42";
+   row="3"; col="8"; itemWidth="10.3"; itemHeight="23.42"; itemXPC="5.5"; itemYPC="12.75";
    NewView="2x6";
 fi
    
@@ -345,8 +354,8 @@ echo -e '
 	itemGapYPC="1"
 	itemWidthPC="'$itemWidth'"
 	itemHeightPC="'$itemHeight'"
-	itemOffsetXPC="5.5"
-	itemOffsetYPC="12.75"
+	itemOffsetXPC="'$itemXPC'"
+	itemOffsetYPC="'$itemYPC'"
 	itemBorderPC="0"
 	itemBorderColor="7:99:176"
 	itemBackgroundColor="-1:-1:-1"
@@ -372,6 +381,8 @@ echo -e '
 		<idleImage> image/POPUP_LOADING_07.png </idleImage>
 		<idleImage> image/POPUP_LOADING_08.png </idleImage>'
 
+
+if ([ $Jukebox_Size = "2x6" ] ||  [ $Jukebox_Size = ""3x8"" ]); then		
 cat <<EOF
 		<backgroundDisplay>
                         <script>
@@ -392,7 +403,41 @@ cat <<EOF
 			    print(Category_Title);
 			</script>
 		</text>
+EOF
 
+elif [ $Jukebox_Size = "sheetwall" ]; then
+cat <<EOF
+		<backgroundDisplay>
+                        <script>
+                                Jukebox_itemSize = getPageInfo("itemCount"); 
+			</script>    
+		</backgroundDisplay>
+		
+		<image redraw="yes" offsetXPC="0" offsetYPC="0" widthPC="100" heightPC="80">
+				<script>
+					getItemInfo(-1, "info");
+				</script>
+</image>
+EOF
+
+else
+cat <<EOF
+		<backgroundDisplay>
+                        <script>
+                                Jukebox_itemSize = getPageInfo("itemCount"); 
+			</script>    
+		</backgroundDisplay>
+		
+		<image redraw="yes" offsetXPC="0" offsetYPC="0" widthPC="100" heightPC="100">
+				<script>
+					getItemInfo(-1, "info");
+				</script>
+</image>
+EOF
+
+fi
+	
+cat <<EOF	
 	<onUserInput>
 			<script>
 				userInput = currentUserInput();
@@ -447,7 +492,11 @@ EOF
 cat << EOF 
 			</script>
 		</onUserInput>
+EOF
 
+
+if ([ $Jukebox_Size = "2x6" ] ||  [ $Jukebox_Size = ""3x8"" ]); then
+cat << EOF 
 <!-- Show Folder Name -->
 <text offsetXPC="7" offsetYPC="88.8" widthPC="60" heightPC="5" fontSize="14" useBackgroundSurface="yes" foregroundColor="195:196:195" redraw="yes" lines="1">
  <script>
@@ -466,7 +515,16 @@ cat << EOF
 </text>
 
 <itemDisplay>
+EOF
 
+else
+cat << EOF 
+<itemDisplay>
+EOF
+
+fi
+
+cat << EOF 
 <!-- Bottom Layer focus/unfocus -->
 <image offsetXPC="0" offsetYPC="0" widthPC="100" heightPC="100">
 EOF
