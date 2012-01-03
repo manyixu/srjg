@@ -233,70 +233,38 @@ echo -e '
 MoviesheetView()
 #Display moviesheet
 {
-echo -e "
-<onEnter>showIdle();</onEnter> 
-<mediaDisplay name='onePartView' 
-itemBackgroundColor='0:0:0' 
-backgroundColor='0:0:0' 
-sideColorBottom='0:0:0' 
-sideColorTop='0:0:0' 
-sideTopHeightPC='0' 
-sideBottomHeightPC='0' 
-itemGap='0' 
-itemGapXPC='0' 
-itemGapYPC='0' 
-itemWidthPC='9' 
-itemHeightPC='5.7' 
-itemBorderPC='1' 
-rowCount='1' 
-columnCount='1' 
-itemPerPage='1' 
-imageBorderPC='0' 
-itemBorderColor='-1:-1:-1' 
-itemImageWidthPC='0' 
-itemImageHeightPC='0' 
-itemXPC='100' 
-itemYPC='100' 
-centerHeightPC='100' 
-showHeader='no' 
-showDefaultInfo='no' 
-idleImageWidthPC='9' 
-idleImageHeightPC='16' 
-> 
-<idleImage> image/POPUP_LOADING_01.png </idleImage> 
-<idleImage> image/POPUP_LOADING_02.png </idleImage> 
-<idleImage> image/POPUP_LOADING_03.png </idleImage> 
-<idleImage> image/POPUP_LOADING_04.png </idleImage> 
-<idleImage> image/POPUP_LOADING_05.png </idleImage> 
-<idleImage> image/POPUP_LOADING_06.png </idleImage> 
-<idleImage> image/POPUP_LOADING_07.png </idleImage> 
-<idleImage> image/POPUP_LOADING_08.png </idleImage> 
-<backgroundDisplay> 
-<image offsetXPC='0' offsetYPC='0' widthPC='100' heightPC='100' >"
-${Sqlite} -separator ''  ${Database}  "SELECT info FROM t1 WHERE Movie_ID like '$Search'" | sed '/<info/!d;s:.*>\(.*\)</.*:\1:'| grep "[!-~]";
-echo -e '</image> 
-</backgroundDisplay> 
+ImgLink="`${Sqlite} -separator ''  ${Database}  "SELECT info FROM t1 WHERE Movie_ID like '$Search'" | sed '/<info/!d;s:.*>\(.*\)</.*:\1:'| grep "[!-~]";`"
+FileLink="`${Sqlite} -separator ''  ${Database}  "SELECT file FROM t1 WHERE Movie_ID like '$Search'" | sed '/<file/!d;s:.*>\(.*\)</.*:\1:'| grep "[!-~]";`"
+
+cat <<EOF
+<onEnter>showIdle();</onEnter>
+<mediaDisplay name="onePartView" backgroundColor="0:0:0" sideColorBottom="0:0:0" sideColorTop="0:0:0" sideTopHeightPC="0" sideBottomHeightPC="0" imageBorderPC="0" centerHeightPC="100" showHeader="no" showDefaultInfo="no" idleImageWidthPC="9" idleImageHeightPC="16">
+<idleImage> image/POPUP_LOADING_01.png </idleImage>
+<idleImage> image/POPUP_LOADING_02.png </idleImage>
+<idleImage> image/POPUP_LOADING_03.png </idleImage>
+<idleImage> image/POPUP_LOADING_04.png </idleImage>
+<idleImage> image/POPUP_LOADING_05.png </idleImage>
+<idleImage> image/POPUP_LOADING_06.png </idleImage>
+<idleImage> image/POPUP_LOADING_07.png </idleImage>
+<idleImage> image/POPUP_LOADING_08.png </idleImage>
+<backgroundDisplay>
+<image redraw="no" offsetXPC="0" offsetYPC="0" widthPC="100" heightPC="100">$ImgLink</image>
+</backgroundDisplay>
 <onUserInput>
-<script> 
+<script>
 userInput = currentUserInput();
-if (userInput == "enter") { 
-    Current_Movie_File=getItemInfo(-1, "file");
-    playItemURL(Current_Movie_File, 10);
+if (userInput == "enter") {
+    playItemURL("$FileLink", 10);
     "true";
-} 
-else if (userInput == "left") {"true"; } 
-else if (userInput == "right") {"true"; }
-
-</script> 
-</onUserInput>
-</mediaDisplay> 
-<channel> 
-<item>
-<title>Movies</title>'
-${Sqlite} -separator ''  ${Database}  "SELECT file FROM t1 WHERE Movie_ID like '$Search'";
-echo -e "</item>"
 }
+else if (userInput == "left" || userInput == "right") {"true"; }
 
+</script>
+</onUserInput>
+</mediaDisplay>
+<channel>
+EOF
+}
 
 
 DisplayRss()
