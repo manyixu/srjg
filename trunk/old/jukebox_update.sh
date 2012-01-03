@@ -168,7 +168,7 @@ echo -e '﻿<?xml version="1.0" encoding="UTF-8"?>
   <Temp>/tmp/</Temp>
   <Version>5.0</Version>
   <Category>
-    <background>/usr/local/etc/srjg/background.bmp</background>
+    <background>/usr/local/etc/srjg/background.jpg</background>
     <title>'$TITLE'</title>
     <link>Jukebox.rss</link>
     <MovieInfo_Template>MovieInfo_Template.rss</MovieInfo_Template>
@@ -187,8 +187,8 @@ do
 
 
         MOVIETITLE="$MOVIENAME</title>"
-        MOVIESHEET=/usr/local/etc/srjg/NoMovieinfo.bmp
-        MOVIEPOSTER=/usr/local/etc/srjg/nofolder.bmp
+        MOVIESHEET=/usr/local/etc/srjg/NoMovieinfo.jpg
+        MOVIEPOSTER=/usr/local/etc/srjg/nofolder.jpg
 
         if [ -e "$MOVIEPATH/MovieInfo.nfo" ]
         then

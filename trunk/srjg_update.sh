@@ -166,8 +166,8 @@ do
 
    # Initialize defaults, replace later
    MOVIETITLE="$MOVIENAME</title>"
-   MOVIESHEET=${Jukebox_Path}/images/NoMovieinfo.bmp
-   MOVIEPOSTER=${Jukebox_Path}/images/nofolder.bmp
+   MOVIESHEET=${Jukebox_Path}/images/NoMovieinfo.jpg
+   MOVIEPOSTER=${Jukebox_Path}/images/nofolder.jpg
    GENRE="<name>Unknown</name>"
    MovieYear=""
 		

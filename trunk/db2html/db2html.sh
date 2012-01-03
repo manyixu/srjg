@@ -5,8 +5,8 @@
 # Demo: http://members.home.nl/hellmann/
 
 # Default SRJG poster and moviesheet
-DEFPOSTER="/usr/local/etc/srjg/nofolder.bmp"
-DEFSHEET="/usr/local/etc/srjg/NoMovieinfo.bmp"
+DEFPOSTER="/usr/local/etc/srjg/nofolder.jpg"
+DEFSHEET="/usr/local/etc/srjg/NoMovieinfo.jpg"
 
 # Paths
 DB2HTML="/usr/local/etc/srjg/db2html"			# Main path to db2html

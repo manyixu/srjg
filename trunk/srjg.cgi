@@ -123,8 +123,8 @@ do
 
    # Initialize defaults, replace later
    MOVIETITLE="$MOVIENAME</title>"
-   MOVIESHEET=${Jukebox_Path}/images/NoMovieinfo.bmp
-   MOVIEPOSTER=${Jukebox_Path}/images/nofolder.bmp
+   MOVIESHEET=${Jukebox_Path}/images/NoMovieinfo.jpg
+   MOVIEPOSTER=${Jukebox_Path}/images/nofolder.jpg
    GENRE="<name>Unknown</name>"
    MovieYear=""
 		
@@ -325,7 +325,7 @@ echo -e '
 	<script>
 	    Jukebox_Temp = "/tmp/";
             Category_Title = "'$CategoryTitle'";
-	    Category_Background = "'${Jukebox_Path}'/images/background.bmp";						           
+	    Category_Background = "'${Jukebox_Path}'/images/background.jpg";						           
             setFocusItemIndex(0);
             Current_Item_index=0;
             NewView = "'$NewView'";
@@ -535,7 +535,7 @@ echo -e'
       "'${Jukebox_Path}'/images/focus_watched.jpg";
       }
     else {
-      "'${Jukebox_Path}'/images/focus.bmp";
+      "'${Jukebox_Path}'/images/focus.jpg";
       }
   }
   else
@@ -543,7 +543,7 @@ echo -e'
       "'${Jukebox_Path}'/images/unfocus_watched.jpg";
       }
     else {
-      "'${Jukebox_Path}'/images/unfocus.bmp";
+      "'${Jukebox_Path}'/images/unfocus.jpg";
       }
   }
  </script>
