@@ -5,9 +5,9 @@
 	<recent>Ostatnio dodane</recent>
 	<select>Wybierz według:</select>
 	<update>Aktualizacja</update>
-	<watched>Nieoglądane</watched>
+	<watched>Do zobaczenia</watched>
 	<year>Rok</year>
 </main>
 <jukebox>
-	<top>1 = Zmiana widoku | Enter = Wybierz | Rtn = Poprzednie menu/widok | Play = Odtwórz film</top>
+	<top>1 = Zmiana widoku | 2 = Zaznacz jako oglądane | Enter = Wybierz | Rtn = Poprzednie menu/widok | Play = Odtwórz film</top>
 </jukebox>
