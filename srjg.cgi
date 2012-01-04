@@ -291,7 +291,18 @@ echo -e '
 	<onEnter>redrawDisplay();</onEnter>
 
 	<script>
-	    Jukebox_Temp = "/tmp/";
+	    Config = "/usr/local/etc/srjg.cfg";
+		Config_ok = loadXMLFile(Config);
+		if (Config_ok == null) {
+			Jukebox_Path = ""/usr/local/etc/srjg";
+			Language = "en";
+        }
+		else {
+			Jukebox_Path = getXMLText("Config", "Jukebox_Path");
+			Language = getXMLText("Config", "Lang");
+		}
+		
+		Jukebox_Temp = "/tmp/";
             Category_Title = "'$CategoryTitle'";
 	    Category_Background = "'${Jukebox_Path}'/images/background.jpg";						           
             setFocusItemIndex(0);
@@ -301,44 +312,17 @@ echo -e '
 	    Jukebox_Size ="'$Jukebox_Size'";
 	    mode = "'$mode'";
 	    nextmode = "'$nextmode'";
+		
+		langpath = Jukebox_Path + "/lang/" + Language;
+		langfile = loadXMLFile(langpath);
+		if (langfile != null)
+		{
+			jukebox_top = getXMLText("jukebox", "top");
+		}
+		
 	</script>
 
-<mediaDisplay
-    	name="photoView"
-
-	rowCount="'$row'"
-	columnCount="'$col'"
-	imageFocus="null"
-	showHeader="no"
-	showDefaultInfo="no"
-	drawItemBorder="no"
-
-	viewAreaXPC="0"
-	viewAreaYPC="0"
-	viewAreaWidthPC="100"
-	viewAreaHeightPC="100"
-
-	itemGapXPC="0.7"
-	itemGapYPC="1"
-	itemWidthPC="'$itemWidth'"
-	itemHeightPC="'$itemHeight'"
-	itemOffsetXPC="'$itemXPC'"
-	itemOffsetYPC="'$itemYPC'"
-	itemBorderPC="0"
-	itemBorderColor="7:99:176"
-	itemBackgroundColor="-1:-1:-1"
-
-	sideTopHeightPC="0"
-	sideBottomHeightPC="0"
-	bottomYPC="100"
-
-	idleImageXPC="67.81"
-	idleImageYPC="89.17"
-	idleImageWidthPC="4.69"
-	idleImageHeightPC="4.17"
-	backgroundColor="0:0:0"
-
-     >
+<mediaDisplay name="photoView" rowCount="'$row'" columnCount="'$col'" imageFocus="null" showHeader="no" showDefaultInfo="no" drawItemBorder="no" viewAreaXPC="0" viewAreaYPC="0" viewAreaWidthPC="100" viewAreaHeightPC="100" itemGapXPC="0.7" itemGapYPC="1" itemWidthPC="'$itemWidth'" itemHeightPC="'$itemHeight'" itemOffsetXPC="'$itemXPC'" itemOffsetYPC="'$itemYPC'" itemBorderPC="0" itemBorderColor="7:99:176" itemBackgroundColor="-1:-1:-1" sideTopHeightPC="0" sideBottomHeightPC="0" bottomYPC="100" idleImageXPC="67.81" idleImageYPC="89.17" idleImageWidthPC="4.69" idleImageHeightPC="4.17" backgroundColor="0:0:0">
 
 		<idleImage> image/POPUP_LOADING_01.png </idleImage>
 		<idleImage> image/POPUP_LOADING_02.png </idleImage>
@@ -353,8 +337,8 @@ echo -e '
 if ([ $Jukebox_Size = "2x6" ] ||  [ $Jukebox_Size = ""3x8"" ]); then		
 cat <<EOF
 		<backgroundDisplay>
-                        <script>
-                                Jukebox_itemSize = getPageInfo("itemCount"); 
+            <script>
+                 Jukebox_itemSize = getPageInfo("itemCount"); 
 			</script>
 			<image redraw="no" offsetXPC="0" offsetYPC="0" widthPC="100" heightPC="100">
 				<script>
@@ -363,7 +347,10 @@ cat <<EOF
 		  	</image>      
 		</backgroundDisplay>   
 
-                <text redraw="no" align="left" offsetXPC="15" offsetYPC="1" widthPC="100" heightPC="3" fontSize="12" backgroundColor="-1:-1:-1" foregroundColor="130:130:130">1 = Switch View | Enter = Select | Rtn = Previous Menu/View | Play = Play Video/Movie 		
+        <text redraw="no" align="center" offsetXPC="2" offsetYPC="1" widthPC="96" heightPC="3" fontSize="12" backgroundColor="-1:-1:-1" foregroundColor="130:130:130">
+			<script>
+				print(jukebox_top);
+			</script>
 		</text>
    
 		<text redraw="no" align="center" offsetXPC="2.5" offsetYPC="3" widthPC="90" heightPC="10" fontSize="20" backgroundColor="-1:-1:-1" foregroundColor="192:192:192">

@@ -8,3 +8,6 @@
 	<watched>Nieoglądane</watched>
 	<year>Rok</year>
 </main>
+<jukebox>
+	<top>1 = Zmiana widoku | Enter = Wybierz | Rtn = Poprzednie menu/widok | Play = Odtwórz film</top>
+</jukebox>
