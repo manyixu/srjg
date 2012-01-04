@@ -302,6 +302,7 @@ echo -e '
 			Language = getXMLText("Config", "Lang");
 		}
 		
+		DefaultView = getXMLText("Config", "Jukebox_Size");
 		Jukebox_Temp = "/tmp/";
             Category_Title = "'$CategoryTitle'";
 	    Category_Background = "'${Jukebox_Path}'/images/background.jpg";						           
@@ -334,7 +335,7 @@ echo -e '
 		<idleImage> image/POPUP_LOADING_08.png </idleImage>'
 
 
-if ([ $Jukebox_Size = "2x6" ] ||  [ $Jukebox_Size = ""3x8"" ]); then		
+if ([ $Jukebox_Size = "2x6" ] || [ $Jukebox_Size = ""3x8"" ]); then		
 cat <<EOF
 		<backgroundDisplay>
             <script>
@@ -422,12 +423,31 @@ cat <<EOF
 					   Genre_Title=urlencode(getItemInfo(-1, "title"));}
 					   jumpToLink("NextView");
 					   "false";
-				} else if (userInput == "one") {
-                                        Genre_Title=urlEncode(Genre_Title); 
+				}
+				
+				else if (userInput == "return") {
+					if ( mode == "genre" || mode == "year" || mode == "alpha" )	{
+						viewtype = getXMLText("main", mode);
+						jumpToLink("SelectionView");
+						"false";
+						redrawDisplay();
+					}
+					else if ( mode == "recent" || mode == "notwatched" || mode == "genreSelection" || mode == "yearSelection" || mode == "alphaSelection" )	{
+						jumpToLink("SRJGView");
+						"false";
+						redrawDisplay();
+					}
+					else
+						postMessage("return");
+				}
+				
+				else if (userInput == "one") {
+                    Genre_Title=urlEncode(Genre_Title); 
 					jumpToLink("SwitchView");
 					"false";
 					redrawDisplay();
 				} 
+
 EOF
 
 	if [ $mode = "genre" ] || [ $mode = "year" ] || [ $mode = "alpha" ] || [ $mode = "recent" ] || [ $mode = "notwatched" ]; then
@@ -436,7 +456,8 @@ EOF
                                         Current_Movie_File=getItemInfo(-1, "file");
                                         playItemURL(Current_Movie_File, 10);
 					"false";
-				} else if (userInput == "two") {
+					}
+ else if (userInput == "two") {
                                         MovieID=getItemInfo(-1, "IdMovie"); 
 					jumpToLink("Watchcgi");
 					"false";
@@ -552,10 +573,26 @@ cat << EOF
 <NextView>
     <link>
        <script>
-	print("http://127.0.0.1:$Port/cgi-bin/srjg.cgi?"+nextmode+"@"+Genre_Title+"@"+Jukebox_Size);
+			print("http://127.0.0.1:$Port/cgi-bin/srjg.cgi?"+nextmode+"@"+Genre_Title+"@"+Jukebox_Size);
        </script>
     </link>
 </NextView>
+
+<SelectionView>
+    <link>
+       <script>
+			print("http://127.0.0.1:$Port/cgi-bin/srjg.cgi?"+mode+"Selection@"+viewtype+"@"+DefaultView);
+       </script>
+    </link>
+</SelectionView>
+
+<SRJGView>
+    <link>
+       <script>
+			print(Jukebox_Path+"/SrjgMainMenu.rss");
+       </script>
+    </link>
+</SRJGView>
 
 
 <SwitchView>

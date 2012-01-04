@@ -1,11 +1,11 @@
 <?xml encoding="UTF-8" version="1.0"?>
 <main>
-	<alphabet>Alphabet</alphabet>
+	<alpha>Alphabet</alpha>
 	<genre>Genre</genre>
 	<recent>Recently Added</recent>
 	<select>Select Movies by:</select>
 	<update>Update Jukebox</update>
-	<watched>Not Watched</watched>
+	<notwatched>Not Watched</notwatched>
 	<year>Year</year>
 </main>
 <jukebox>

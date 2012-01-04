@@ -26,12 +26,12 @@
 	 langfile = loadXMLFile(langpath);
 	 if (langfile != null)
 	 {
-		main_alphabet = getXMLText("main", "alphabet");
+		main_alpha = getXMLText("main", "alpha");
 		main_genre = getXMLText("main", "genre");
 		main_recent = getXMLText("main", "recent");
 		main_select = getXMLText("main", "select");
 		main_update = getXMLText("main", "update");
-		main_watched = getXMLText("main", "watched");
+		main_notwatched = getXMLText("main", "notwatched");
 		main_year = getXMLText("main", "year");
 	 }
 	 
@@ -65,7 +65,23 @@
 <onUserInput>
     <script>
 	userInput = currentUserInput();
-				
+	
+	if( userInput == "return" ) {
+		showIdle();
+		
+		mainmenu="/tmp/srjg-main.cfg";
+		backstat = readStringFromFile(mainmenu);
+		if (backstat == "yes")	{
+			writeStringToFile(mainmenu, "no");
+			jumpToLink("MainRSS");
+			redrawDisplay();
+		}
+		else	{
+			jumpToLink("MenuRSS");
+			redrawDisplay();
+		}
+	}
+	
 	if (userInput == "enter") {
 	  SelTitle=getItemInfo(-1, "title");
 	  SelTitle=urlEncode(SelTitle);
@@ -73,7 +89,7 @@
           mode=urlEncode(mode);
           jumpToLink("SelectionEntered");
           "false";
-      }
+    }
      </script>
 </onUserInput>
 
@@ -110,6 +126,23 @@
 
 </mediaDisplay>
 
+<MenuRSS>
+    <link>
+       <script>
+			print(Jukebox_Path+"/SrjgMainMenu.rss");
+       </script>
+    </link>
+	
+	<script>
+		mainmenu="/tmp/srjg-main.cfg";
+		writeStringToFile(mainmenu, "yes");
+	</script>
+</MenuRSS>
+
+<MainRSS>
+    <link>/usr/local/bin/IMS_Modules/menu.rss</link>
+</MainRSS>
+
 <SelectionEntered>
     <link>
        <script>
@@ -142,7 +175,7 @@
 <item>
 <title>
 	<script>
-		print(main_alphabet);
+		print(main_alpha);
 	</script>
 </title>
 <selection>alphaSelection</selection>
@@ -160,7 +193,7 @@
 <item>
 <title>
 	<script>
-		print(main_watched);
+		print(main_notwatched);
 	</script>
 </title>
 <selection>notwatched</selection>

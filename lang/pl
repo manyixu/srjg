@@ -1,11 +1,11 @@
 <?xml encoding="UTF-8" version="1.0"?>
 <main>
-	<alphabet>Alfabet</alphabet>
+	<alpha>Alfabet</alpha>
 	<genre>Gatunek</genre>
 	<recent>Ostatnio dodane</recent>
 	<select>Wybierz według:</select>
 	<update>Aktualizacja</update>
-	<watched>Do zobaczenia</watched>
+	<notwatched>Do zobaczenia</notwatched>
 	<year>Rok</year>
 </main>
 <jukebox>
