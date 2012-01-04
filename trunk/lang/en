@@ -8,3 +8,6 @@
 	<watched>Not Watched</watched>
 	<year>Year</year>
 </main>
+<jukebox>
+	<top>1 = Switch View | Enter = Select | Rtn = Previous Menu/View | Play = Play Video/Movie</top>
+</jukebox>
