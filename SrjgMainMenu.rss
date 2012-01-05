@@ -1,41 +1,29 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <rss version="2.0" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:media="http://purl.org/dc/elements/1.1/">
 
-<onEnter>showIdle();</onEnter>
-
-<script>
-    Config = "/usr/local/etc/srjg.cfg";
+<onEnter>
+    showIdle();
+	Config = "/usr/local/etc/srjg.cfg";
     Config_ok = loadXMLFile(Config);
-    if (Config_ok == null) {
-	print("Load Config fail ", Config);
-        }
+    
+	if (Config_ok == null) {
+		print("Load Config fail ", Config);
+	}
     else {
         Config_itemSize = getXMLElementCount("Config");
 	}
-     if (Config_itemSize > 0) {
-	Language = getXMLText("Config", "Lang");
-        Jukebox_Path = getXMLText("Config", "Jukebox_Path");
- 	Jukebox_Size = getXMLText("Config", "Jukebox_Size");
-        Movies_Path = getXMLText("Config", "Movies_Path");
-	Movie_Filter = getXMLText("Config", "Movie_Filter");
-	Port = getXMLText("Config", "Port");
-	Recent_Max = getXMLText("Config", "Recent_Max");
+    
+	if (Config_itemSize > 0) {
+		Language = getXMLText("Config", "Lang");
+		Jukebox_Path = getXMLText("Config", "Jukebox_Path");
+		Jukebox_Size = getXMLText("Config", "Jukebox_Size");
+		Movies_Path = getXMLText("Config", "Movies_Path");
+		Movie_Filter = getXMLText("Config", "Movie_Filter");
+		Port = getXMLText("Config", "Port");
+		Recent_Max = getXMLText("Config", "Recent_Max");
      }
 	 
-	 langpath = Jukebox_Path + "/lang/" + Language;
-	 langfile = loadXMLFile(langpath);
-	 if (langfile != null)
-	 {
-		main_alpha = getXMLText("main", "alpha");
-		main_genre = getXMLText("main", "genre");
-		main_recent = getXMLText("main", "recent");
-		main_select = getXMLText("main", "select");
-		main_update = getXMLText("main", "update");
-		main_notwatched = getXMLText("main", "notwatched");
-		main_year = getXMLText("main", "year");
-	 }
-	 
-     srjgconf="/tmp/srjg.cfg";	
+	 srjgconf="/tmp/srjg.cfg";	
      tmpconfigArray=null;
      tmpconfigArray=pushBackStringArray(tmpconfigArray, "Language="+Language);
      tmpconfigArray=pushBackStringArray(tmpconfigArray, "Jukebox_Path="+Jukebox_Path);
@@ -44,7 +32,21 @@
      tmpconfigArray=pushBackStringArray(tmpconfigArray, "Port="+Port);
      tmpconfigArray=pushBackStringArray(tmpconfigArray, "Recent_Max="+Recent_Max);
      writeStringToFile(srjgconf, tmpconfigArray);
-</script>
+	 
+	 langpath = Jukebox_Path + "/lang/" + Language;
+	 langfile = loadXMLFile(langpath);
+	 if (langfile != null) {
+		main_alpha = getXMLText("main", "alpha");
+		main_genre = getXMLText("main", "genre");
+		main_recent = getXMLText("main", "recent");
+		main_select = getXMLText("main", "select");
+		main_update = getXMLText("main", "update");
+		main_notwatched = getXMLText("main", "notwatched");
+		main_year = getXMLText("main", "year");
+	 }
+</onEnter>
+
+
 
 <mediaDisplay name="photoView" rowCount="6" columnCount="1" drawItemText="no" showHeader="no" showDefaultInfo="no" menuBorderColor="255:255:255" sideColorBottom="-1:-1:-1" sideColorTop="-1:-1:-1" itemAlignt="left" itemOffsetXPC="24" itemOffsetYPC="30" itemWidthPC="25" itemHeightPC="7.2" backgroundColor="-1:-1:-1" itemBackgroundColor="-1:-1:-1" sliding="no" itemGap="0" idleImageXPC="90" idleImageYPC="5" idleImageWidthPC="5" idleImageHeightPC="8" imageUnFocus="null" imageParentFocus="null" imageBorderPC="0" forceFocusOnItem="no" cornerRounding="yes" itemBorderColor="-1:-1:-1" focusBorderColor="-1:-1:-1" unFocusBorderColor="-1:-1:-1">
 <idleImage> image/POPUP_LOADING_01.png </idleImage> 
@@ -67,28 +69,17 @@
 	userInput = currentUserInput();
 	
 	if( userInput == "return" ) {
-		showIdle();
-		
-		mainmenu="/tmp/srjg-main.cfg";
-		backstat = readStringFromFile(mainmenu);
-		if (backstat == "yes")	{
-			writeStringToFile(mainmenu, "no");
-			jumpToLink("MainRSS");
-			redrawDisplay();
-		}
-		else	{
-			jumpToLink("MenuRSS");
-			redrawDisplay();
-		}
+		doModalRSS("/usr/local/bin/scripts/menu.rss");
+        "false";
 	}
 	
 	if (userInput == "enter") {
-	  SelTitle=getItemInfo(-1, "title");
-	  SelTitle=urlEncode(SelTitle);
-          mode=getItemInfo(-1, "selection");
-          mode=urlEncode(mode);
-          jumpToLink("SelectionEntered");
-          "false";
+		SelTitle=getItemInfo(-1, "title");
+		SelTitle=urlEncode(SelTitle);
+		mode=getItemInfo(-1, "selection");
+        mode=urlEncode(mode);
+        jumpToLink("SelectionEntered");
+        "false";
     }
      </script>
 </onUserInput>
@@ -125,23 +116,6 @@
     </backgroundDisplay> 
 
 </mediaDisplay>
-
-<MenuRSS>
-    <link>
-       <script>
-			print(Jukebox_Path+"/SrjgMainMenu.rss");
-       </script>
-    </link>
-	
-	<script>
-		mainmenu="/tmp/srjg-main.cfg";
-		writeStringToFile(mainmenu, "yes");
-	</script>
-</MenuRSS>
-
-<MainRSS>
-    <link>/usr/local/bin/IMS_Modules/menu.rss</link>
-</MainRSS>
 
 <SelectionEntered>
     <link>
