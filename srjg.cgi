@@ -30,7 +30,7 @@ SetVar()
 [ $mode = "yearSelection" ] && nextmode="year";
 [ $mode = "alphaSelection" ] && nextmode="alpha";
 
-if [ $mode = "genre" ] || [ $mode = "year" ] || [ $mode = "alpha" ] || [ $mode = "recent" ] || [ $mode = "notwatched" ]; then
+if [ $mode = "genre" ] || [ $mode = "year" ] || [ $mode = "alpha" ] || [ $mode = "recent" ] || [ $mode = "notwatched" ] || [ $mode = "moviesearch" ]; then
   nextmode="moviesheet";
 fi
 }
@@ -432,7 +432,7 @@ cat <<EOF
 						"false";
 						redrawDisplay();
 					}
-					else if ( mode == "recent" || mode == "notwatched" || mode == "genreSelection" || mode == "yearSelection" || mode == "alphaSelection" )	{
+					else if ( mode == "recent" || mode == "notwatched" || mode == "genreSelection" || mode == "yearSelection" || mode == "alphaSelection" || mode == "moviesearch" )	{
 						jumpToLink("SRJGView");
 						"false";
 						redrawDisplay();
@@ -639,6 +639,10 @@ fi
 
 if [ "$mode" = "notwatched" ]; then
 ${Sqlite} -separator ''  ${Database}  "SELECT header,IdMovhead,Movie_ID,IdMovFoot,title,poster,info,file,WatchedHead,watched,WatchedFoot,footer FROM t1,t2 WHERE watched <>'1' OR watched IS NULL ORDER BY title COLLATE NOCASE";
+fi
+
+if [ "$mode" = "moviesearch" ]; then
+${Sqlite} -separator ''  ${Database}  "SELECT header,IdMovhead,Movie_ID,IdMovFoot,title,poster,info,file,WatchedHead,watched,WatchedFoot,footer FROM t1,t2 WHERE title LIKE '<title>%$Search%' ORDER BY title COLLATE NOCASE";
 fi
 
 if [ "$mode" = "yearSelection" ]; then
