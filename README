@@ -15,10 +15,12 @@ Step 2) edit the srjg.cfg file as indicated below and move the file to the /usr/
   <Port>80</Port>   <----- Your player web server port, most of the players uses "80" or "1024"; you can use any number you want.
 </Config>  <---- Just an xml footer tag **Do not change
 
-Step 3) Create a symbolic link for the srjg.cgi under your web server cgi-bin directory.  For most server this will be /tmp/www/cgi-bin/ or/and /tmp_orig/www/cgi-bin.  Some firmware only requires a symbolic link to /tmp/www.... but other also require the /tmp_orig/www.... (both places must have the symbolic link).  To create use:
+Step 3) Create a symbolic link for the srjg.cgi and srjg-gui.cgi under your web server cgi-bin directory.  For most server this will be /tmp/www/cgi-bin/ or/and /tmp_orig/www/cgi-bin.  Some firmware only requires a symbolic link to /tmp/www.... but other also require the /tmp_orig/www.... (both places must have the symbolic link).  To create use:
 
 ln -sf <Jukebox_Path>/srjg.cgi /tmp/www/cgi-bin/srjg.cgi
 ln -sf <Jukebox_Path>/srjg.cgi /tmp_orig/www/cgi-bin/srjg.cgi   ..... Probably will need to make root writable before this can be done.
+ln -sf <Jukebox_Path>/srjg-gui.cgi /tmp/www/cgi-bin/srjg-gui.cgi
+ln -sf <Jukebox_Path>/srjg-gui.cgi /tmp_orig/www/cgi-bin/srjg-gui.cgi
 
 mount -o remount,rw /
 
