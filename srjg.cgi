@@ -294,7 +294,7 @@ echo -e '
 	    Config = "/usr/local/etc/srjg.cfg";
 		Config_ok = loadXMLFile(Config);
 		if (Config_ok == null) {
-			Jukebox_Path = ""/usr/local/etc/srjg";
+			Jukebox_Path = "/usr/local/etc/srjg";
 			Language = "en";
         }
 		else {
