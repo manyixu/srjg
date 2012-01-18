@@ -33,7 +33,7 @@
      tmpconfigArray=pushBackStringArray(tmpconfigArray, "Recent_Max="+Recent_Max);
      writeStringToFile(srjgconf, tmpconfigArray);
 	 
-	 langpath = Jukebox_Path + "/lang/" + Language;
+	 langpath = Jukebox_Path + "lang/" + Language;
 	 langfile = loadXMLFile(langpath);
 	 if (langfile != null) {
 		main_alpha = getXMLText("main", "alpha");
@@ -69,11 +69,6 @@
     <script>
 	userInput = currentUserInput();
 	
-	if( userInput == "return" ) {
-		doModalRSS("/usr/local/bin/scripts/menu.rss");
-        "false";
-	}
-	
 	if (userInput == "enter") {
 	   mode=getItemInfo(-1, "selection");		
 	   if ( mode == "moviesearch") {
@@ -100,11 +95,11 @@
  <script>
   if (getDrawingItemState() == "focus")
   {
-      print(Jukebox_Path+"/images/focus_on.png");
+      print(Jukebox_Path + "images/focus_on.png");
   }
  else
   {
-      print(Jukebox_Path+"/images/focus_off.png");
+      print(Jukebox_Path + "images/focus_off.png");
   }
  </script>
 </image>
@@ -119,7 +114,7 @@
    <backgroundDisplay>
         <image redraw="no" offsetXPC="0" offsetYPC="0" widthPC="100" heightPC="100">
 	     <script>
-                 print(Jukebox_Path+"/images/srjgMainMenu.jpg");
+                 print(Jukebox_Path + "images/srjgMainMenu.jpg");
              </script>
         </image>
     </backgroundDisplay> 

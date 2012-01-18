@@ -20,8 +20,8 @@ fi
 
 # Setting up other variable
 
-Database=${Jukebox_Path}"/movies.db"
-Sqlite=${Jukebox_Path}"/sqlite3"
+Database=${Jukebox_Path}"movies.db"
+Sqlite=${Jukebox_Path}"sqlite3"
 
 SetVar()
 # Settting up a few variables needed
@@ -123,8 +123,8 @@ do
 
    # Initialize defaults, replace later
    MOVIETITLE="$MOVIENAME</title>"
-   MOVIESHEET=${Jukebox_Path}/images/NoMovieinfo.jpg
-   MOVIEPOSTER=${Jukebox_Path}/images/nofolder.jpg
+   MOVIESHEET=${Jukebox_Path}images/NoMovieinfo.jpg
+   MOVIEPOSTER=${Jukebox_Path}images/nofolder.jpg
    GENRE="<name>Unknown</name>"
    MovieYear=""
 		
@@ -168,12 +168,12 @@ Update()
 MoviesList="/tmp/movies.list"
 InsertList="/tmp/insert.list"
 DeleteList="/tmp/delete.list"
-PreviousMovieList="${Jukebox_Path}/prevmovies.list"
+PreviousMovieList="${Jukebox_Path}prevmovies.list"
 IMDB=""
 Force_DB_Update=""
 
 GenerateMovieList;
-[ -n "$IMDB" ] &&  ${Jukebox_Path}/imdb.sh
+[ -n "$IMDB" ] &&  ${Jukebox_Path}imdb.sh
 [ -n "$Force_DB_Update" ] && Force_DB_Creation
 [ ! -f "${Database}" ] && CreateMovieDB
 GenerateInsDelFiles;
@@ -294,7 +294,7 @@ echo -e '
 	    Config = "/usr/local/etc/srjg.cfg";
 		Config_ok = loadXMLFile(Config);
 		if (Config_ok == null) {
-			Jukebox_Path = "/usr/local/etc/srjg";
+			Jukebox_Path = "/usr/local/etc/srjg/";
 			Language = "en";
         }
 		else {
@@ -305,7 +305,7 @@ echo -e '
 		DefaultView = getXMLText("Config", "Jukebox_Size");
 		Jukebox_Temp = "/tmp/";
             Category_Title = "'$CategoryTitle'";
-	    Category_Background = "'${Jukebox_Path}'/images/background.jpg";						           
+	    Category_Background = "'${Jukebox_Path}'images/background.jpg";						           
             setFocusItemIndex(0);
             Current_Item_index=0;
             NewView = "'$NewView'";
@@ -314,7 +314,7 @@ echo -e '
 	    mode = "'$mode'";
 	    nextmode = "'$nextmode'";
 		
-		langpath = Jukebox_Path + "/lang/" + Language;
+		langpath = Jukebox_Path + "lang/" + Language;
 		langfile = loadXMLFile(langpath);
 		if (langfile != null)
 		{
@@ -425,22 +425,6 @@ cat <<EOF
 					   "false";
 				}
 				
-				else if (userInput == "return") {
-					if ( mode == "genre" || mode == "year" || mode == "alpha" )	{
-						viewtype = getXMLText("main", mode);
-						jumpToLink("SelectionView");
-						"false";
-						redrawDisplay();
-					}
-					else if ( mode == "recent" || mode == "notwatched" || mode == "genreSelection" || mode == "yearSelection" || mode == "alphaSelection" || mode == "moviesearch" )	{
-						jumpToLink("SRJGView");
-						"false";
-						redrawDisplay();
-					}
-					else
-						postMessage("return");
-				}
-				
 				else if (userInput == "one") {
                     Genre_Title=urlEncode(Genre_Title); 
 					jumpToLink("SwitchView");
@@ -508,18 +492,18 @@ echo -e'
  <script>
   if (getDrawingItemState() == "focus")
   { if (getItemInfo(-1, "Watched") == "1") {
-      "'${Jukebox_Path}'/images/focus_watched.jpg";
+      "'${Jukebox_Path}'images/focus_watched.jpg";
       }
     else {
-      "'${Jukebox_Path}'/images/focus.jpg";
+      "'${Jukebox_Path}'images/focus.jpg";
       }
   }
   else
   { if (getItemInfo(-1, "Watched") == "1") {
-      "'${Jukebox_Path}'/images/unfocus_watched.jpg";
+      "'${Jukebox_Path}'images/unfocus_watched.jpg";
       }
     else {
-      "'${Jukebox_Path}'/images/unfocus.jpg";
+      "'${Jukebox_Path}'images/unfocus.jpg";
       }
   }
  </script>
@@ -531,7 +515,7 @@ echo -e '
 <!-- Top Layer folder.jpg -->
 <image offsetXPC="8.2" offsetYPC="5.5" widthPC="84.25" heightPC="89.25">
  <script>
-  thumbnailPath = "'${Jukebox_Path}'/images/yearfolder.jpg";
+  thumbnailPath = "'${Jukebox_Path}'images/yearfolder.jpg";
   thumbnailPath;
  </script>
 </image>
@@ -557,10 +541,10 @@ echo -e '
 <image offsetXPC="3.2" offsetYPC="3.0" widthPC="20" heightPC="15">
 <script>
    if (getItemInfo(-1, "Watched") == "1") {
-      "'${Jukebox_Path}'/images/watched.png";
+      "'${Jukebox_Path}'images/watched.png";
       }
    else {
-      "'${Jukebox_Path}'/images/notwatched.png"; }
+      "'${Jukebox_Path}'images/notwatched.png"; }
 </script>
 </image>'
      
@@ -578,22 +562,13 @@ cat << EOF
     </link>
 </NextView>
 
-<SelectionView>
-    <link>
-       <script>
-			print("http://127.0.0.1:$Port/cgi-bin/srjg.cgi?"+mode+"Selection@"+viewtype+"@"+DefaultView);
-       </script>
-    </link>
-</SelectionView>
-
 <SRJGView>
     <link>
        <script>
-			print(Jukebox_Path+"/SrjgMainMenu.rss");
+			print(Jukebox_Path + "SrjgMainMenu.rss");
        </script>
     </link>
 </SRJGView>
-
 
 <SwitchView>
     <link>
@@ -668,7 +643,7 @@ while read LINE
 do
 echo -e '<item>
      <title>'$LINE'</title>
-     <poster>'${Jukebox_Path}'/images/genre/'$LINE'.jpg</poster>
+     <poster>'${Jukebox_Path}'images/genre/'$LINE'.jpg</poster>
      </item>'
 done < /tmp/genre.list
 fi
@@ -683,7 +658,7 @@ while read LINE
 do
 echo "<item>"
 echo "<title>"$LINE"</title>"
-echo "<poster>"${Jukebox_Path}"/images/alpha/JukeMenu_"$LINE".jpg</poster>"
+echo "<poster>"${Jukebox_Path}"images/alpha/JukeMenu_"$LINE".jpg</poster>"
 echo "</item>"
 done < /tmp/alpha.list
 fi
