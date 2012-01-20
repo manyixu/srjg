@@ -70,7 +70,8 @@
 	userInput = currentUserInput();
 	
 	if (userInput == "enter") {
-	   mode=getItemInfo(-1, "selection");		
+     indx=getFocusItemIndex();
+	   mode=getItemInfo(indx, "selection");		/* getItemInfo(-1, "selection"); don't work with the last item */
 	   if ( mode == "moviesearch") {
 		inputMovie=getInput("doModal");
 		if (inputMovie != NULL) {
@@ -79,7 +80,6 @@
 	   }
            else {
 		SelTitle=getItemInfo(-1, "title"); }
-
 	  SelTitle=urlEncode(SelTitle);	
           mode=urlEncode(mode);
           jumpToLink("SelectionEntered");
