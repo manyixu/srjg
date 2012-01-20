@@ -236,8 +236,8 @@ echo -e '
 </rss>'
 }
 
-Question()
-#Display question
+UpdateMenu()
+#Display UpdateMenu
 {
 cat <<EOF
 <?xml version="1.0"   encoding="utf-8" ?>
@@ -246,38 +246,7 @@ cat <<EOF
 <onEnter>
 </onEnter>
 
-<mediaDisplay name="photoView"
-rowCount="2"
-columnCount="1"
-drawItemText="no"
-showHeader="no"
-showDefaultInfo="no"
-menuBorderColor="255:255:255"
-sideColorBottom="-1:-1:-1"
-sideColorTop="-1:-1:-1"
-itemAlignt="left"
-itemOffsetXPC="41"
-itemOffsetYPC="75"
-itemWidthPC="20"
-itemHeightPC="7.2"
-backgroundColor="-1:-1:-1"
-itemBackgroundColor="-1:-1:-1"
-sliding="no"
-itemGap="0"
-idleImageXPC="90"
-idleImageYPC="5"
-idleImageWidthPC="5"
-idleImageHeightPC="8"
-imageUnFocus="null"
-imageParentFocus="null"
-imageBorderPC="0"
-forceFocusOnItem="no"
-cornerRounding="yes"
-itemBorderColor="-1:-1:-1"
-focusBorderColor="-1:-1:-1"
-unFocusBorderColor="-1:-1:-1"
-
->
+<mediaDisplay name="photoView" rowCount="2" columnCount="1" drawItemText="no" showHeader="no" showDefaultInfo="no" menuBorderColor="255:255:255" sideColorBottom="-1:-1:-1" sideColorTop="-1:-1:-1" itemAlignt="left" itemOffsetXPC="41" itemOffsetYPC="75" itemWidthPC="20" itemHeightPC="7.2" backgroundColor="-1:-1:-1" itemBackgroundColor="-1:-1:-1" sliding="no" itemGap="0" idleImageXPC="90" idleImageYPC="5" idleImageWidthPC="5" idleImageHeightPC="8" imageUnFocus="null" imageParentFocus="null" imageBorderPC="0" forceFocusOnItem="no" cornerRounding="yes" itemBorderColor="-1:-1:-1" focusBorderColor="-1:-1:-1" unFocusBorderColor="-1:-1:-1">
 <idleImage> image/POPUP_LOADING_01.png </idleImage>
 <idleImage> image/POPUP_LOADING_02.png </idleImage>
 <idleImage> image/POPUP_LOADING_03.png </idleImage>
@@ -315,10 +284,6 @@ unFocusBorderColor="-1:-1:-1"
   if (userInput == "right") {
     "true";
   } else if (userInput == "enter") {
-    indx=getFocusItemIndex();
-    mode=getItemInfo(indx, "selection");		/* getItemInfo(-1, "selection"); don't work with the last item */
-    SelTitle=getItemInfo(-1, "selection");
-    jumpToLink("SelectionEntered");
     postMessage("return");
     "false";
   }
@@ -326,25 +291,17 @@ unFocusBorderColor="-1:-1:-1"
 </onUserInput>
 </mediaDisplay>
 
-<SelectionEntered>
-    <link>
-       <script>
-           print("http://127.0.0.1:$Port/cgi-bin/srjg.cgi?Update@"+SelTitle+"@$Jukebox_Size");
-       </script>
-    </link>
-</SelectionEntered>
-
 <channel>
 <title>Updating</title>
 
 <item>
 <title>Fast</title>
-<selection>Fast</selection>
+<link>http://127.0.0.1:$Port/cgi-bin/srjg.cgi?Update@Fast@$Jukebox_Size</link>
 </item>
 
 <item>
 <title>Rebuild</title>
-<selection>Rebuild</selection>
+<link>http://127.0.0.1:$Port/cgi-bin/srjg.cgi?Update@Rebuild@$Jukebox_Size</link>
 </item>
 
 </channel>
@@ -799,7 +756,7 @@ if [ "$mode" = "Update" ]; then
     Force_DB_Update="";
     Update;
   else
-    Question;
+    UpdateMenu;
   fi
 else
   if [ "$mode" = "moviesheet" ]; then
