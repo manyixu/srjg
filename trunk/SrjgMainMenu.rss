@@ -79,7 +79,7 @@
 		}
 	   }
            else {
-		SelTitle=getItemInfo(-1, "title"); }
+		SelTitle=getItemInfo(-1, "selection"); }
 	  SelTitle=urlEncode(SelTitle);	
           mode=urlEncode(mode);
           jumpToLink("SelectionEntered");
