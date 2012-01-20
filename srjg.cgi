@@ -74,18 +74,16 @@ GENRE=`sed -e '/<genre/,/\/genre>/!d;/genre>/d' "$MOVIEPATH/$INFONAME"`
 MovieYear=`sed '/<year/!d;s:.*>\(.*\)</.*:\1:' "$MOVIEPATH/$INFONAME"`            
 }
 
-
 GenerateMovieList()
 # Find the movies based on movie extension and path provided.  Remove movies 
 # that contains the string(s) specified in $Movie_Filter
 {
 # Replace the comma in Movie_Filter to pipes |
 Movie_Filter=`echo $Movie_Filter | sed 's/,/|/ g'`
-echo "Searching for movies.."
+
 find "$Movies_Path" \
   | egrep -i '\.(asf|avi|dat|divx|flv|img|iso|m1v|m2p|m2t|m2ts|m2v|m4v|mkv|mov|mp4|mpg|mts|qt|rm|rmp4|rmvb|tp|trp|ts|vob|wmv)$' \
   | egrep -iv "$Movie_Filter" > $MoviesList
-echo "Found `sed -n '$=' $MoviesList` movies"
 }
 
 GenerateInsDelFiles()
@@ -163,6 +161,13 @@ done < $InsertList
 Update()
 # Will update the Database based on the parameters in srjg.cfg
 {
+
+Header;
+echo -e '<onEnter>
+showIdle();
+postMessage("return");
+</onEnter>'
+
 # Initialize some Variables
 
 MoviesList="/tmp/movies.list"
@@ -170,15 +175,18 @@ InsertList="/tmp/insert.list"
 DeleteList="/tmp/delete.list"
 PreviousMovieList="${Jukebox_Path}prevmovies.list"
 IMDB=""
-Force_DB_Update=""
 
 GenerateMovieList;
+
 [ -n "$IMDB" ] &&  ${Jukebox_Path}imdb.sh
 [ -n "$Force_DB_Update" ] && Force_DB_Creation
 [ ! -f "${Database}" ] && CreateMovieDB
 GenerateInsDelFiles;
 [[ -s $DeleteList ]] && DBMovieDelete
 [[ -s $InsertList ]] && DBMovieInsert
+
+echo '<channel>'
+Footer;
 }
 
 WatchedToggle()
@@ -215,8 +223,7 @@ exit 0
 Header()
 #Insert RSS Header
 {
-echo -e '
-<?xml version="1.0" ?>
+echo -e '<?xml version="1.0" ?>
 <rss version="2.0" xmlns:dc="http://purl.org/dc/elements/1.1/">'
 }
 
@@ -229,6 +236,121 @@ echo -e '
 </rss>'
 }
 
+Question()
+#Display question
+{
+cat <<EOF
+<?xml version="1.0"   encoding="utf-8" ?>
+<rss version="2.0" xmlns:dc="http://purl.org/dc/elements/1.1/">
+
+<onEnter>
+</onEnter>
+
+<mediaDisplay name="photoView"
+rowCount="2"
+columnCount="1"
+drawItemText="no"
+showHeader="no"
+showDefaultInfo="no"
+menuBorderColor="255:255:255"
+sideColorBottom="-1:-1:-1"
+sideColorTop="-1:-1:-1"
+itemAlignt="left"
+itemOffsetXPC="41"
+itemOffsetYPC="75"
+itemWidthPC="20"
+itemHeightPC="7.2"
+backgroundColor="-1:-1:-1"
+itemBackgroundColor="-1:-1:-1"
+sliding="no"
+itemGap="0"
+idleImageXPC="90"
+idleImageYPC="5"
+idleImageWidthPC="5"
+idleImageHeightPC="8"
+imageUnFocus="null"
+imageParentFocus="null"
+imageBorderPC="0"
+forceFocusOnItem="no"
+cornerRounding="yes"
+itemBorderColor="-1:-1:-1"
+focusBorderColor="-1:-1:-1"
+unFocusBorderColor="-1:-1:-1"
+
+>
+<idleImage> image/POPUP_LOADING_01.png </idleImage>
+<idleImage> image/POPUP_LOADING_02.png </idleImage>
+<idleImage> image/POPUP_LOADING_03.png </idleImage>
+<idleImage> image/POPUP_LOADING_04.png </idleImage>
+<idleImage> image/POPUP_LOADING_05.png </idleImage>
+<idleImage> image/POPUP_LOADING_06.png </idleImage>
+<idleImage> image/POPUP_LOADING_07.png </idleImage>
+<idleImage> image/POPUP_LOADING_08.png </idleImage>
+<itemDisplay>
+
+<image offsetXPC="0" offsetYPC="0" widthPC="100" heightPC="100">
+ <script>
+  if (getDrawingItemState() == "focus")
+  {
+      print("${Jukebox_Path}images/focus_on.png");
+  }
+ else
+  {
+      print("${Jukebox_Path}images/focus_off.png");
+  }
+ </script>
+</image>
+
+<text redraw="no" offsetXPC="0" offsetYPC="0" widthPC="94" heightPC="100" backgroundColor="-1:-1:-1" foregroundColor="200:200:200" fontSize="16" align="center">
+ <script>
+    getItemInfo(-1, "title");
+ </script>
+</text>
+</itemDisplay>  
+
+<onUserInput>
+
+  userInput = currentUserInput();
+
+  if (userInput == "right") {
+    "true";
+  } else if (userInput == "enter") {
+    indx=getFocusItemIndex();
+    mode=getItemInfo(indx, "selection");		/* getItemInfo(-1, "selection"); don't work with the last item */
+    SelTitle=getItemInfo(-1, "selection");
+    jumpToLink("SelectionEntered");
+    postMessage("return");
+    "false";
+  }
+
+</onUserInput>
+</mediaDisplay>
+
+<SelectionEntered>
+    <link>
+       <script>
+           print("http://127.0.0.1:$Port/cgi-bin/srjg.cgi?Update@"+SelTitle+"@$Jukebox_Size");
+       </script>
+    </link>
+</SelectionEntered>
+
+<channel>
+<title>Updating</title>
+
+<item>
+<title>Fast</title>
+<selection>Fast</selection>
+</item>
+
+<item>
+<title>Rebuild</title>
+<selection>Rebuild</selection>
+</item>
+
+</channel>
+</rss>
+EOF
+}
 
 MoviesheetView()
 #Display moviesheet
@@ -664,14 +786,21 @@ done < /tmp/alpha.list
 fi
 }
 
-
 #***********************Main Program*********************************
 
 if [ "$mode" = "togglewatch" ]; then
    WatchedToggle;
 fi
 if [ "$mode" = "Update" ]; then
-  Update;
+  if [ "$CategoryTitle" = "Rebuild" ]; then
+    Force_DB_Update="y";
+    Update;
+  elif [ "$CategoryTitle" = "Fast" ]; then
+    Force_DB_Update="";
+    Update;
+  else
+    Question;
+  fi
 else
   if [ "$mode" = "moviesheet" ]; then
     Header;
