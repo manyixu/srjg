@@ -19,10 +19,15 @@ Step 3) Create a symbolic link for the srjg.cgi and srjg-gui.cgi under your web 
 
 ln -sf <Jukebox_Path>/srjg.cgi /tmp/www/cgi-bin/srjg.cgi
 ln -sf <Jukebox_Path>/srjg.cgi /tmp_orig/www/cgi-bin/srjg.cgi   ..... Probably will need to make root writable before this can be done.
-ln -sf <Jukebox_Path>/srjg-gui.cgi /tmp/www/cgi-bin/srjg-gui.cgi
-ln -sf <Jukebox_Path>/srjg-gui.cgi /tmp_orig/www/cgi-bin/srjg-gui.cgi
 
 mount -o remount,rw /
+
+For SRJG web-interface:
+ln -sf <Jukebox_Path>/srjg-gui.cgi /tmp/www/cgi-bin/srjg-gui.cgi
+ln -sf <Jukebox_Path>/srjg-gui.cgi /tmp_orig/www/cgi-bin/srjg-gui.cgi
+ln -sf <Jukebox_Path>/generate-icon.png /tmp/www/generate-icon.png
+ln -sf <Jukebox_Path>/generate-icon.png /tmp_orig/www/generate-icon.png
+
 
 Step 4) Create a new entry in your /usr/local/bin/script/menu.rss to be able to launch <Jukebox_Path>/srjgMainMenu.rss from there.
 
