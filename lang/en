@@ -13,6 +13,6 @@
 	<top>1 = Switch View | 2 = Mark as Watched | Enter = Select | Rtn = Previous Menu/View | Play = Play Video/Movie</top>
 </jukebox>
 <update>
-  <fast>Rapide</fast>
-  <rebuild>Reconstruire</rebuild>
+  <fast>Fast</fast>
+  <rebuild>Rebuild</rebuild>
 </update>
