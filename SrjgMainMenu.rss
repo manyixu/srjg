@@ -66,26 +66,24 @@
 </text>
 
 <onUserInput>
-    <script>
-	userInput = currentUserInput();
+  <script>
+    userInput = currentUserInput();
 	
-	if (userInput == "enter") {
-     indx=getFocusItemIndex();
-	   mode=getItemInfo(indx, "selection");		/* getItemInfo(-1, "selection"); don't work with the last item */
-	   if ( mode == "moviesearch") {
-		inputMovie=getInput("doModal");
-		if (inputMovie != NULL) {
-		   SelTitle = inputMovie;
-		}
-	   }
-           else {
-		SelTitle=getItemInfo(-1, "selection"); }
-	  SelTitle=urlEncode(SelTitle);	
-          mode=urlEncode(mode);
-          jumpToLink("SelectionEntered");
-          "false";
-       }
-     </script>
+    if (userInput == "enter") {
+      indx=getFocusItemIndex();
+      mode=getItemInfo(indx, "selection");		/* getItemInfo(-1, "selection"); don't work with the last item */
+      if ( mode == "moviesearch") {
+        inputMovie=getInput("doModal");
+        if (inputMovie != NULL) {
+          SelTitle = inputMovie;
+        }
+      } else { SelTitle=getItemInfo(indx, "title"); }
+      SelTitle=urlEncode(SelTitle);	
+      mode=urlEncode(mode);
+      jumpToLink("SelectionEntered");
+      "false";
+    }
+  </script>
 </onUserInput>
 
  

@@ -244,6 +244,13 @@ cat <<EOF
 <rss version="2.0" xmlns:dc="http://purl.org/dc/elements/1.1/">
 
 <onEnter>
+		langpath = "${Jukebox_Path}lang/${Language}";
+		langfile = loadXMLFile(langpath);
+		if (langfile != null)
+		{
+			update_fast = getXMLText("update", "fast");
+      update_rebuild = getXMLText("update", "rebuild");
+		}
 </onEnter>
 
 <mediaDisplay name="photoView" rowCount="2" columnCount="1" drawItemText="no" showHeader="no" showDefaultInfo="no" menuBorderColor="255:255:255" sideColorBottom="-1:-1:-1" sideColorTop="-1:-1:-1" itemAlignt="left" itemOffsetXPC="41" itemOffsetYPC="75" itemWidthPC="20" itemHeightPC="7.2" backgroundColor="-1:-1:-1" itemBackgroundColor="-1:-1:-1" sliding="no" itemGap="0" idleImageXPC="90" idleImageYPC="5" idleImageWidthPC="5" idleImageHeightPC="8" imageUnFocus="null" imageParentFocus="null" imageBorderPC="0" forceFocusOnItem="no" cornerRounding="yes" itemBorderColor="-1:-1:-1" focusBorderColor="-1:-1:-1" unFocusBorderColor="-1:-1:-1">
@@ -295,12 +302,12 @@ cat <<EOF
 <title>Updating</title>
 
 <item>
-<title>Fast</title>
+<title><script>update_fast;</script></title>
 <link>http://127.0.0.1:$Port/cgi-bin/srjg.cgi?Update@Fast@$Jukebox_Size</link>
 </item>
 
 <item>
-<title>Rebuild</title>
+<title><script>update_rebuild;</script></title>
 <link>http://127.0.0.1:$Port/cgi-bin/srjg.cgi?Update@Rebuild@$Jukebox_Size</link>
 </item>
 
@@ -732,7 +739,7 @@ if [ "$mode" = "alphaSelection" ]; then
 # pulls out the first letter of alphabet of the movie title
 # The first line does the following: Pull data from database; remove the leading and trailing <title></title>; cut the title first 
 # Character; remove anything that is not A-Z ex: a number; sort and remove duplicate.
-${Sqlite} -separator ''  ${Database}  "SELECT title FROM t1" | sed '/<title/!d;s:.*>\(.*\)</.*:\1:' | cut -c 1 | grep '[A-Z]' | sort -u > /tmp/alpha.list
+${Sqlite} -separator ''  ${Database}  "SELECT title FROM t1" | sed '/<title/!d;s:.*>\(.*\)</.*:\1:' | cut -c 1 | grep '[0-9A-Z]' | sort -u > /tmp/alpha.list
 while read LINE
 do
 echo "<item>"
