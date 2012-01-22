@@ -1,11 +1,18 @@
 <?xml encoding="UTF-8" version="1.0"?>
 <main>
-	<alpha>Alphabet</alpha>
+	<alpha>Alphabetique</alpha>
 	<genre>Genre</genre>
-	<recent>Ajouter Récemment</recent>
+	<recent>Ajout Récent</recent>
 	<select>Sélection par:</select>
 	<update>Mise à Jour</update>
 	<notwatched>Pas Regardé</notwatched>
 	<year>Année</year>
 	<search>Recherche</search>
 </main>
+<jukebox>
+	<top>1 = Change vue | 2 = Marquer comme vu | Enter = Select | Rtn = Ecran précédent | Play = Joue la vidéo</top>
+</jukebox>
+<update>
+  <fast>Rapide</fast>
+  <rebuild>Reconstruire</rebuild>
+</update>
