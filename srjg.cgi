@@ -198,7 +198,19 @@ echo -e '
 <onEnter>
 showIdle();
 postMessage("return");
-</onEnter>'
+</onEnter>
+
+<mediaDisplay name="nullView">
+<idleImage> image/POPUP_LOADING_01.png </idleImage>
+<idleImage> image/POPUP_LOADING_02.png </idleImage>
+<idleImage> image/POPUP_LOADING_03.png </idleImage>
+<idleImage> image/POPUP_LOADING_04.png </idleImage>
+<idleImage> image/POPUP_LOADING_05.png </idleImage>
+<idleImage> image/POPUP_LOADING_06.png </idleImage>
+<idleImage> image/POPUP_LOADING_07.png </idleImage>
+<idleImage> image/POPUP_LOADING_08.png </idleImage>
+</mediaDisplay>
+'
 
 watch="`${Sqlite} -separator ''  ${Database}  "SELECT Watched FROM t1 WHERE Movie_ID like '$CategoryTitle'";`"
 
@@ -210,12 +222,7 @@ fi
 
 ${Sqlite} ${Database} "UPDATE t1 set Watched=$watch WHERE Movie_ID like '$CategoryTitle'";
 
-echo -e '
-<channel>
-<item>
-</item>
-</channel>
-</rss>'
+echo -e '<channel></channel></rss>'
 
 exit 0
 }
