@@ -731,14 +731,20 @@ if [ "$mode" = "genreSelection" ]; then
 # remove possible empty line that may exist; remove <name>Sci-fi</name> keeps Science fiction instead; remove any blank line
 # that may be still present.
 ${Sqlite} -separator ''  ${Database}  "SELECT genre FROM t1" | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//' | sort -u | sed '/<name/!d;s:.*>\(.*\)</.*:\1:' | grep "[!-~]" | egrep -v "Sci-Fi" > /tmp/genre.list
-sed -i 1i"All Movies" /tmp/genre.list
+
+# Add "All Movies" depending of the language, into the genre list
+AllMovies=`sed "/>All Movies|/!d;s:|\(.*\)>.*:\1:" "${Jukebox_Path}lang/${Language}_genre"`
+sed -i 1i"$AllMovies" /tmp/genre.list
 while read LINE
 do
-echo -e '<item>
+  # translate to find genre thumbnails 
+  Img_genre=`sed "/|$LINE>/!d;s:.*>\(.*\)|:\1:" "${Jukebox_Path}lang/${Language}_genre"`
+  if [ -z $Img_genre ]; then Img_genre="Unknown"; fi
+  echo -e '<item>
      <title>'$LINE'</title>
-     <poster>'${Jukebox_Path}'images/genre/'$LINE'.jpg</poster>
+     <poster>'${Jukebox_Path}'images/genre/'$Img_genre'.jpg</poster>
      </item>'
-done < /tmp/genre.list
+  done < /tmp/genre.list
 fi
 
 
