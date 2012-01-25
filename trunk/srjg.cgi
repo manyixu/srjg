@@ -694,7 +694,11 @@ if [ "$mode" = "genre" ]; then
 fi
 
 if [ "$mode" = "alpha" ]; then
+if [ "$Search" = "0-9" ]; then
+${Sqlite} -separator ''  ${Database}  "SELECT header,IdMovhead,Movie_ID,IdMovFoot,title,poster,info,file,WatchedHead,watched,WatchedFoot,footer FROM t1,t2 WHERE title LIKE '<title>9%' OR title LIKE '<title>8%' OR title LIKE '<title>7%' OR title LIKE '<title>6%' OR title LIKE '<title>5%' OR title LIKE '<title>4%' OR title LIKE '<title>3%' OR title LIKE '<title>2%' OR title LIKE '<title>1%' OR title LIKE '<title>0%'";
+else
 ${Sqlite} -separator ''  ${Database}  "SELECT header,IdMovhead,Movie_ID,IdMovFoot,title,poster,info,file,WatchedHead,watched,WatchedFoot,footer FROM t1,t2 WHERE title LIKE '<title>$Search%' ORDER BY title COLLATE NOCASE";
+fi
 fi
 
 if [ "$mode" = "year" ]; then
@@ -753,12 +757,23 @@ if [ "$mode" = "alphaSelection" ]; then
 # The first line does the following: Pull data from database; remove the leading and trailing <title></title>; cut the title first 
 # Character; remove anything that is not A-Z ex: a number; sort and remove duplicate.
 ${Sqlite} -separator ''  ${Database}  "SELECT title FROM t1" | sed '/<title/!d;s:.*>\(.*\)</.*:\1:' | cut -c 1 | grep '[0-9A-Z]' | sort -u > /tmp/alpha.list
+iteration="0";
 while read LINE
 do
+if [ $LINE -eq $LINE 2> /dev/null ]; then   
+if [ $iteration = "0" ]; then
+iteration="1";
+echo "<item>"
+echo "<title>"0-9"</title>"
+echo "<poster>"${Jukebox_Path}"images/alpha/JukeMenu_0.jpg</poster>"
+echo "</item>"
+fi
+else
 echo "<item>"
 echo "<title>"$LINE"</title>"
 echo "<poster>"${Jukebox_Path}"images/alpha/JukeMenu_"$LINE".jpg</poster>"
 echo "</item>"
+fi
 done < /tmp/alpha.list
 fi
 }
