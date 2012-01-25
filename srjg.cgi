@@ -6,7 +6,9 @@ SAVEIFS=$IFS
 IFS="@"
 set -- $QUERY
 mode=`echo $1`
-CategoryTitle=`echo $2 | sed "s/%2d/-/g" | sed "s/%20/ /g"`
+# full urldecode the CategoryTitle
+CategoryTitle=$(echo $2 | sed 's/+/ /g;s/%\(..\)/\\x\1/g;')
+CategoryTitle=`echo -n -e $CategoryTitle`
 Jukebox_Size=`echo $3`
 IFS=$SAVEIFS
 if [ $mode = "genre" ]; then
@@ -199,17 +201,7 @@ echo -e '
 showIdle();
 postMessage("return");
 </onEnter>
-
-<mediaDisplay name="nullView">
-<idleImage> image/POPUP_LOADING_01.png </idleImage>
-<idleImage> image/POPUP_LOADING_02.png </idleImage>
-<idleImage> image/POPUP_LOADING_03.png </idleImage>
-<idleImage> image/POPUP_LOADING_04.png </idleImage>
-<idleImage> image/POPUP_LOADING_05.png </idleImage>
-<idleImage> image/POPUP_LOADING_06.png </idleImage>
-<idleImage> image/POPUP_LOADING_07.png </idleImage>
-<idleImage> image/POPUP_LOADING_08.png </idleImage>
-</mediaDisplay>
+<mediaDisplay name="nullView"/>
 '
 
 watch="`${Sqlite} -separator ''  ${Database}  "SELECT Watched FROM t1 WHERE Movie_ID like '$CategoryTitle'";`"
@@ -513,7 +505,7 @@ cat <<EOF
 					if (nextmode == "moviesheet") {
 					   Genre_Title=getItemInfo(-1, "IdMovie");}
 					else {
-					   Genre_Title=urlencode(getItemInfo(-1, "title"));}
+					   Genre_Title=urlEncode(getItemInfo(-1, "title"));}
 					   jumpToLink("NextView");
 					   "false";
 				}
@@ -581,7 +573,7 @@ cat << EOF
 <!-- Bottom Layer focus/unfocus -->
 <image offsetXPC="0" offsetYPC="0" widthPC="100" heightPC="100">
 EOF
-echo -e'
+echo -e '
  <script>
   if (getDrawingItemState() == "focus")
   { if (getItemInfo(-1, "Watched") == "1") {
@@ -765,7 +757,7 @@ if [ $iteration = "0" ]; then
 iteration="1";
 echo "<item>"
 echo "<title>"0-9"</title>"
-echo "<poster>"${Jukebox_Path}"images/alpha/JukeMenu_0.jpg</poster>"
+echo "<poster>"${Jukebox_Path}"images/alpha/JukeMenu_Number.jpg</poster>"
 echo "</item>"
 fi
 else
