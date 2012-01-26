@@ -373,6 +373,11 @@ else
 fi
    
 echo -e '
+  <script>
+    /* initialize array before onEnter to keep these variable after the update Watchcgi */
+    AWatched="";
+    AWatched_size=0;
+  </script>
 	<onEnter>redrawDisplay();</onEnter>
 
 	<script>
@@ -528,7 +533,9 @@ EOF
 					}
  else if (userInput == "two") {
                                         MovieID=getItemInfo(-1, "IdMovie"); 
-					jumpToLink("Watchcgi");
+          Item_Watched=getItemInfo(-1, "Watched"); /* get item info before exiting rss */
+					jumpToLink("Watchcgi"); /* update database */
+          executeScript("WatchUpdate"); /* update array AWatched */
 					"false";
 				}
 EOF
@@ -625,11 +632,25 @@ echo -e '
 <!-- Display watched icon -->
 <image offsetXPC="3.2" offsetYPC="3.0" widthPC="20" heightPC="15">
 <script>
-   if (getItemInfo(-1, "Watched") == "1") {
-      "'${Jukebox_Path}'images/watched.png";
-      }
-   else {
-      "'${Jukebox_Path}'images/notwatched.png"; }
+  MovieID=getItemInfo(-1, "IdMovie");
+  AWatched_found="false";
+  AWatched_state="";
+	i=0;
+	while(i &lt; AWatched_size ){
+    if (MovieID == getStringArrayAt(AWatched,i)) {
+      AWatched_found="true";
+      AWatched_state=getStringArrayAt(AWatched,add(i,1));
+      break;
+    }
+		i += 2;
+	}
+  if ( AWatched_found == "true") {
+    if ( AWatched_state == "1" ) "/usr/local/etc/scripts/srjg/images/watched.png";
+    else "/usr/local/etc/scripts/srjg/images/notwatched.png";
+  } else {
+    if (getItemInfo(-1, "Watched") == "1") "/usr/local/etc/scripts/srjg/images/watched.png";
+    else "/usr/local/etc/scripts/srjg/images/notwatched.png";
+  }
 </script>
 </image>'
      
@@ -670,6 +691,33 @@ cat << EOF
        </script>
     </link>
 </Watchcgi>
+
+<WatchUpdate>
+  /* find if also watched, remove it and do nothing */
+  AWatched_found="false";
+
+  i=0;
+  while(i &lt; AWatched_size ){
+    if (MovieID == getStringArrayAt(AWatched,i)) {
+      AWatched_found="true";
+      AWatched=deleteStringArrayAt(AWatched, i);
+      AWatched=deleteStringArrayAt(AWatched, i);
+      AWatched_size -=2;
+      break;
+    }
+  	i += 2;
+  }
+  if ( AWatched_found != "true") {
+    if (Item_Watched == "1" ) {
+      Watched = 0;
+    } else {
+      Watched = 1;
+    }
+    AWatched=pushBackStringArray(AWatched, MovieID);
+    AWatched=pushBackStringArray(AWatched, Watched);
+    AWatched_size +=2;
+  }
+</WatchUpdate>
 
 <channel>
 	<title><script>Category_Title;</script></title>
