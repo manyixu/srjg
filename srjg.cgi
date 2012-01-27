@@ -25,6 +25,9 @@ fi
 Database=${Jukebox_Path}"movies.db"
 Sqlite=${Jukebox_Path}"sqlite3"
 
+# Genre "All Movies" depending of the language
+AllMovies=`sed "/>All Movies|/!d;s:|\(.*\)>.*:\1:" "${Jukebox_Path}lang/${Language}_genre"`
+
 SetVar()
 # Settting up a few variables needed
 {
@@ -373,11 +376,6 @@ else
 fi
    
 echo -e '
-  <script>
-    /* initialize array before onEnter to keep these variable after the update Watchcgi */
-    AWatched="";
-    AWatched_size=0;
-  </script>
 	<onEnter>redrawDisplay();</onEnter>
 
 	<script>
@@ -410,7 +408,10 @@ echo -e '
 		{
 			jukebox_top = getXMLText("jukebox", "top");
 		}
-		
+
+    /* array to keep update Watchcgi during views */
+    AWatched="";
+    AWatched_size=0;
 	</script>
 
 <mediaDisplay name="photoView" rowCount="'$row'" columnCount="'$col'" imageFocus="null" showHeader="no" showDefaultInfo="no" drawItemBorder="no" viewAreaXPC="0" viewAreaYPC="0" viewAreaWidthPC="100" viewAreaHeightPC="100" itemGapXPC="0.7" itemGapYPC="1" itemWidthPC="'$itemWidth'" itemHeightPC="'$itemHeight'" itemOffsetXPC="'$itemXPC'" itemOffsetYPC="'$itemYPC'" itemBorderPC="0" itemBorderColor="7:99:176" itemBackgroundColor="-1:-1:-1" sideTopHeightPC="0" sideBottomHeightPC="0" bottomYPC="100" idleImageXPC="67.81" idleImageYPC="89.17" idleImageWidthPC="4.69" idleImageHeightPC="4.17" backgroundColor="0:0:0">
@@ -425,7 +426,7 @@ echo -e '
 		<idleImage> image/POPUP_LOADING_08.png </idleImage>'
 
 
-if ([ $Jukebox_Size = "2x6" ] || [ $Jukebox_Size = ""3x8"" ]); then		
+if ([ $Jukebox_Size = "2x6" ] || [ $Jukebox_Size = "3x8" ]); then		
 cat <<EOF
 		<backgroundDisplay>
             <script>
@@ -485,7 +486,6 @@ fi
 	
 cat <<EOF	
 	<onUserInput>
-			<script>
 				userInput = currentUserInput();
 				Current_Item_index=getFocusItemIndex();
 				Max_index = (-1 + Jukebox_itemSize);
@@ -542,12 +542,11 @@ EOF
 	fi
 
 cat << EOF 
-			</script>
 		</onUserInput>
 EOF
 
 
-if ([ $Jukebox_Size = "2x6" ] ||  [ $Jukebox_Size = ""3x8"" ]); then
+if ([ $Jukebox_Size = "2x6" ] ||  [ $Jukebox_Size = "3x8" ]); then
 cat << EOF 
 <!-- Show Folder Name -->
 <text offsetXPC="7" offsetYPC="88.8" widthPC="60" heightPC="5" fontSize="14" useBackgroundSurface="yes" foregroundColor="195:196:195" redraw="yes" lines="1">
@@ -645,11 +644,9 @@ echo -e '
 		i += 2;
 	}
   if ( AWatched_found == "true") {
-    if ( AWatched_state == "1" ) "/usr/local/etc/scripts/srjg/images/watched.png";
-    else "/usr/local/etc/scripts/srjg/images/notwatched.png";
+    if ( AWatched_state == "1" ) "'${Jukebox_Path}'images/watched.png";
   } else {
-    if (getItemInfo(-1, "Watched") == "1") "/usr/local/etc/scripts/srjg/images/watched.png";
-    else "/usr/local/etc/scripts/srjg/images/notwatched.png";
+    if (getItemInfo(-1, "Watched") == "1") "'${Jukebox_Path}'images/watched.png";
   }
 </script>
 </image>'
@@ -726,7 +723,7 @@ cat << EOF
 EOF
 
 if [ "$mode" = "genre" ]; then
-   if [ "$Search" = "All" ]; then
+   if [ "$Search" = "`echo ${AllMovies} | cut -c1-3`" ]; then
      ${Sqlite} -separator ''  ${Database}  "SELECT header,IdMovhead,Movie_ID,IdMovFoot,title,poster,info,file,WatchedHead,watched,WatchedFoot,footer FROM t1,t2 ORDER BY title COLLATE NOCASE"; # All Movies
    else
       ${Sqlite} -separator ''  ${Database}  "SELECT header,IdMovhead,Movie_ID,IdMovFoot,title,poster,info,file,WatchedHead,watched,WatchedFoot,footer FROM t1,t2 WHERE genre LIKE '%$Search%' ORDER BY title COLLATE NOCASE";
@@ -777,7 +774,6 @@ if [ "$mode" = "genreSelection" ]; then
 ${Sqlite} -separator ''  ${Database}  "SELECT genre FROM t1" | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//' | sort -u | sed '/<name/!d;s:.*>\(.*\)</.*:\1:' | grep "[!-~]" | egrep -v "Sci-Fi" > /tmp/genre.list
 
 # Add "All Movies" depending of the language, into the genre list
-AllMovies=`sed "/>All Movies|/!d;s:|\(.*\)>.*:\1:" "${Jukebox_Path}lang/${Language}_genre"`
 sed -i 1i"$AllMovies" /tmp/genre.list
 while read LINE
 do
@@ -790,7 +786,6 @@ do
      </item>'
   done < /tmp/genre.list
 fi
-
 
 if [ "$mode" = "alphaSelection" ]; then
 # pulls out the first letter of alphabet of the movie title
