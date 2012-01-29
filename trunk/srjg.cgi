@@ -690,7 +690,6 @@ cat <<EOF
 <SwitchView>
   if( Jukebox_Size == "2x6" ) Jukebox_Size="3x8";
 	else if( Jukebox_Size == "3x8") Jukebox_Size="sheetwall";
-	else if( Jukebox_Size == "sheetwall") Jukebox_Size="sheetmovie";
 	else Jukebox_Size="2x6";
 </SwitchView>
 EOF
