@@ -11,11 +11,7 @@ CategoryTitle=$(echo $2 | sed 's/+/ /g;s/%\(..\)/\\x\1/g;')
 CategoryTitle=`echo -n -e $CategoryTitle`
 Jukebox_Size=`echo $3`
 IFS=$SAVEIFS
-if [ $mode = "genre" ]; then
-Search=`echo ${CategoryTitle} | cut -c1-3`
-else
 Search=${CategoryTitle}
-fi
 
 # Setting up variable according to srjg.cfg file
 . /tmp/srjg.cfg
@@ -483,6 +479,16 @@ cat <<EOF
 EOF
 
 fi
+
+if ([ $mode = "genreSelection" ] || [ $mode = "alphaSelection" ] || [ $mode = "yearSelection" ]); then
+cat <<EOF	
+		<image redraw="yes" offsetXPC="80" offsetYPC="5.5" widthPC="8" heightPC="6">
+				<script>
+					print("${Jukebox_Path}images/"+Jukebox_Size+".jpg");
+				</script>
+    </image>
+EOF
+fi
 	
 cat <<EOF	
 	<onUserInput>
@@ -514,24 +520,23 @@ cat <<EOF
 					   jumpToLink("NextView");
 					   "false";
 				}
-				
+EOF
+	if ([ $mode = "genreSelection" ] || [ $mode = "alphaSelection" ] || [ $mode = "yearSelection" ]); then
+cat <<EOF	
 				else if (userInput == "one") {
                     Genre_Title=urlEncode(Genre_Title); 
-					jumpToLink("SwitchView");
+					executeScript("SwitchView");
 					"false";
 					redrawDisplay();
 				} 
 
 EOF
+fi
 
-	if [ $mode = "genre" ] || [ $mode = "year" ] || [ $mode = "alpha" ] || [ $mode = "recent" ] || [ $mode = "notwatched" ]; then
-	  cat <<EOF     
-				  else if (userInput == "video_play") {
-                                        Current_Movie_File=getItemInfo(-1, "file");
-                                        playItemURL(Current_Movie_File, 10);
-					"false";
-					}
- else if (userInput == "two") {
+if ([ $mode = "genre" ] || [ $mode = "year" ] || [ $mode = "alpha" ] || [ $mode = "recent" ] || [ $mode = "notwatched" ]); then
+cat <<EOF     
+
+          else if (userInput == "two") {
                                         MovieID=getItemInfo(-1, "IdMovie"); 
           Item_Watched=getItemInfo(-1, "Watched"); /* get item info before exiting rss */
 					jumpToLink("Watchcgi"); /* update database */
@@ -541,7 +546,12 @@ EOF
 EOF
 	fi
 
-cat << EOF 
+cat << EOF
+				  else if (userInput == "video_play") {
+                                        Current_Movie_File=getItemInfo(-1, "file");
+                                        playItemURL(Current_Movie_File, 10);
+					"false";
+					}
 		</onUserInput>
 EOF
 
@@ -672,15 +682,21 @@ cat << EOF
        </script>
     </link>
 </SRJGView>
+EOF
+
+if ([ $mode = "genreSelection" ] || [ $mode = "alphaSelection" ] || [ $mode = "yearSelection" ]); then
+cat <<EOF	
 
 <SwitchView>
-    <link>
-       <script>
-           print("http://127.0.0.1:$Port/cgi-bin/srjg.cgi?"+mode+"@"+Genre_Title+"@"+NewView);
-       </script>
-    </link>
+  if( Jukebox_Size == "2x6" ) Jukebox_Size="3x8";
+	else if( Jukebox_Size == "3x8") Jukebox_Size="sheetwall";
+	else if( Jukebox_Size == "sheetwall") Jukebox_Size="sheetmovie";
+	else Jukebox_Size="2x6";
 </SwitchView>
+EOF
+fi
 
+cat << EOF
 <Watchcgi>
     <link>
        <script>
@@ -723,7 +739,7 @@ cat << EOF
 EOF
 
 if [ "$mode" = "genre" ]; then
-   if [ "$Search" = "`echo ${AllMovies} | cut -c1-3`" ]; then
+   if [ "$Search" = "$AllMovies" ]; then
      ${Sqlite} -separator ''  ${Database}  "SELECT header,IdMovhead,Movie_ID,IdMovFoot,title,poster,info,file,WatchedHead,watched,WatchedFoot,footer FROM t1,t2 ORDER BY title COLLATE NOCASE"; # All Movies
    else
       ${Sqlite} -separator ''  ${Database}  "SELECT header,IdMovhead,Movie_ID,IdMovFoot,title,poster,info,file,WatchedHead,watched,WatchedFoot,footer FROM t1,t2 WHERE genre LIKE '%$Search%' ORDER BY title COLLATE NOCASE";
