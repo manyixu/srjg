@@ -17,11 +17,11 @@ sed '1d;$d;s:<\(.*\)>\(.*\)</.*>:\1=\2:' ${CfgFile} >/tmp/srjg.cfg
 MoviesList="/tmp/movies.list"
 InsertList="/tmp/insert.list"
 DeleteList="/tmp/delete.list"
-PreviousMovieList="${Jukebox_Path}/prevmovies.list"
+PreviousMovieList="${Jukebox_Path}prevmovies.list"
 IMDB=""
 Force_DB_Update=""
-Database=${Jukebox_Path}"/movies.db"
-Sqlite=${Jukebox_Path}"/sqlite3"
+Database=${Jukebox_Path}"movies.db"
+Sqlite=${Jukebox_Path}"sqlite3"
 
 usage()
 # Display help menu
@@ -38,7 +38,7 @@ OPTIONS:
            string(s) will be skipped.  Strings must be separated by a ","
            (Optional) ex: -f sample,trailer
    -g      Generate moviesheets, thumbnails and NFO files. (Optional)
-           Please refer to ${Jukebox_Path}/imdb.sh for additional settings.
+           Please refer to ${Jukebox_Path}imdb.sh for additional settings.
    -u      Forces the rebuild of the movies database.  If you suspect that your movies.db
            is corrupted or made changes that require a full database update use -u.
 NOTES:  If any of the arguments have spaces in them they must be surrounded by quotes: ""
@@ -134,7 +134,7 @@ do
   break   # Found <title>, quit looking
 done <"$MOVIEPATH/$INFONAME"
         
-GENRE=`sed -e '/<genre/,/\/genre>/!d;/genre>/d' "$MOVIEPATH/$INFONAME"`
+GENRE=`sed -e '/<genre/,/\/genre>/!d;/genre>/d' -f "${Jukebox_Path}lang/${Lang}_genreGrp" "$MOVIEPATH/$INFONAME"`
 MovieYear=`sed '/<year/!d;s:.*>\(.*\)</.*:\1:' "$MOVIEPATH/$INFONAME"`            
 }
 
@@ -166,8 +166,8 @@ do
 
    # Initialize defaults, replace later
    MOVIETITLE="$MOVIENAME</title>"
-   MOVIESHEET=${Jukebox_Path}/images/NoMovieinfo.jpg
-   MOVIEPOSTER=${Jukebox_Path}/images/nofolder.jpg
+   MOVIESHEET=${Jukebox_Path}images/NoMovieinfo.jpg
+   MOVIEPOSTER=${Jukebox_Path}images/nofolder.jpg
    GENRE="<name>Unknown</name>"
    MovieYear=""
 		
@@ -221,7 +221,7 @@ ${Sqlite} ${Database}  "VACUUM";
 #*****************  Main Program  *****************************************
 
 GenerateMovieList;
-[ -n "$IMDB" ] &&  ${Jukebox_Path}/imdb.sh
+[ -n "$IMDB" ] &&  ${Jukebox_Path}imdb.sh
 [ -n "$Force_DB_Update" ] && Force_DB_Creation
 [ ! -f "${Database}" ] && CreateMovieDB
 echo Indexing $Movies_Path;
