@@ -71,7 +71,7 @@ do
   break   # Found <title>, quit looking
 done <"$MOVIEPATH/$INFONAME"
         
-GENRE=`sed -e '/<genre/,/\/genre>/!d;/genre>/d' "$MOVIEPATH/$INFONAME"`
+GENRE=`sed -e '/<genre/,/\/genre>/!d;/genre>/d' -f "${Jukebox_Path}lang/${Language}_genreGrp" "$MOVIEPATH/$INFONAME"`
 MovieYear=`sed '/<year/!d;s:.*>\(.*\)</.*:\1:' "$MOVIEPATH/$INFONAME"`            
 }
 
@@ -784,9 +784,9 @@ fi
 if [ "$mode" = "genreSelection" ]; then
 # pulls out the genre of the movies
 # The first line does the following: Pull data from database; remove all leading/trailing white spaces; sort and remove duplicate
-# remove possible empty line that may exist; remove <name>Sci-fi</name> keeps Science fiction instead; remove any blank line
+# remove possible empty line that may exist; remove any blank line
 # that may be still present.
-${Sqlite} -separator ''  ${Database}  "SELECT genre FROM t1" | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//' | sort -u | sed '/<name/!d;s:.*>\(.*\)</.*:\1:' | grep "[!-~]" | egrep -v "Sci-Fi" > /tmp/genre.list
+${Sqlite} -separator ''  ${Database}  "SELECT genre FROM t1" | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//' | sort -u | sed '/<name/!d;s:.*>\(.*\)</.*:\1:' | grep "[!-~]" > /tmp/genre.list
 
 # Add "All Movies" depending of the language, into the genre list
 sed -i 1i"$AllMovies" /tmp/genre.list
