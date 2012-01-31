@@ -660,7 +660,16 @@ echo -e '
   }
 </script>
 </image>'
+
+if [ "$mode" = "genreSelection" ]; then
+echo -e '
+<text offsetXPC="1" offsetYPC="75" widthPC="98" heightPC="13" fontSize="13" align="center" foregroundColor="255:255:255">
+<script>
+	getItemInfo(-1, "title");
+</script>
+</text>'
      
+  fi # if "$mode" = "genreSelection"
 fi
 
 cat << EOF
