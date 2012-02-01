@@ -84,6 +84,7 @@ then
 fi
 
 # Create symlink to HTML jukebox
+mount -o remount,rw /
 rm -f /tmp/www/srjg
 rm -f /tmp_orig/www/srjg
 ln -sf "$HTMLPATH" /tmp/www/srjg
@@ -105,7 +106,6 @@ echo '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 # Creating /hdd symlink
 if [ $USETITLE = 1 ];
 then
-  mount -o remount,rw /
   rm -f /tmp/www/hdd
   rm -f /tmp_orig/www/hdd
   ln -sf "$MOVPATH" /tmp/www/hdd
