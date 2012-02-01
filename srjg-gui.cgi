@@ -16,6 +16,7 @@ Content-type: text/html
 var one='Directory which will be scanned by SRJG'
 var two='Generate moviesheets, thumbnails and NFO files'
 var three='Force rebuild of the movies database'
+var four='Start jukebox generation'
 function writetext(what){
 document.getElementById('textarea').innerHTML=''+what+'';
 }
@@ -27,7 +28,8 @@ document.getElementById('textarea').innerHTML='';
 <style type="text/css">
 * { margin:0; padding:0;}
 body { background:#000; font-family:Arial; font-size:100%; line-height:.9375em; color:#7d7d7d; text-align:center;}
-p, h1 { margin:10px 10px 10px 10px;}
+p, h1 { margin:10px 10px 10px 10px; }
+pre { margin:10px 10px 10px 10px; font-family:Arial; font-size:100%; line-height:150%; color:#7d7d7d; }
 input, select { vertical-align:middle; font-weight:normal;}
 a {color:#fff;}
 a:hover{text-decoration:none;}
@@ -45,10 +47,9 @@ div.container3{ margin: 0 2%;background: #1a1a19; width:96%; float: left; margin
 .form1 { height:24px; float:left; }
 .form1 input {width:81px; height:16px; background:#1d1d1a; border:1px solid #333331; font-size:1em; color:#fff; padding-left:3px;}
 .form1 label { width:62px; float:left; text-align:right; margin-right:3px; margin-left:10px;}
-.form1 .input_1 { width:131px;}
-.form1 select {width:86px; height:18px; background:#1d1d1a; border:1px solid #333331; font-size:1em; color:#fff; line-height:16px;}
-.form1 .select_1 { width:136px;}
-.input_2 { margin-left:4px;}
+.form1 .input_1 { width:231px;}
+.form1 select {width:56px; height:18px; background:#1d1d1a; border:1px solid #333331; font-size:1em; color:#fff; line-height:16px;}
+.input_2 { background: transparent url(/generate-icon.png) no-repeat center top; width: 48px; height: 64px; padding: 48px 0 0; margin: 0; border: 0; overflow: hidden; cursor: pointer; cursor: hand; font-family:Arial; font-size:100%; line-height:.9375em; color:#7d7d7d; text-align:center;}
 .separator { width:50px; float:left;}
 #main {width:766px; margin:0 auto; text-align:left;}
 #border { border:1px solid #111;}
@@ -145,22 +146,49 @@ echo '</tbody></table>
 <b class="rbottom"><b class="r4"></b><b class="r3"></b><b class="r2"></b><b class="r1"></b></b>
 </div>'
 
-
-
 echo '
 <div class="container3">
-<b class="rtop"><b class="r1"></b><b class="r2"></b><b class="r3"></b><b class="r4"></b></b>
-	<h1>Generate</h1>
-	<form id="form2" action="" enctype="multipart/form-data"><br>
-		<div class="form1" onmouseover="writetext(one)" onmouseout="notext()"><label>Path:</label><input type="text" value="'$MPATH'" class="input_1" /></div>	
+<b class="rtop"><b class="r1"></b><b class="r2"></b><b class="r3"></b><b class="r4"></b></b>'
+
+if [ -z $QUERY_STRING ]
+then
+	echo '<h1>Options</h1>
+	<form id="form2" action="srjg-gui.cgi" method="get"><br>
+		<div class="form1" onmouseover="writetext(two)" onmouseout="notext()"><label>IMDB plugin:</label><select name="imdb"><option value="1">Yes</option><option value="0">No</option></select></div>
+		<div class="form1" onmouseover="writetext(three)" onmouseout="notext()"><label>Force:</label><select name="force"><option value="0">No</option><option value="1">Yes</option></select></div>
+		<div class="form1" onmouseover="writetext(one)" onmouseout="notext()"><label>Path:</label><input type="text" name="path" value="'$MPATH'" class="input_1" /></div>
 		<div class="separator">&nbsp;</div>
-		<div><input class="input_2" type="image" src="/generate-icon.png" label="Generate jukebox" /></div>
-		<div class="form1" onmouseover="writetext(two)" onmouseout="notext()"><label>IMDB plugin:</label><select class="select_1"><option>Yes</option><option>No</option></select></div><br><br>				
-		<div class="form1" onmouseover="writetext(three)" onmouseout="notext()"><label>Force:</label><select class="select_1"><option>No</option><option>Yes</option></select></div>
-		<div class="separator">&nbsp;</div>						
-		<div id="textarea"></div><br><br><br><br>
-	</form>						
+		<div onmouseover="writetext(four)"><input class="input_2" type="submit" value="Generate" /></div><br>
+		<div class="separator">&nbsp;</div>
+		<div id="textarea"></div><br><br>
+	</form>'
+else
+	echo '<h1>Generation</h1><pre>'
+
+GFORC="`echo "$QUERY_STRING" | cut -d'&' -f1 | cut -d'=' -f2`"
+GIMDB="`echo "$QUERY_STRING" | cut -d'&' -f2 | cut -d'=' -f2`"
+GPATH="`echo "$QUERY_STRING" | cut -d'&' -f3 | cut -d'=' -f2 | sed 's/+/ /g;s/%2F/\//g'`"
+
+if [ $GFORC = "1" ]
+then
+  USE_FORCE="-u"
+else
+  USE_FORCE=""
+fi
+
+if [ $GIMDB = "1" ]
+then
+  USE_IMDB="-g"
+else
+  USE_IMDB=""
+fi
+
+$JPATH/srjg_update.sh $USE_IMDB $USE_FORCE -p $GPATH
+
+echo '</pre>'
+fi
 	
+echo '
 	<p><center><a href="http://code.google.com/p/srjg/">SRJG web panel</a> &copy; 2012</center></p>					
 <b class="rbottom"><b class="r4"></b><b class="r3"></b><b class="r2"></b><b class="r1"></b></b>						
 </div>
