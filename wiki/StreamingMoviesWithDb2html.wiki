@@ -7,7 +7,7 @@
  # Install the latest _VLC media player_ from http://www.videolan.org/vlc/  (optional: you can also install web browser plug-in)
  # Generate HTML jukebox with _db2html_ using *-t* option. This will generate titles with hyperlink to the movie
  # Start _VLC media player_ and select *Media* -> *Open Network Stream* from main menu
- # Open http://192.168.1.15/srjg/ with your web browser and copy hyperlink to the movie you would like to play into the field shown below:
+ # Open http://YOUR-MEDIA-PLAYER-IP/srjg/ with your web browser and copy hyperlink to the movie you would like to play into the field shown below:
 
 http://members.home.nl/hellmann/vlc.gif
 
