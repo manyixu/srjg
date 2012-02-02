@@ -221,7 +221,8 @@ exit 0
 Header()
 #Insert RSS Header
 {
-echo -e '<?xml version="1.0" ?>
+echo -e '
+<?xml version="1.0" ?>
 <rss version="2.0" xmlns:dc="http://purl.org/dc/elements/1.1/">'
 }
 
