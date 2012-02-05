@@ -263,7 +263,7 @@ cat <<EOF
 <idleImage> image/POPUP_LOADING_08.png </idleImage>
 <itemDisplay>
 
-<image offsetXPC="0" offsetYPC="0" widthPC="100" heightPC="100">
+<image type="image/png" offsetXPC="0" offsetYPC="0" widthPC="100" heightPC="100">
  <script>
   if (getDrawingItemState() == "focus")
   {
@@ -333,7 +333,7 @@ cat <<EOF
 <idleImage> image/POPUP_LOADING_07.png </idleImage>
 <idleImage> image/POPUP_LOADING_08.png </idleImage>
 <backgroundDisplay>
-<image redraw="no" offsetXPC="0" offsetYPC="0" widthPC="100" heightPC="100">$ImgLink</image>
+<image type="image/jpeg" redraw="no" offsetXPC="0" offsetYPC="0" widthPC="100" heightPC="100">$ImgLink</image>
 </backgroundDisplay>
 <onUserInput>
 <script>
@@ -429,7 +429,7 @@ cat <<EOF
             <script>
                  Jukebox_itemSize = getPageInfo("itemCount"); 
 			</script>
-			<image redraw="no" offsetXPC="0" offsetYPC="0" widthPC="100" heightPC="100">
+			<image type="image/jpeg" redraw="no" offsetXPC="0" offsetYPC="0" widthPC="100" heightPC="100">
 				<script>
 					print(Category_Background);
 				</script>
@@ -457,7 +457,7 @@ cat <<EOF
 			</script>    
 		</backgroundDisplay>
 		
-		<image redraw="yes" offsetXPC="0" offsetYPC="0" widthPC="100" heightPC="80">
+		<image type="image/jpeg" redraw="yes" offsetXPC="0" offsetYPC="0" widthPC="100" heightPC="80">
 				<script>
 					getItemInfo(-1, "info");
 				</script>
@@ -472,7 +472,7 @@ cat <<EOF
 			</script>    
 		</backgroundDisplay>
 		
-		<image redraw="yes" offsetXPC="0" offsetYPC="0" widthPC="100" heightPC="100">
+		<image type="image/jpeg" redraw="yes" offsetXPC="0" offsetYPC="0" widthPC="100" heightPC="100">
 				<script>
 					getItemInfo(-1, "info");
 				</script>
@@ -483,7 +483,7 @@ fi
 
 if ([ $mode = "genreSelection" ] || [ $mode = "alphaSelection" ] || [ $mode = "yearSelection" ]); then
 cat <<EOF	
-		<image redraw="yes" offsetXPC="80" offsetYPC="5.5" widthPC="8" heightPC="6">
+		<image type="image/jpeg" redraw="yes" offsetXPC="80" offsetYPC="5.5" widthPC="8" heightPC="6">
 				<script>
 					print("${Jukebox_Path}images/"+Jukebox_Size+".jpg");
 				</script>
@@ -588,7 +588,7 @@ fi
 
 cat << EOF 
 <!-- Bottom Layer focus/unfocus -->
-<image offsetXPC="0" offsetYPC="0" widthPC="100" heightPC="100">
+<image type="image/jpeg" offsetXPC="0" offsetYPC="0" widthPC="100" heightPC="100">
 EOF
 echo -e '
  <script>
@@ -615,7 +615,7 @@ echo -e '
 if [ "$mode" = "yearSelection" ]; then
 echo -e '
 <!-- Top Layer folder.jpg -->
-<image offsetXPC="8.2" offsetYPC="5.5" widthPC="84.25" heightPC="89.25">
+<image type="image/jpeg" offsetXPC="8.2" offsetYPC="5.5" widthPC="84.25" heightPC="89.25">
  <script>
   thumbnailPath = "'${Jukebox_Path}'images/yearfolder.jpg";
   thumbnailPath;
@@ -632,7 +632,7 @@ else
 echo -e '
 
 <!-- Top Layer folder.jpg -->
-<image offsetXPC="8.2" offsetYPC="5.5" widthPC="84.25" heightPC="89.25">
+<image type="image/jpeg" offsetXPC="8.2" offsetYPC="5.5" widthPC="84.25" heightPC="89.25">
  <script>
   thumbnailPath = getItemInfo(-1, "poster");
   thumbnailPath;
@@ -640,7 +640,7 @@ echo -e '
 </image>
 
 <!-- Display watched icon -->
-<image offsetXPC="3.2" offsetYPC="3.0" widthPC="20" heightPC="15">
+<image type="image/png" offsetXPC="3.2" offsetYPC="3.0" widthPC="20" heightPC="15">
 <script>
   MovieID=getItemInfo(-1, "IdMovie");
   AWatched_found="false";

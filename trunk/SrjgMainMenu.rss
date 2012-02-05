@@ -89,7 +89,7 @@
  
 <itemDisplay>
 
-<image offsetXPC="0" offsetYPC="0" widthPC="100" heightPC="100">
+<image type="image/png" offsetXPC="0" offsetYPC="0" widthPC="100" heightPC="100">
  <script>
   if (getDrawingItemState() == "focus")
   {
@@ -110,7 +110,7 @@
 </itemDisplay>  
 
    <backgroundDisplay>
-        <image redraw="no" offsetXPC="0" offsetYPC="0" widthPC="100" heightPC="100">
+        <image type="image/jpeg" redraw="no" offsetXPC="0" offsetYPC="0" widthPC="100" heightPC="100">
 	     <script>
                  print(Jukebox_Path + "images/srjgMainMenu.jpg");
              </script>
