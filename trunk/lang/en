@@ -8,6 +8,7 @@
 	<notwatched>Not Watched</notwatched>
 	<year>Year</year>
 	<search>Search</search>
+  <config>Config</config>
 </main>
 <jukebox>
 	<top>1 = Switch View | 2 = Mark as Watched | Enter = Select | Rtn = Previous Menu/View | Play = Play Video/Movie</top>
@@ -16,3 +17,17 @@
   <fast>Fast</fast>
   <rebuild>Rebuild</rebuild>
 </update>
+<cfg>
+  <Lang>Language</Lang>
+  <Jukebox_Size>View</Jukebox_Size>
+  <Movies_Path>Movie path</Movies_Path>
+  <Movie_Filter>Filter</Movie_Filter>
+  <Recent_Max>Max recent movie</Recent_Max>
+  <Jukebox_Path>Jukebox path:</Jukebox_Path>
+  <Port>Port:</Port>
+  <Version>Version:</Version>
+</cfg>
+<FBrowser>
+  <FBrowser_Title>Movies Path:</FBrowser_Title>
+  <FBrowser_Valid>to validate</FBrowser_Valid>
+</FBrowser>

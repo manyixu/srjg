@@ -8,6 +8,7 @@
 	<notwatched>Do zobaczenia</notwatched>
 	<year>Rok</year>
 	<search>Szukaj</search>
+  <config>Config</config>
 </main>
 <jukebox>
 	<top>1 = Zmiana widoku | 2 = Zaznacz jako oglądane | Enter = Wybierz | Rtn = Poprzednie menu/widok | Play = Odtwórz film</top>
@@ -16,3 +17,17 @@
   <fast>Szybko</fast>
   <rebuild>Odbuduj</rebuild>
 </update>
+<cfg>
+  <Lang>Język</Lang>
+  <Jukebox_Size>Zobacz</Jukebox_Size>
+  <Movies_Path>Ścieżka film</Movies_Path>
+  <Movie_Filter>Filter</Movie_Filter>
+  <Recent_Max>Max niedawno film</Recent_Max>
+  <Jukebox_Path>Jukebox path:</Jukebox_Path>
+  <Port>Port:</Port>
+  <Version>Version:</Version>
+</cfg>
+<FBrowser>
+  <FBrowser_Title>Filmy Ścieżka:</FBrowser_Title>
+  <FBrowser_Valid>do sprawdzenia</FBrowser_Valid>
+</FBrowser>
