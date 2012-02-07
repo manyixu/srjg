@@ -8,6 +8,7 @@
 	<notwatched>Pas Regardé</notwatched>
 	<year>Année</year>
 	<search>Recherche</search>
+  <config>Config</config>
 </main>
 <jukebox>
 	<top>1 = Change vue | 2 = Marquer comme vu | Enter = Select | Rtn = Ecran précédent | Play = Joue la vidéo</top>
@@ -16,3 +17,17 @@
   <fast>Rapide</fast>
   <rebuild>Reconstruire</rebuild>
 </update>
+<cfg>
+  <Lang>Langue</Lang>
+  <Jukebox_Size>Vue</Jukebox_Size>
+  <Movies_Path>Chemin des Films</Movies_Path>
+  <Movie_Filter>Filtre</Movie_Filter>
+  <Recent_Max>Max films récents</Recent_Max>
+  <Jukebox_Path>Chemin du Jukebox:</Jukebox_Path>
+  <Port>Port:</Port>
+  <Version>Version:</Version>
+</cfg>
+<FBrowser>
+  <FBrowser_Title>Chemin des films:</FBrowser_Title>
+  <FBrowser_Valid>pour valider</FBrowser_Valid>
+</FBrowser>

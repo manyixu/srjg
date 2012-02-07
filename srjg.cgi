@@ -804,7 +804,7 @@ while read LINE
 do
   # translate to find genre thumbnails 
   Img_genre=`sed "/|$LINE>/!d;s:.*>\(.*\)|:\1:" "${Jukebox_Path}lang/${Language}_genre"`
-  if [ -z $Img_genre ]; then Img_genre="Unknown"; fi
+  if [ -z "$Img_genre" ] ; then Img_genre="Unknown"; fi
   echo -e '<item>
      <title>'$LINE'</title>
      <poster>'${Jukebox_Path}'images/genre/'$Img_genre'.jpg</poster>
@@ -838,32 +838,624 @@ done < /tmp/alpha.list
 fi
 }
 
+MenuCfg()
+# RSS to edit srjg.cfg
+{
+cat <<EOF
+<?xml version="1.0" encoding="UTF-8" ?>
+<rss version="2.0" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:media="http://purl.org/dc/elements/1.1/">
+
+<onEnter>
+  showIdle();
+	Config = "/usr/local/etc/srjg.cfg";
+  Config_ok = loadXMLFile(Config);
+    
+	if (Config_ok == null) {
+		print("Load Config fail ", Config);
+	}
+    else {
+        Config_itemSize = getXMLElementCount("Config");
+	}
+    
+  if (Config_itemSize > 0) {
+    Language = getXMLText("Config", "Lang");
+		Jukebox_Path = getXMLText("Config", "Jukebox_Path");
+		Jukebox_Size = getXMLText("Config", "Jukebox_Size");
+		Movies_Path = getXMLText("Config", "Movies_Path");
+		Movie_Filter = getXMLText("Config", "Movie_Filter");
+		Port = getXMLText("Config", "Port");
+		Recent_Max = getXMLText("Config", "Recent_Max");
+  }
+	 
+  srjgconf="/tmp/srjg.cfg";
+  tmpconfigArray=null;
+  tmpconfigArray=pushBackStringArray(tmpconfigArray, "Language="+Language);
+  tmpconfigArray=pushBackStringArray(tmpconfigArray, "Jukebox_Path="+Jukebox_Path);
+  tmpconfigArray=pushBackStringArray(tmpconfigArray, "Movies_Path="+Movies_Path);
+  tmpconfigArray=pushBackStringArray(tmpconfigArray, "Movie_Filter="+Movie_Filter);
+  tmpconfigArray=pushBackStringArray(tmpconfigArray, "Port="+Port);
+  tmpconfigArray=pushBackStringArray(tmpconfigArray, "Recent_Max="+Recent_Max);
+  writeStringToFile(srjgconf, tmpconfigArray);
+	 
+  langpath = Jukebox_Path + "lang/" + Language;
+  langfile = loadXMLFile(langpath);
+  if (langfile != null) {
+    cfg_lang = getXMLText("cfg", "Lang");
+    cfg_Jukebox_Path = getXMLText("cfg", "Jukebox_Path");
+    cfg_Jukebox_Size = getXMLText("cfg", "Jukebox_Size");
+    cfg_Movies_Path = getXMLText("cfg", "Movies_Path");
+    cfg_Movie_Filter = getXMLText("cfg", "Movie_Filter");
+    cfg_Port = getXMLText("cfg", "Port");
+    cfg_Version = getXMLText("cfg", "Version");
+    cfg_Recent_Max = getXMLText("cfg", "Recent_Max");
+  }
+
+  Version = readStringFromFile(Jukebox_Path + "Version");
+  if ( Version == null ) print ("Version File not found");
+</onEnter>
+
+<mediaDisplay name="photoView" rowCount="5" columnCount="1" drawItemText="no" showHeader="no" showDefaultInfo="no" menuBorderColor="255:255:255" sideColorBottom="-1:-1:-1" sideColorTop="-1:-1:-1" itemAlignt="left" itemOffsetXPC="4" itemOffsetYPC="32" itemWidthPC="32" itemHeightPC="7.2" backgroundColor="-1:-1:-1" itemBackgroundColor="-1:-1:-1" sliding="no" itemGap="0" idleImageXPC="90" idleImageYPC="5" idleImageWidthPC="5" idleImageHeightPC="8" imageUnFocus="null" imageParentFocus="null" imageBorderPC="0" forceFocusOnItem="no" cornerRounding="yes" itemBorderColor="-1:-1:-1" focusBorderColor="-1:-1:-1" unFocusBorderColor="-1:-1:-1">
+<idleImage> image/POPUP_LOADING_01.png </idleImage> 
+<idleImage> image/POPUP_LOADING_02.png </idleImage> 
+<idleImage> image/POPUP_LOADING_03.png </idleImage> 
+<idleImage> image/POPUP_LOADING_04.png </idleImage> 
+<idleImage> image/POPUP_LOADING_05.png </idleImage> 
+<idleImage> image/POPUP_LOADING_06.png </idleImage> 
+<idleImage> image/POPUP_LOADING_07.png </idleImage> 
+<idleImage> image/POPUP_LOADING_08.png </idleImage> 
+
+<!-- comment menu display -->
+<text redraw="no" backgroundColor="-1:-1:-1" foregroundColor="200:200:200" offsetXPC="36" offsetYPC="35" widthPC="57" heightPC="4" fontSize="16" lines="1" align="left">
+	<script>
+		print(Language);
+	</script>
+</text>
+
+<text redraw="no" backgroundColor="-1:-1:-1" foregroundColor="200:200:200" offsetXPC="36" offsetYPC="43" widthPC="57" heightPC="4" fontSize="16" lines="1" align="left">
+	<script>
+		print(Movies_Path);
+	</script>
+</text>
+
+<text redraw="no" backgroundColor="-1:-1:-1" foregroundColor="200:200:200" offsetXPC="36" offsetYPC="51" widthPC="57" heightPC="4" fontSize="16" lines="1" align="left">
+	<script>
+		print(Movie_Filter);
+	</script>
+</text>
+
+<text redraw="no" backgroundColor="-1:-1:-1" foregroundColor="200:200:200" offsetXPC="36" offsetYPC="59" widthPC="57" heightPC="4" fontSize="16" lines="1" align="left">
+	<script>
+		print(Jukebox_Size);
+	</script>
+</text>
+
+<text redraw="no" backgroundColor="-1:-1:-1" foregroundColor="200:200:200" offsetXPC="36" offsetYPC="67" widthPC="57" heightPC="4" fontSize="16" lines="1" align="left">
+	<script>
+		print(Recent_Max);
+	</script>
+</text>
+
+<!-- info display -->
+<text redraw="no" backgroundColor="-1:-1:-1" foregroundColor="200:200:200" offsetXPC="59" offsetYPC="10" widthPC="37" heightPC="4" fontSize="16" lines="1" align="center">
+	<script>
+		print(cfg_Jukebox_Path);
+	</script>
+</text>
+
+<text redraw="no" backgroundColor="-1:-1:-1" foregroundColor="200:200:200" offsetXPC="59" offsetYPC="14" widthPC="37" heightPC="4" fontSize="13" lines="1" align="center">
+	<script>
+		print(Jukebox_Path);
+	</script>
+</text>
+
+<text redraw="no" backgroundColor="-1:-1:-1" foregroundColor="200:200:200" offsetXPC="65" offsetYPC="18" widthPC="23" heightPC="4" fontSize="16" lines="1" align="left">
+	<script>
+		print(cfg_Port);
+	</script>
+</text>
+
+<text redraw="no" backgroundColor="-1:-1:-1" foregroundColor="200:200:200" offsetXPC="75" offsetYPC="18" widthPC="10" heightPC="4" fontSize="16" lines="1" align="left">
+	<script>
+		print(Port);
+	</script>
+</text>
+
+<text redraw="no" backgroundColor="-1:-1:-1" foregroundColor="200:200:200" offsetXPC="65" offsetYPC="22" widthPC="10" heightPC="4" fontSize="16" lines="1" align="left">
+	<script>
+		print(cfg_Version);
+	</script>
+</text>
+
+<text redraw="no" backgroundColor="-1:-1:-1" foregroundColor="200:200:200" offsetXPC="75" offsetYPC="22" widthPC="10" heightPC="4" fontSize="16" lines="1" align="left">
+	<script>
+		print(Version);
+	</script>
+</text>
+
+<onUserInput>
+  <script>
+    userInput = currentUserInput();
+	
+    if (userInput == "enter" ) {
+      indx=getFocusItemIndex();
+      mode=getItemInfo(indx, "selection");
+      if ( mode == "Movie_Filter") {
+        inputFilter=getInput("userName","doModal");
+        if (inputFilter != NULL) {
+          mode="UpdateCfg";
+          YPos="Movie_Filter";
+          SelParam=inputFilter;
+					jumpToLink("SelectionEntered");
+        }
+			} else {
+        SelParam=getItemInfo(indx, "param");
+        YPos=getItemInfo(indx, "pos");
+        jumpToLink("SelectionEntered");
+			}
+      "false";
+    }
+  </script>
+</onUserInput>
+
+ 
+<itemDisplay>
+
+<image type="image/png" offsetXPC="0" offsetYPC="0" widthPC="100" heightPC="100">
+ <script>
+  if (getDrawingItemState() == "focus")
+  {
+      print(Jukebox_Path + "images/focus_on.png");
+  }
+ else
+  {
+      print(Jukebox_Path + "images/focus_off.png");
+  }
+ </script>
+</image>
+
+<text redraw="no" offsetXPC="0" offsetYPC="0" widthPC="94" heightPC="100" backgroundColor="-1:-1:-1" foregroundColor="200:200:200" fontSize="16" align="center">
+ <script>
+    getItemInfo(-1, "title");
+ </script>
+</text>
+</itemDisplay>  
+
+   <backgroundDisplay>
+        <image type="image/jpeg" redraw="no" offsetXPC="0" offsetYPC="0" widthPC="100" heightPC="100">
+	     <script>
+                 print(Jukebox_Path + "images/srjgMainMenu.jpg");
+             </script>
+        </image>
+    </backgroundDisplay> 
+
+</mediaDisplay>
+
+<SelectionEntered>
+    <link>
+       <script>
+           print("http://127.0.0.1:"+Port+"/cgi-bin/srjg.cgi?"+mode+"@"+SelParam+"@"+YPos);
+       </script>
+    </link>
+</SelectionEntered>
+
+<channel>
+<title>Config menu</title>
+
+<item>
+<title>
+	<script>
+		print(cfg_lang);
+	</script>
+</title>
+<selection>Lang</selection>
+<param>en%20fr%20pl</param>
+<pos>25</pos>
+</item>
+
+<item>
+<title>
+	<script>
+		print(cfg_Movies_Path);
+	</script>
+</title>
+<selection>FBrowser</selection>
+</item>
+
+<item>
+<title>
+	<script>
+		print(cfg_Movie_Filter);
+	</script>
+</title>
+<selection>Movie_Filter</selection>
+</item>
+
+<item>
+<title>
+	<script>
+		print(cfg_Jukebox_Size);
+	</script>
+</title>
+<selection>Jukebox_Size</selection>
+<param>2x6%203x8%20sheetwall</param>
+<pos>43</pos>
+</item>
+
+<item>
+<title>
+	<script>
+		print(cfg_Recent_Max);
+	</script>
+</title>
+<selection>Recent_Max</selection>
+<param>10%2025%2050%2075%20100</param>
+<pos>50</pos>
+</item>
+
+</channel>
+</rss>
+EOF
+}
+
+FBrowser()
+# File browser
+# Original code from DMD RM Jukebox by Martini(CZ) from DMD team
+#    Contact: w0m@seznam.cz, http://www.hddplayer.cz
+# Modified and adapted to the srjg project
+{
+cat <<EOF
+<?xml version='1.0' ?>
+<rss version="2.0" xmlns:dc="http://purl.org/dc/elements/1.1/">
+
+<onEnter> 
+  Jukebox_Path="$Jukebox_Path";
+  langpath = Jukebox_Path + "lang/$Language";
+  langfile = loadXMLFile(langpath);
+  if (langfile != null) {
+		FBrowser_Title = getXMLText("FBrowser", "FBrowser_Title");
+		FBrowser_Valid = getXMLText("FBrowser", "FBrowser_Valid");
+  }
+  dirCount=0;
+  dir2File = "/tmp/Browser_dir.list";
+  dirArray = null;
+  Ch_Base = "/tmp/public/";
+  Ch_Sel = Ch_Base;
+  executeScript("listDir");
+  setFocusItemIndex(0);
+  RedrawDisplay();
+</onEnter>
+
+<mediaDisplay name="onePartView" sideLeftWidthPC="0" sideColorLeft="0:0:0" sideRightWidthPC="0" fontSize="14" focusFontColor="210:16:16" itemAlignt="center" viewAreaXPC=29.7 viewAreaYPC=26 viewAreaWidthPC=40 viewAreaHeightPC=50 headerImageWidthPC="0" itemImageHeightPC="0" itemImageWidthPC="0" itemXPC="10" itemYPC="15" itemWidthPC="80" itemHeightPC="10" itemBackgroundColor="0:0:0" itemPerPage="6" itemGap="0" infoYPC="90" infoXPC="90" backgroundColor="0:0:0" showHeader="no" showDefaultInfo="no">
+<idleImage> image/POPUP_LOADING_01.png </idleImage>
+<idleImage> image/POPUP_LOADING_02.png </idleImage>
+<idleImage> image/POPUP_LOADING_03.png </idleImage>
+<idleImage> image/POPUP_LOADING_04.png </idleImage>
+<idleImage> image/POPUP_LOADING_05.png </idleImage>
+<idleImage> image/POPUP_LOADING_06.png </idleImage>
+<idleImage> image/POPUP_LOADING_07.png </idleImage>
+<idleImage> image/POPUP_LOADING_08.png </idleImage>
+
+<backgroundDisplay>
+  <image type="image/png" offsetXPC=0 offsetYPC=0 widthPC=100 heightPC=100>
+    <script>print(Jukebox_Path + "images/FBrowser_Bg.jpg");</script>
+  </image>
+</backgroundDisplay>
+
+<text align="center" offsetXPC=0 offsetYPC=0 widthPC=100 heightPC=10 fontSize=14 backgroundColor=-1:-1:-1    foregroundColor=70:140:210>
+  <script>print(FBrowser_Title);</script>
+</text>
+
+<image redraw="no" offsetXPC="10" offsetYPC="90.5" widthPC="9" heightPC="7.2">
+  <script>print(Jukebox_Path + "images/play.png");</script>
+</image>
+
+<text align="left" offsetXPC=20.5 offsetYPC=89 widthPC=33 heightPC=10 fontSize=12 backgroundColor=-1:-1:-1    foregroundColor=200:200:200>
+<script>print(FBrowser_Valid);</script>
+</text>
+
+<text redraw="yes" align="center" offsetXPC=2 offsetYPC=75 widthPC=96 heightPC=10 fontSize=10 backgroundColor=0:0:0 foregroundColor=200:150:0>
+   <script>
+		    curidx = getFocusItemIndex();
+		    if (curidx != 0) {
+		      New = getStringArrayAt(pathArray, curidx);
+		    } else {
+		      New = Ch_Sel;
+		    }
+        print(New);
+    </script>
+</text>
+
+<itemDisplay>
+  <image type="image/png" redraw="yes" offsetXPC="0" offsetYPC="0" widthPC="100" heightPC="100">
+    <script>
+  if (getDrawingItemState() == "focus")
+  {
+      print(Jukebox_Path + "images/focus_on.png");
+  }
+ else
+  {
+      print(Jukebox_Path + "images/FBrowser_unfocus.png");
+  }
+    </script>
+  </image>
+  <image type="image/png" redraw="yes" offsetXPC="0" offsetYPC="25" widthPC="8" heightPC="50">
+    <script>
+					  Jukebox_Path +"images/folder.png";
+    </script>
+  </image>
+  <text redraw="yes" offsetXPC="6" offsetYPC="0" widthPC="94" heightPC="100" backgroundColor="-1:-1:-1" foregroundColor="200:200:200" fontSize="15">
+   <script>
+      getStringArrayAt(titleArray , -1);
+   </script>
+  </text>
+</itemDisplay>
+
+<onUserInput>
+	userInput = currentUserInput();
+
+	if ( userInput == "enter" || userInput == "right"){
+		    curidx = getFocusItemIndex();
+		    Ch_Sel = getStringArrayAt(pathArray, curidx);
+		    executeScript("listDir");
+  
+        setFocusItemIndex(0);
+        RedrawDisplay();
+        "true";
+
+  } else if ( userInput == "video_play" ) {
+		    curidx = getFocusItemIndex();
+		    if (curidx != 0) {
+		      New_Ch_Base = getStringArrayAt(pathArray, curidx);
+		    } else {
+		      New_Ch_Base = Ch_Sel;
+		    }
+        New_Ch_Base=urlEncode(New_Ch_Base);
+        dlok = loadXMLFile("http://127.0.0.1:80/cgi-bin/srjg.cgi?UpdateCfg@"+New_Ch_Base+"@Movies_Path");
+        postMessage("return");
+        "true";
+
+  } else if ( userInput == "left") {
+        setFocusItemIndex(0);
+        postMessage("enter");
+        "true";
+  }
+</onUserInput>
+</mediaDisplay>
+
+<listDir>
+    writeStringToFile(dir2File, Ch_Sel);
+    dlok = loadXMLFile("http://127.0.0.1:80/cgi-bin/srjg.cgi?DirList");
+    test="";
+    dirArray=null;
+    titleArray=null;
+    pathArray=null;
+    idx=0;
+    dirArray = readStringFromFile(dir2File);
+    while (test != " ") {
+      if (idx==0) {
+          title = "..";
+          path = getStringArrayAt(dirArray, idx);
+      } else {
+        test = getStringArrayAt(dirArray, idx);
+        if (test == "*") test = " ";
+        if (test != " ") {  
+          title = test;
+          path = Ch_Sel + test + "/";
+        }
+      }
+
+      titleArray = pushBackStringArray(titleArray,title);
+      pathArray = pushBackStringArray(pathArray,path);
+      
+      idx=Add(idx,1);
+    }
+    dirCount=idx - 1;
+</listDir>
+
+<item_template>
+       <displayTitle>
+            <script>
+				getStringArrayAt(titleArray , -1);
+			</script>
+        </displayTitle>
+        <media:thumbnail>
+            <script>
+			url = Jukebox_Path + "folder.png";
+     	print("thumbnail:");
+     	print(url);
+     	url;
+			</script>
+        </media:thumbnail>
+      		<media:content type="image/jpeg" />  
+		<onClick>
+			print("onClick");
+		</onClick>
+</item_template>
+<channel>
+        <title></title>
+  <itemSize>
+     <script>
+        dirCount;
+     </script>
+  </itemSize>
+</channel>
+</rss>
+EOF
+}
+
+UpdateCfg()
+# Update the srjg.cfg
+{
+cat <<EOF
+<?xml version="1.0" ?>
+<rss version="2.0" xmlns:dc="http://purl.org/dc/elements/1.1/">
+<onEnter>
+showIdle();
+postMessage("return");
+</onEnter>
+<mediaDisplay name="nullView"/>
+EOF
+
+Cfg_Tag=$Jukebox_Size
+Cfg_Par=$CategoryTitle
+
+if [ Cfg_Tag = "Movies_Path" ]; then
+  sed -i "s:<$Cfg_Tag>.*</$Cfg_Tag>:<$Cfg_Tag>\"$Cfg_Par\"</$Cfg_Tag>:" /usr/local/etc/srjg.cfg
+else
+  sed -i "s:<$Cfg_Tag>.*</$Cfg_Tag>:<$Cfg_Tag>$Cfg_Par</$Cfg_Tag>:" /usr/local/etc/srjg.cfg
+fi
+
+cat <<EOF
+<channel></channel></rss>
+EOF
+
+exit 0
+}
+
+DirList()
+# List HDD or Usb devices
+{
+cat <<EOF
+<?xml version="1.0" ?>
+<rss version="2.0" xmlns:dc="http://purl.org/dc/elements/1.1/">
+<onEnter>
+showIdle();
+postMessage("return");
+</onEnter>
+<mediaDisplay name="nullView"/>
+EOF
+
+folder=`sed -n '1p' /tmp/Browser_dir.list`
+
+dirname=${folder%/*}
+prevdir=${dirname%/*}
+
+echo $prevdir"/" > /tmp/Browser_dir.list
+
+cd "$folder"
+echo */ " " | sed "s/\/ /\n/g"  >> /tmp/Browser_dir.list
+
+cat <<EOF
+<channel></channel></rss>
+EOF
+
+exit 0
+}
+
+SubMenucfg()
+# auto choice menu to edit cfg
+{
+
+Item_nb=0
+for Item_lst in $CategoryTitle
+do
+  let Item_nb+=1
+done
+
+YPos=$Jukebox_Size
+
+cat <<EOF
+<?xml version="1.0"   encoding="utf-8" ?>
+<rss version="2.0" xmlns:dc="http://purl.org/dc/elements/1.1/">
+
+<onEnter>
+</onEnter>
+
+<mediaDisplay name="photoView" rowCount="$Item_nb" columnCount="1" drawItemText="no" showHeader="no" showDefaultInfo="no" menuBorderColor="255:255:255" sideColorBottom="-1:-1:-1" sideColorTop="-1:-1:-1" itemAlignt="left" itemOffsetXPC="10" itemOffsetYPC="$YPos" itemWidthPC="20" itemHeightPC="7.2" backgroundColor="-1:-1:-1" itemBackgroundColor="-1:-1:-1" sliding="no" itemGap="0" idleImageXPC="90" idleImageYPC="5" idleImageWidthPC="5" idleImageHeightPC="8" imageUnFocus="null" imageParentFocus="null" imageBorderPC="0" forceFocusOnItem="no" cornerRounding="yes" itemBorderColor="-1:-1:-1" focusBorderColor="-1:-1:-1" unFocusBorderColor="-1:-1:-1">
+<idleImage> image/POPUP_LOADING_01.png </idleImage>
+<idleImage> image/POPUP_LOADING_02.png </idleImage>
+<idleImage> image/POPUP_LOADING_03.png </idleImage>
+<idleImage> image/POPUP_LOADING_04.png </idleImage>
+<idleImage> image/POPUP_LOADING_05.png </idleImage>
+<idleImage> image/POPUP_LOADING_06.png </idleImage>
+<idleImage> image/POPUP_LOADING_07.png </idleImage>
+<idleImage> image/POPUP_LOADING_08.png </idleImage>
+<itemDisplay>
+
+<image offsetXPC="0" offsetYPC="0" widthPC="100" heightPC="100">
+ <script>
+  if (getDrawingItemState() == "focus")
+  {
+      print("${Jukebox_Path}images/focus_on.png");
+  }
+ else
+  {
+      print("${Jukebox_Path}images/focus_off.png");
+  }
+ </script>
+</image>
+
+<text redraw="no" offsetXPC="0" offsetYPC="0" widthPC="94" heightPC="100" backgroundColor="-1:-1:-1" foregroundColor="200:200:200" fontSize="16" align="center">
+ <script>
+    getItemInfo(-1, "title");
+ </script>
+</text>
+</itemDisplay>  
+
+<onUserInput>
+
+  userInput = currentUserInput();
+
+  if (userInput == "right") {
+    "true";
+  } else if (userInput == "enter") {
+    postMessage("return");
+    "false";
+  }
+
+</onUserInput>
+</mediaDisplay>
+
+<channel>
+<title>Updating Cfg</title>
+EOF
+
+Item_nb=0
+for Item_lst in $CategoryTitle
+do
+cat <<EOF
+<item>
+<title>$Item_lst</title>
+<link>http://127.0.0.1:$Port/cgi-bin/srjg.cgi?UpdateCfg@$Item_lst@$mode</link>
+</item>
+EOF
+done
+
+cat <<EOF
+</channel>
+</rss>
+EOF
+}
+
 #***********************Main Program*********************************
 
-if [ "$mode" = "togglewatch" ]; then
-   WatchedToggle;
-fi
-if [ "$mode" = "Update" ]; then
-  if [ "$CategoryTitle" = "Rebuild" ]; then
-    Force_DB_Update="y";
-    Update;
-  elif [ "$CategoryTitle" = "Fast" ]; then
-    Force_DB_Update="";
-    Update;
-  else
-    UpdateMenu;
-  fi
-else
-  if [ "$mode" = "moviesheet" ]; then
-    Header;
-    MoviesheetView;
-    Footer;
-  else
-    SetVar;
-    Header;
-    DisplayRss;
-    Footer;
-  fi
-fi
+case $mode in
+  "togglewatch") WatchedToggle;;
+  "Update")
+    if [ "$CategoryTitle" = "Rebuild" ]; then
+      Force_DB_Update="y"
+      Update
+    elif [ "$CategoryTitle" = "Fast" ]; then
+      Force_DB_Update=""
+      Update
+    else
+      UpdateMenu;
+    fi;;
+  "moviesheet")
+    Header
+    MoviesheetView
+    Footer;;
+  "Lang"|"Jukebox_Size"|"Port"|"Recent_Max") SubMenucfg;;
+  "UpdateCfg") UpdateCfg;;
+  "DirList") DirList;;
+  "FBrowser") FBrowser;;
+  "MenuCfg") MenuCfg;;
+  *)
+    SetVar
+    Header
+    DisplayRss
+    Footer;;
+esac
+
 exit 0
 
