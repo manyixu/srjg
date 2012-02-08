@@ -21,17 +21,19 @@
 		Movie_Filter = getXMLText("Config", "Movie_Filter");
 		Port = getXMLText("Config", "Port");
 		Recent_Max = getXMLText("Config", "Recent_Max");
-     }
+    Imdb = getXMLText("Config", "Imdb");
+  }
 	 
-	 srjgconf="/tmp/srjg.cfg";	
-     tmpconfigArray=null;
-     tmpconfigArray=pushBackStringArray(tmpconfigArray, "Language="+Language);
-     tmpconfigArray=pushBackStringArray(tmpconfigArray, "Jukebox_Path="+Jukebox_Path);
-     tmpconfigArray=pushBackStringArray(tmpconfigArray, "Movies_Path="+Movies_Path);
-     tmpconfigArray=pushBackStringArray(tmpconfigArray, "Movie_Filter="+Movie_Filter);
-     tmpconfigArray=pushBackStringArray(tmpconfigArray, "Port="+Port);
-     tmpconfigArray=pushBackStringArray(tmpconfigArray, "Recent_Max="+Recent_Max);
-     writeStringToFile(srjgconf, tmpconfigArray);
+  srjgconf="/tmp/srjg.cfg";	
+  tmpconfigArray=null;
+  tmpconfigArray=pushBackStringArray(tmpconfigArray, "Language="+Language);
+  tmpconfigArray=pushBackStringArray(tmpconfigArray, "Jukebox_Path="+Jukebox_Path);
+  tmpconfigArray=pushBackStringArray(tmpconfigArray, "Movies_Path="+Movies_Path);
+  tmpconfigArray=pushBackStringArray(tmpconfigArray, "Movie_Filter="+Movie_Filter);
+  tmpconfigArray=pushBackStringArray(tmpconfigArray, "Port="+Port);
+  tmpconfigArray=pushBackStringArray(tmpconfigArray, "Recent_Max="+Recent_Max);
+  tmpconfigArray=pushBackStringArray(tmpconfigArray, "Imdb="+Imdb);
+  writeStringToFile(srjgconf, tmpconfigArray);
 	 
 	 langpath = Jukebox_Path + "lang/" + Language;
 	 langfile = loadXMLFile(langpath);

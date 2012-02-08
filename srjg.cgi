@@ -175,11 +175,10 @@ MoviesList="/tmp/srjg_movies.list"
 InsertList="/tmp/srjg_insert.list"
 DeleteList="/tmp/srjg_delete.list"
 PreviousMovieList="${Movies_Path}SRJG/prevmovies.list"
-IMDB=""
 
 GenerateMovieList;
 
-[ -n "$IMDB" ] &&  ${Jukebox_Path}imdb.sh
+[ "$Imdb"="yes" ] &&  ${Jukebox_Path}imdb.sh >/dev/null
 [ -n "$Force_DB_Update" ] && Force_DB_Creation
 [ ! -f "${Database}" ] && CreateMovieDB
 GenerateInsDelFiles;
@@ -864,6 +863,7 @@ cat <<EOF
 		Movie_Filter = getXMLText("Config", "Movie_Filter");
 		Port = getXMLText("Config", "Port");
 		Recent_Max = getXMLText("Config", "Recent_Max");
+    Imdb = getXMLText("Config", "Imdb");
   }
 	 
   srjgconf="/tmp/srjg.cfg";
@@ -874,6 +874,7 @@ cat <<EOF
   tmpconfigArray=pushBackStringArray(tmpconfigArray, "Movie_Filter="+Movie_Filter);
   tmpconfigArray=pushBackStringArray(tmpconfigArray, "Port="+Port);
   tmpconfigArray=pushBackStringArray(tmpconfigArray, "Recent_Max="+Recent_Max);
+  tmpconfigArray=pushBackStringArray(tmpconfigArray, "Imdb="+Imdb);
   writeStringToFile(srjgconf, tmpconfigArray);
 	 
   langpath = Jukebox_Path + "lang/" + Language;
@@ -884,6 +885,7 @@ cat <<EOF
     cfg_Jukebox_Size = getXMLText("cfg", "Jukebox_Size");
     cfg_Movies_Path = getXMLText("cfg", "Movies_Path");
     cfg_Movie_Filter = getXMLText("cfg", "Movie_Filter");
+    cfg_Imdb = getXMLText("cfg", "Imdb");
     cfg_Port = getXMLText("cfg", "Port");
     cfg_Version = getXMLText("cfg", "Version");
     cfg_Recent_Max = getXMLText("cfg", "Recent_Max");
@@ -893,7 +895,7 @@ cat <<EOF
   if ( Version == null ) print ("Version File not found");
 </onEnter>
 
-<mediaDisplay name="photoView" rowCount="5" columnCount="1" drawItemText="no" showHeader="no" showDefaultInfo="no" menuBorderColor="255:255:255" sideColorBottom="-1:-1:-1" sideColorTop="-1:-1:-1" itemAlignt="left" itemOffsetXPC="4" itemOffsetYPC="32" itemWidthPC="32" itemHeightPC="7.2" backgroundColor="-1:-1:-1" itemBackgroundColor="-1:-1:-1" sliding="no" itemGap="0" idleImageXPC="90" idleImageYPC="5" idleImageWidthPC="5" idleImageHeightPC="8" imageUnFocus="null" imageParentFocus="null" imageBorderPC="0" forceFocusOnItem="no" cornerRounding="yes" itemBorderColor="-1:-1:-1" focusBorderColor="-1:-1:-1" unFocusBorderColor="-1:-1:-1">
+<mediaDisplay name="photoView" rowCount="6" columnCount="1" drawItemText="no" showHeader="no" showDefaultInfo="no" menuBorderColor="255:255:255" sideColorBottom="-1:-1:-1" sideColorTop="-1:-1:-1" itemAlignt="left" itemOffsetXPC="4" itemOffsetYPC="32" itemWidthPC="32" itemHeightPC="7.2" backgroundColor="-1:-1:-1" itemBackgroundColor="-1:-1:-1" sliding="no" itemGap="0" idleImageXPC="90" idleImageYPC="5" idleImageWidthPC="5" idleImageHeightPC="8" imageUnFocus="null" imageParentFocus="null" imageBorderPC="0" forceFocusOnItem="no" cornerRounding="yes" itemBorderColor="-1:-1:-1" focusBorderColor="-1:-1:-1" unFocusBorderColor="-1:-1:-1">
 <idleImage> image/POPUP_LOADING_01.png </idleImage> 
 <idleImage> image/POPUP_LOADING_02.png </idleImage> 
 <idleImage> image/POPUP_LOADING_03.png </idleImage> 
@@ -931,6 +933,12 @@ cat <<EOF
 <text redraw="no" backgroundColor="-1:-1:-1" foregroundColor="200:200:200" offsetXPC="36" offsetYPC="67" widthPC="57" heightPC="4" fontSize="16" lines="1" align="left">
 	<script>
 		print(Recent_Max);
+	</script>
+</text>
+
+<text redraw="no" backgroundColor="-1:-1:-1" foregroundColor="200:200:200" offsetXPC="36" offsetYPC="75" widthPC="57" heightPC="4" fontSize="16" lines="1" align="left">
+	<script>
+		print(Imdb);
 	</script>
 </text>
 
@@ -1089,6 +1097,17 @@ cat <<EOF
 <selection>Recent_Max</selection>
 <param>10%2025%2050%2075%20100</param>
 <pos>50</pos>
+</item>
+
+<item>
+<title>
+	<script>
+		print(cfg_Imdb);
+	</script>
+</title>
+<selection>Imdb</selection>
+<param>yes%20no</param>
+<pos>70</pos>
 </item>
 
 </channel>
@@ -1444,7 +1463,7 @@ case $mode in
     Header
     MoviesheetView
     Footer;;
-  "Lang"|"Jukebox_Size"|"Port"|"Recent_Max") SubMenucfg;;
+  "Lang"|"Jukebox_Size"|"Port"|"Recent_Max"|"Imdb") SubMenucfg;;
   "UpdateCfg") UpdateCfg;;
   "DirList") DirList;;
   "FBrowser") FBrowser;;
