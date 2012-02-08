@@ -101,7 +101,7 @@ else
 fi
 
 echo '<tr><td><p>Checking movies database:</p></td>'
-if [ -f "$JPATH/movies.db" ];
+if [ -f "$MPATH/SRJG/movies.db" ];
 then
 	echo '<td><font color="green">Found</font></td></tr>'
 else

@@ -14,13 +14,13 @@ sed '1d;$d;s:<\(.*\)>\(.*\)</.*>:\1=\2:' ${CfgFile} >/tmp/srjg.cfg
 
 # Initialize some Variables
 
-MoviesList="/tmp/movies.list"
-InsertList="/tmp/insert.list"
-DeleteList="/tmp/delete.list"
-PreviousMovieList="${Jukebox_Path}prevmovies.list"
+MoviesList="/tmp/srjg_movies.list"
+InsertList="/tmp/srjg_insert.list"
+DeleteList="/tmp/srjg_delete.list"
+PreviousMovieList="${Movies_Path}SRJG/prevmovies.list"
 IMDB=""
 Force_DB_Update=""
-Database=${Jukebox_Path}"movies.db"
+Database=${Movies_Path}"SRJG/movies.db"
 Sqlite=${Jukebox_Path}"sqlite3"
 
 usage()

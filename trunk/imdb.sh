@@ -9,7 +9,7 @@ IMDB_INFO="&mode=info"													# Parameters for generating info file
 IMDB_MOVIE="&mode=sheet&backdrop=y&box=bluray&source=y&tagline=y"		# Parameters for generating moviesheet
 IMDB_POSTER="&mode=poster"												# Parameters for generating poster
 
-IMDB_TMP="/tmp/movies.list"				# Path to the list of movies [DO NOT CHANGE, unless you are requested to do so]
+IMDB_TMP="/tmp/srjg_movies.list"				# Path to the list of movies [DO NOT CHANGE, unless you are requested to do so]
 IMDB_MODE="all"							# all: Generate everything (moviesheet, nfo, poster)
 										# images: Generate both moviesheet and poster
 										# moviesheet: Generate only moviesheet

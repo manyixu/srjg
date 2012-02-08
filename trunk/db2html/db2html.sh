@@ -8,14 +8,14 @@
 SRJGPATH="`sed '/<Jukebox_Path/!d;s:.*>\(.*\)</.*:\1:' /usr/local/etc/srjg.cfg | grep "[!-~]"`"
 MOVPATH="`sed '/<Movies_Path/!d;s:.*>\(.*\)</.*:\1:' /usr/local/etc/srjg.cfg | grep "[!-~]"`"
 DB2HTML="$SRJGPATH/db2html"		# Main path to db2html
-DBFILE="$SRJGPATH/movies.db"	# Path to movies.db
+DBFILE="$MOVPATH/SRJG/movies.db"	# Path to movies.db
 SQLPATH="$SRJGPATH/sqlite3"		# Path to sqlite binary
 DEFPOSTER="$SRJGPATH/nofolder.jpg"
 DEFSHEET="$SRJGPATH/NoMovieinfo.jpg"
-TMPTITLE="/tmp/title"
-TMPPOSTER="/tmp/poster"
-TMPSHEET="/tmp/sheet"
-TMPFILE="/tmp/file"
+TMPTITLE="/tmp/srjg_title"
+TMPPOSTER="/tmp/srjg_poster"
+TMPSHEET="/tmp/srjg_sheet"
+TMPFILE="/tmp/srjg_file"
 
 COLUMNS=10						# Number of columns to be created
 WIDTH=85						# Width of poster to be displayed
