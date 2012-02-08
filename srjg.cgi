@@ -18,7 +18,7 @@ Search=${CategoryTitle}
 
 # Setting up other variable
 
-Database=${Jukebox_Path}"movies.db"
+Database=${Movies_Path}"SRJG/movies.db"
 Sqlite=${Jukebox_Path}"sqlite3"
 
 # Genre "All Movies" depending of the language
@@ -171,10 +171,10 @@ postMessage("return");
 
 # Initialize some Variables
 
-MoviesList="/tmp/movies.list"
-InsertList="/tmp/insert.list"
-DeleteList="/tmp/delete.list"
-PreviousMovieList="${Jukebox_Path}prevmovies.list"
+MoviesList="/tmp/srjg_movies.list"
+InsertList="/tmp/srjg_insert.list"
+DeleteList="/tmp/srjg_delete.list"
+PreviousMovieList="${Movies_Path}SRJG/prevmovies.list"
 IMDB=""
 
 GenerateMovieList;
@@ -388,7 +388,6 @@ echo -e '
 		}
 		
 		DefaultView = getXMLText("Config", "Jukebox_Size");
-		Jukebox_Temp = "/tmp/";
             Category_Title = "'$CategoryTitle'";
 	    Category_Background = "'${Jukebox_Path}'images/background.jpg";						           
             setFocusItemIndex(0);
@@ -781,13 +780,13 @@ fi
 
 if [ "$mode" = "yearSelection" ]; then
 # pulls out the years of the movies
-${Sqlite} -separator ''  ${Database}  "SELECT DISTINCT year FROM t1 ORDER BY year COLLATE NOCASE" > /tmp/year.list
+${Sqlite} -separator ''  ${Database}  "SELECT DISTINCT year FROM t1 ORDER BY year COLLATE NOCASE" > /tmp/srjg_year.list
 while read LINE
 do
 echo "<item>"
 echo "<title>"$LINE"</title>"
 echo "</item>"
-done < /tmp/year.list
+done < /tmp/srjg_year.list
 fi
 
 
@@ -796,10 +795,10 @@ if [ "$mode" = "genreSelection" ]; then
 # The first line does the following: Pull data from database; remove all leading/trailing white spaces; sort and remove duplicate
 # remove possible empty line that may exist; remove any blank line
 # that may be still present.
-${Sqlite} -separator ''  ${Database}  "SELECT genre FROM t1" | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//' | sort -u | sed '/<name/!d;s:.*>\(.*\)</.*:\1:' | grep "[!-~]" > /tmp/genre.list
+${Sqlite} -separator ''  ${Database}  "SELECT genre FROM t1" | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//' | sort -u | sed '/<name/!d;s:.*>\(.*\)</.*:\1:' | grep "[!-~]" > /tmp/srjg_genre.list
 
 # Add "All Movies" depending of the language, into the genre list
-sed -i 1i"$AllMovies" /tmp/genre.list
+sed -i 1i"$AllMovies" /tmp/srjg_genre.list
 while read LINE
 do
   # translate to find genre thumbnails 
@@ -809,14 +808,14 @@ do
      <title>'$LINE'</title>
      <poster>'${Jukebox_Path}'images/genre/'$Img_genre'.jpg</poster>
      </item>'
-  done < /tmp/genre.list
+  done < /tmp/srjg_genre.list
 fi
 
 if [ "$mode" = "alphaSelection" ]; then
 # pulls out the first letter of alphabet of the movie title
 # The first line does the following: Pull data from database; remove the leading and trailing <title></title>; cut the title first 
 # Character; remove anything that is not A-Z ex: a number; sort and remove duplicate.
-${Sqlite} -separator ''  ${Database}  "SELECT title FROM t1" | sed '/<title/!d;s:.*>\(.*\)</.*:\1:' | cut -c 1 | grep '[0-9A-Z]' | sort -u > /tmp/alpha.list
+${Sqlite} -separator ''  ${Database}  "SELECT title FROM t1" | sed '/<title/!d;s:.*>\(.*\)</.*:\1:' | cut -c 1 | grep '[0-9A-Z]' | sort -u > /tmp/srjg_alpha.list
 iteration="0";
 while read LINE
 do
@@ -834,7 +833,7 @@ echo "<title>"$LINE"</title>"
 echo "<poster>"${Jukebox_Path}"images/alpha/JukeMenu_"$LINE".jpg</poster>"
 echo "</item>"
 fi
-done < /tmp/alpha.list
+done < /tmp/srjg_alpha.list
 fi
 }
 
@@ -1116,7 +1115,7 @@ cat <<EOF
 		FBrowser_Valid = getXMLText("FBrowser", "FBrowser_Valid");
   }
   dirCount=0;
-  dir2File = "/tmp/Browser_dir.list";
+  dir2File = "/tmp/srjg_Browser_dir.list";
   dirArray = null;
   Ch_Base = "/tmp/public/";
   Ch_Sel = Ch_Base;
@@ -1325,15 +1324,15 @@ postMessage("return");
 <mediaDisplay name="nullView"/>
 EOF
 
-folder=`sed -n '1p' /tmp/Browser_dir.list`
+folder=`sed -n '1p' /tmp/srjg_Browser_dir.list`
 
 dirname=${folder%/*}
 prevdir=${dirname%/*}
 
-echo $prevdir"/" > /tmp/Browser_dir.list
+echo $prevdir"/" > /tmp/srjg_Browser_dir.list
 
 cd "$folder"
-echo */ " " | sed "s/\/ /\n/g"  >> /tmp/Browser_dir.list
+echo */ " " | sed "s/\/ /\n/g"  >> /tmp/srjg_Browser_dir.list
 
 cat <<EOF
 <channel></channel></rss>
