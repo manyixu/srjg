@@ -20,8 +20,10 @@ DeleteList="/tmp/srjg_delete.list"
 PreviousMovieList="${Movies_Path}SRJG/prevmovies.list"
 IMDB=""
 Force_DB_Update=""
-Database=${Movies_Path}"SRJG/movies.db"
-Sqlite=${Jukebox_Path}"sqlite3"
+Database="${Movies_Path}SRJG/movies.db"
+Sqlite="${Jukebox_Path}sqlite3"
+
+mkdir -p "${Movies_Path}SRJG/"
 
 usage()
 # Display help menu
@@ -90,10 +92,10 @@ CreateMovieDB()
 # correct date which can be trivial with some players.
 {
 echo "Creating Database..."
-${Sqlite} ${Database} \
+${Sqlite} "${Database}" \
    "create table t1 (Movie_ID INTEGER PRIMARY KEY AUTOINCREMENT,genre TEXT,title TEXT,year TEXT,poster TEXT,info TEXT,file TEXT,watched INTEGER,dateStamp DATE DEFAULT CURRENT_DATE)";
-${Sqlite} ${Database} "create table t2 (header TEXT, footer TEXT, IdMovhead TEXT, IdMovFoot TEXT, WatchedHead TEXT, WatchedFoot TEXT)";
-${Sqlite} ${Database} "insert into t2 values ('<item>','</item>','<IdMovie>','</IdMovie>','<Watched>','</Watched>')";
+${Sqlite} "${Database}" "create table t2 (header TEXT, footer TEXT, IdMovhead TEXT, IdMovFoot TEXT, WatchedHead TEXT, WatchedFoot TEXT)";
+${Sqlite} "${Database}" "insert into t2 values ('<item>','</item>','<IdMovie>','</IdMovie>','<Watched>','</Watched>')";
 }
 
 Force_DB_Creation()
@@ -101,8 +103,8 @@ Force_DB_Creation()
 # This option can be use to start up with a fresh database in case of
 # Database corruption
 {
-rm $PreviousMovieList
-rm ${Database}
+rm "${PreviousMovieList}" 2>/dev/null
+rm "${Database}" 2>/dev/null
 CreateMovieDB;
 }
 
@@ -143,13 +145,13 @@ GenerateInsDelFiles()
 # Generate insertion and deletion files
 {
 sed -i -e 's/\[/\&lsqb;/g' -e 's/\]/\&rsqb;/g' $MoviesList # Conversion of [] for grep
-if [ -s "$PreviousMovieList" ] ; then # because the grep -f don't work with empty file
-  grep -vf $MoviesList $PreviousMovieList | sed -e 's/\&lsqb;/\[/g' -e 's/\&rsqb;/\]/g' > $DeleteList
-  grep -vf $PreviousMovieList $MoviesList | sed -e 's/\&lsqb;/\[/g' -e 's/\&rsqb;/\]/g' > $InsertList
+if [ -s "${PreviousMovieList}" ] ; then # because the grep -f don't work with empty file
+  grep -vf $MoviesList "${PreviousMovieList}" | sed -e 's/\&lsqb;/\[/g' -e 's/\&rsqb;/\]/g' > $DeleteList
+  grep -vf "${PreviousMovieList}" $MoviesList | sed -e 's/\&lsqb;/\[/g' -e 's/\&rsqb;/\]/g' > $InsertList
 else
   cat $MoviesList | sed -e 's/\&lsqb;/\[/g' -e 's/\&rsqb;/\]/g' > $InsertList
 fi
-mv $MoviesList $PreviousMovieList
+mv $MoviesList "${PreviousMovieList}"
 }
 
 
@@ -198,7 +200,7 @@ dbinfo=`echo "<info>$MOVIESHEET</info>" | sed "s/'/''/g"`
 dbfile=`echo "<file>$MOVIEPATH/$MOVIEFILE</file>" | sed "s/'/''/g"`
 dbYear=$MovieYear
 
-${Sqlite} ${Database} \
+${Sqlite} "${Database}" \
   "insert into t1 (genre,title,year,poster,info,file) \
   values ('$dbgenre','$dbtitle','$dbYear','$dbposter','$dbinfo','$dbfile');";
 
@@ -212,9 +214,9 @@ DBMovieDelete()
 echo "Removing movies from the Database ...."
 while read LINE
 do
-  ${Sqlite} ${Database}  "DELETE from t1 WHERE file='<file>${LINE}</file>'";
+  ${Sqlite} "${Database}"  "DELETE from t1 WHERE file='<file>${LINE}</file>'";
 done < $DeleteList
-${Sqlite} ${Database}  "VACUUM";
+${Sqlite} "${Database}"  "VACUUM";
 }
 
 
@@ -225,7 +227,7 @@ GenerateMovieList;
 [ -n "$Force_DB_Update" ] && Force_DB_Creation
 [ ! -f "${Database}" ] && CreateMovieDB
 echo Indexing $Movies_Path;
-# if full update required then just delete (rm) $PreviousMovieList
+# if full update required then just delete (rm) ${PreviousMovieList}
 GenerateInsDelFiles;
 [[ -s $DeleteList ]] && DBMovieDelete
 [[ -s $InsertList ]] && DBMovieInsert

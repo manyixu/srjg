@@ -41,9 +41,9 @@ CreateMovieDB()
 # DB as an automatic datestamp but unfortunately it relies on the player having the
 # correct date which can be trivial with some players.
 {
-${Sqlite} ${Database} "create table t1 (Movie_ID INTEGER PRIMARY KEY AUTOINCREMENT,genre TEXT,title TEXT,year TEXT,poster TEXT,info TEXT,file TEXT,watched INTEGER,dateStamp DATE DEFAULT CURRENT_DATE)";
-${Sqlite} ${Database} "create table t2 (header TEXT, footer TEXT, IdMovhead TEXT, IdMovFoot TEXT,WatchedHead TEXT, WatchedFoot TEXT)";
-${Sqlite} ${Database} "insert into t2 values ('<item>','</item>','<IdMovie>','</IdMovie>','<Watched>','</Watched>')";
+${Sqlite} "${Database}" "create table t1 (Movie_ID INTEGER PRIMARY KEY AUTOINCREMENT,genre TEXT,title TEXT,year TEXT,poster TEXT,info TEXT,file TEXT,watched INTEGER,dateStamp DATE DEFAULT CURRENT_DATE)";
+${Sqlite} "${Database}" "create table t2 (header TEXT, footer TEXT, IdMovhead TEXT, IdMovFoot TEXT,WatchedHead TEXT, WatchedFoot TEXT)";
+${Sqlite} "${Database}" "insert into t2 values ('<item>','</item>','<IdMovie>','</IdMovie>','<Watched>','</Watched>')";
 }
 
 Force_DB_Creation()
@@ -51,8 +51,8 @@ Force_DB_Creation()
 # This option can be use to start up with a fresh database in case of
 # Database corruption
 {
-rm $PreviousMovieList
-rm ${Database}
+rm "${PreviousMovieList}" 2>/dev/null # The /dev/null if list not exist due to rss update
+rm "${Database}" 2>/dev/null
 CreateMovieDB;
 }
 
@@ -91,13 +91,13 @@ GenerateInsDelFiles()
 # Generate insertion and deletion files
 {
 sed -i -e 's/\[/\&lsqb;/g' -e 's/\]/\&rsqb;/g' $MoviesList # Conversion of [] for grep
-if [ -s "$PreviousMovieList" ] ; then # because the grep -f don't work with empty file
-  grep -vf $MoviesList $PreviousMovieList | sed -e 's/\&lsqb;/\[/g' -e 's/\&rsqb;/\]/g' > $DeleteList
-  grep -vf $PreviousMovieList $MoviesList | sed -e 's/\&lsqb;/\[/g' -e 's/\&rsqb;/\]/g' > $InsertList
+if [ -s "${PreviousMovieList}" ] ; then # because the grep -f don't work with empty file
+  grep -vf $MoviesList "${PreviousMovieList}" | sed -e 's/\&lsqb;/\[/g' -e 's/\&rsqb;/\]/g' > $DeleteList
+  grep -vf "${PreviousMovieList}" $MoviesList | sed -e 's/\&lsqb;/\[/g' -e 's/\&rsqb;/\]/g' > $InsertList
 else
   cat $MoviesList | sed -e 's/\&lsqb;/\[/g' -e 's/\&rsqb;/\]/g' > $InsertList
 fi
-mv $MoviesList $PreviousMovieList
+mv $MoviesList "${PreviousMovieList}"
 }
 
 DBMovieDelete()
@@ -106,9 +106,9 @@ DBMovieDelete()
 echo "Removing movies from the Database ...."
 while read LINE
 do
-  ${Sqlite} ${Database}  "DELETE from t1 WHERE file='<file>${LINE}</file>'";
+  ${Sqlite} "${Database}"  "DELETE from t1 WHERE file='<file>${LINE}</file>'";
 done < $DeleteList
-${Sqlite} ${Database}  "VACUUM";
+${Sqlite} "${Database}"  "VACUUM";
 }
 
 DBMovieInsert()
@@ -154,7 +154,7 @@ dbinfo=`echo "<info>$MOVIESHEET</info>" | sed "s/'/''/g"`
 dbfile=`echo "<file>$MOVIEPATH/$MOVIEFILE</file>" | sed "s/'/''/g"`
 dbYear=$MovieYear
 
-${Sqlite} ${Database} "insert into t1 (genre,title,year,poster,info,file) values('$dbgenre','$dbtitle','$dbYear','$dbposter','$dbinfo','$dbfile');";
+${Sqlite} "${Database}" "insert into t1 (genre,title,year,poster,info,file) values('$dbgenre','$dbtitle','$dbYear','$dbposter','$dbinfo','$dbfile');";
 
 done < $InsertList
 }
@@ -176,9 +176,11 @@ InsertList="/tmp/srjg_insert.list"
 DeleteList="/tmp/srjg_delete.list"
 PreviousMovieList="${Movies_Path}SRJG/prevmovies.list"
 
+mkdir -p "${Movies_Path}SRJG/"
+
 GenerateMovieList;
 
-[ "$Imdb"="yes" ] &&  ${Jukebox_Path}imdb.sh >/dev/null
+[ "$Imdb"="yes" ] &&  ${Jukebox_Path}imdb.sh >/dev/null 2>&1
 [ -n "$Force_DB_Update" ] && Force_DB_Creation
 [ ! -f "${Database}" ] && CreateMovieDB
 GenerateInsDelFiles;
@@ -202,7 +204,7 @@ postMessage("return");
 <mediaDisplay name="nullView"/>
 '
 
-watch="`${Sqlite} -separator ''  ${Database}  "SELECT Watched FROM t1 WHERE Movie_ID like '$CategoryTitle'";`"
+watch="`${Sqlite} -separator ''  "${Database}"  "SELECT Watched FROM t1 WHERE Movie_ID like '$CategoryTitle'";`"
 
 if [ $watch == "1" ]; then
       watch="0";
@@ -210,7 +212,7 @@ else
      watch="1";
 fi
 
-${Sqlite} ${Database} "UPDATE t1 set Watched=$watch WHERE Movie_ID like '$CategoryTitle'";
+${Sqlite} "${Database}" "UPDATE t1 set Watched=$watch WHERE Movie_ID like '$CategoryTitle'";
 
 echo -e '<channel></channel></rss>'
 
@@ -317,8 +319,8 @@ EOF
 MoviesheetView()
 #Display moviesheet
 {
-ImgLink="`${Sqlite} -separator ''  ${Database}  "SELECT info FROM t1 WHERE Movie_ID like '$Search'" | sed '/<info/!d;s:.*>\(.*\)</.*:\1:'| grep "[!-~]";`"
-FileLink="`${Sqlite} -separator ''  ${Database}  "SELECT file FROM t1 WHERE Movie_ID like '$Search'" | sed '/<file/!d;s:.*>\(.*\)</.*:\1:'| grep "[!-~]";`"
+ImgLink="`${Sqlite} -separator ''  "${Database}"  "SELECT info FROM t1 WHERE Movie_ID like '$Search'" | sed '/<info/!d;s:.*>\(.*\)</.*:\1:'| grep "[!-~]";`"
+FileLink="`${Sqlite} -separator ''  "${Database}"  "SELECT file FROM t1 WHERE Movie_ID like '$Search'" | sed '/<file/!d;s:.*>\(.*\)</.*:\1:'| grep "[!-~]";`"
 
 cat <<EOF
 <onEnter>showIdle();</onEnter>
@@ -747,39 +749,39 @@ EOF
 
 if [ "$mode" = "genre" ]; then
    if [ "$Search" = "$AllMovies" ]; then
-     ${Sqlite} -separator ''  ${Database}  "SELECT header,IdMovhead,Movie_ID,IdMovFoot,title,poster,info,file,WatchedHead,watched,WatchedFoot,footer FROM t1,t2 ORDER BY title COLLATE NOCASE"; # All Movies
+     ${Sqlite} -separator ''  "${Database}"  "SELECT header,IdMovhead,Movie_ID,IdMovFoot,title,poster,info,file,WatchedHead,watched,WatchedFoot,footer FROM t1,t2 ORDER BY title COLLATE NOCASE"; # All Movies
    else
-      ${Sqlite} -separator ''  ${Database}  "SELECT header,IdMovhead,Movie_ID,IdMovFoot,title,poster,info,file,WatchedHead,watched,WatchedFoot,footer FROM t1,t2 WHERE genre LIKE '%$Search%' ORDER BY title COLLATE NOCASE";
+      ${Sqlite} -separator ''  "${Database}"  "SELECT header,IdMovhead,Movie_ID,IdMovFoot,title,poster,info,file,WatchedHead,watched,WatchedFoot,footer FROM t1,t2 WHERE genre LIKE '%$Search%' ORDER BY title COLLATE NOCASE";
    fi   
 fi
 
 if [ "$mode" = "alpha" ]; then
 if [ "$Search" = "0-9" ]; then
-${Sqlite} -separator ''  ${Database}  "SELECT header,IdMovhead,Movie_ID,IdMovFoot,title,poster,info,file,WatchedHead,watched,WatchedFoot,footer FROM t1,t2 WHERE title LIKE '<title>9%' OR title LIKE '<title>8%' OR title LIKE '<title>7%' OR title LIKE '<title>6%' OR title LIKE '<title>5%' OR title LIKE '<title>4%' OR title LIKE '<title>3%' OR title LIKE '<title>2%' OR title LIKE '<title>1%' OR title LIKE '<title>0%'";
+${Sqlite} -separator ''  "${Database}"  "SELECT header,IdMovhead,Movie_ID,IdMovFoot,title,poster,info,file,WatchedHead,watched,WatchedFoot,footer FROM t1,t2 WHERE title LIKE '<title>9%' OR title LIKE '<title>8%' OR title LIKE '<title>7%' OR title LIKE '<title>6%' OR title LIKE '<title>5%' OR title LIKE '<title>4%' OR title LIKE '<title>3%' OR title LIKE '<title>2%' OR title LIKE '<title>1%' OR title LIKE '<title>0%'";
 else
-${Sqlite} -separator ''  ${Database}  "SELECT header,IdMovhead,Movie_ID,IdMovFoot,title,poster,info,file,WatchedHead,watched,WatchedFoot,footer FROM t1,t2 WHERE title LIKE '<title>$Search%' ORDER BY title COLLATE NOCASE";
+${Sqlite} -separator ''  "${Database}"  "SELECT header,IdMovhead,Movie_ID,IdMovFoot,title,poster,info,file,WatchedHead,watched,WatchedFoot,footer FROM t1,t2 WHERE title LIKE '<title>$Search%' ORDER BY title COLLATE NOCASE";
 fi
 fi
 
 if [ "$mode" = "year" ]; then
-${Sqlite} -separator ''  ${Database}  "SELECT header,IdMovhead,Movie_ID,IdMovFoot,title,poster,info,file,WatchedHead,watched,WatchedFoot,footer FROM t1,t2 WHERE year ='$Search' ORDER BY title COLLATE NOCASE";
+${Sqlite} -separator ''  "${Database}"  "SELECT header,IdMovhead,Movie_ID,IdMovFoot,title,poster,info,file,WatchedHead,watched,WatchedFoot,footer FROM t1,t2 WHERE year ='$Search' ORDER BY title COLLATE NOCASE";
 fi
 
 if [ "$mode" = "recent" ]; then
-${Sqlite} -separator ''  ${Database}  "SELECT header,IdMovhead,Movie_ID,IdMovFoot,title,poster,info,file,WatchedHead,watched,WatchedFoot,footer FROM t1,t2 ORDER BY datestamp DESC LIMIT "$Recent_Max;
+${Sqlite} -separator ''  "${Database}"  "SELECT header,IdMovhead,Movie_ID,IdMovFoot,title,poster,info,file,WatchedHead,watched,WatchedFoot,footer FROM t1,t2 ORDER BY datestamp DESC LIMIT "$Recent_Max;
 fi
 
 if [ "$mode" = "notwatched" ]; then
-${Sqlite} -separator ''  ${Database}  "SELECT header,IdMovhead,Movie_ID,IdMovFoot,title,poster,info,file,WatchedHead,watched,WatchedFoot,footer FROM t1,t2 WHERE watched <>'1' OR watched IS NULL ORDER BY title COLLATE NOCASE";
+${Sqlite} -separator ''  "${Database}"  "SELECT header,IdMovhead,Movie_ID,IdMovFoot,title,poster,info,file,WatchedHead,watched,WatchedFoot,footer FROM t1,t2 WHERE watched <>'1' OR watched IS NULL ORDER BY title COLLATE NOCASE";
 fi
 
 if [ "$mode" = "moviesearch" ]; then
-${Sqlite} -separator ''  ${Database}  "SELECT header,IdMovhead,Movie_ID,IdMovFoot,title,poster,info,file,WatchedHead,watched,WatchedFoot,footer FROM t1,t2 WHERE title LIKE '<title>%$Search%' ORDER BY title COLLATE NOCASE";
+${Sqlite} -separator ''  "${Database}"  "SELECT header,IdMovhead,Movie_ID,IdMovFoot,title,poster,info,file,WatchedHead,watched,WatchedFoot,footer FROM t1,t2 WHERE title LIKE '<title>%$Search%' ORDER BY title COLLATE NOCASE";
 fi
 
 if [ "$mode" = "yearSelection" ]; then
 # pulls out the years of the movies
-${Sqlite} -separator ''  ${Database}  "SELECT DISTINCT year FROM t1 ORDER BY year COLLATE NOCASE" > /tmp/srjg_year.list
+${Sqlite} -separator ''  "${Database}"  "SELECT DISTINCT year FROM t1 ORDER BY year COLLATE NOCASE" > /tmp/srjg_year.list
 while read LINE
 do
 echo "<item>"
@@ -794,7 +796,7 @@ if [ "$mode" = "genreSelection" ]; then
 # The first line does the following: Pull data from database; remove all leading/trailing white spaces; sort and remove duplicate
 # remove possible empty line that may exist; remove any blank line
 # that may be still present.
-${Sqlite} -separator ''  ${Database}  "SELECT genre FROM t1" | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//' | sort -u | sed '/<name/!d;s:.*>\(.*\)</.*:\1:' | grep "[!-~]" > /tmp/srjg_genre.list
+${Sqlite} -separator ''  "${Database}"  "SELECT genre FROM t1" | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//' | sort -u | sed '/<name/!d;s:.*>\(.*\)</.*:\1:' | grep "[!-~]" > /tmp/srjg_genre.list
 
 # Add "All Movies" depending of the language, into the genre list
 sed -i 1i"$AllMovies" /tmp/srjg_genre.list
@@ -814,7 +816,7 @@ if [ "$mode" = "alphaSelection" ]; then
 # pulls out the first letter of alphabet of the movie title
 # The first line does the following: Pull data from database; remove the leading and trailing <title></title>; cut the title first 
 # Character; remove anything that is not A-Z ex: a number; sort and remove duplicate.
-${Sqlite} -separator ''  ${Database}  "SELECT title FROM t1" | sed '/<title/!d;s:.*>\(.*\)</.*:\1:' | cut -c 1 | grep '[0-9A-Z]' | sort -u > /tmp/srjg_alpha.list
+${Sqlite} -separator ''  "${Database}"  "SELECT title FROM t1" | sed '/<title/!d;s:.*>\(.*\)</.*:\1:' | cut -c 1 | grep '[0-9A-Z]' | sort -u > /tmp/srjg_alpha.list
 iteration="0";
 while read LINE
 do
@@ -889,6 +891,8 @@ cat <<EOF
     cfg_Port = getXMLText("cfg", "Port");
     cfg_Version = getXMLText("cfg", "Version");
     cfg_Recent_Max = getXMLText("cfg", "Recent_Max");
+    cfg_Yes = getXMLText("cfg", "yes");
+    cfg_No = getXMLText("cfg", "no");
   }
 
   Version = readStringFromFile(Jukebox_Path + "Version");
@@ -938,7 +942,8 @@ cat <<EOF
 
 <text redraw="no" backgroundColor="-1:-1:-1" foregroundColor="200:200:200" offsetXPC="36" offsetYPC="75" widthPC="57" heightPC="4" fontSize="16" lines="1" align="left">
 	<script>
-		print(Imdb);
+		if ( Imdb == "yes" ) print( cfg_Yes );
+    else print( cfg_No );
 	</script>
 </text>
 
@@ -1431,9 +1436,14 @@ EOF
 Item_nb=0
 for Item_lst in $CategoryTitle
 do
+  case ${Item_lst} in
+    "yes") Item_dspl=`sed "/<yes>/!d;s:.*>\(.*\)<.*:\1:" "${Jukebox_Path}lang/${Language}"`;;
+    "no")  Item_dspl=`sed "/<no>/!d;s:.*>\(.*\)<.*:\1:" "${Jukebox_Path}lang/${Language}"`;;
+    *)     Item_dspl=$Item_lst;;
+  esac
 cat <<EOF
 <item>
-<title>$Item_lst</title>
+<title>$Item_dspl</title>
 <link>http://127.0.0.1:$Port/cgi-bin/srjg.cgi?UpdateCfg@$Item_lst@$mode</link>
 </item>
 EOF

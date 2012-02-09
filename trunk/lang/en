@@ -23,9 +23,12 @@
   <Movies_Path>Movie path</Movies_Path>
   <Movie_Filter>Filter</Movie_Filter>
   <Recent_Max>Max recent movie</Recent_Max>
+  <Imdb>Use Imdb</Imdb>
   <Jukebox_Path>Jukebox path:</Jukebox_Path>
   <Port>Port:</Port>
   <Version>Version:</Version>
+  <yes>Yes</yes>
+  <no>No</no>
 </cfg>
 <FBrowser>
   <FBrowser_Title>Movies Path:</FBrowser_Title>
