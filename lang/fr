@@ -23,9 +23,12 @@
   <Movies_Path>Chemin des Films</Movies_Path>
   <Movie_Filter>Filtre</Movie_Filter>
   <Recent_Max>Max films récents</Recent_Max>
+  <Imdb>Utiliser Imdb</Imdb>
   <Jukebox_Path>Chemin du Jukebox:</Jukebox_Path>
   <Port>Port:</Port>
   <Version>Version:</Version>
+  <yes>Oui</yes>
+  <no>Non</no>
 </cfg>
 <FBrowser>
   <FBrowser_Title>Chemin des films:</FBrowser_Title>
