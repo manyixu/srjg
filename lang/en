@@ -34,3 +34,15 @@
   <FBrowser_Title>Movies Path:</FBrowser_Title>
   <FBrowser_Valid>to validate</FBrowser_Valid>
 </FBrowser>
+<Imdb>
+  <Imdb_Use>Activate Imdb</Imdb_Use>
+  <Imdb_Lang>Synopsis</Imdb_Lang>
+  <Imdb_Backdrop>Random Bankground</Imdb_Backdrop>
+  <Imdb_Box>Poster Box</Imdb_Box>
+  <Imdb_Font>Font</Imdb_Font>
+  <Imdb_Genres>Genres images</Imdb_Genres>
+  <Imdb_Source>Random Poster</Imdb_Source>
+  <Imdb_Tagline>Tagline</Imdb_Tagline>
+  <Imdb_Time>Format time</Imdb_Time>
+  <Imdb_Info>Create file info</Imdb_Info>
+</Imdb>

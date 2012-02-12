@@ -34,3 +34,15 @@
   <FBrowser_Title>Chemin des films:</FBrowser_Title>
   <FBrowser_Valid>pour valider</FBrowser_Valid>
 </FBrowser>
+<Imdb>
+  <Imdb_Use>Activer Imdb</Imdb_Use>
+  <Imdb_Lang>Synopsis</Imdb_Lang>
+  <Imdb_Backdrop>Image du fond aléatoire</Imdb_Backdrop>
+  <Imdb_Box>Cadre de la pochette</Imdb_Box>
+  <Imdb_Font>Police de caractère</Imdb_Font>
+  <Imdb_Genres>Genres en images</Imdb_Genres>
+  <Imdb_Source>Pochette aléatoire</Imdb_Source>
+  <Imdb_Tagline>Ligne Tag</Imdb_Tagline>
+  <Imdb_Time>Format de la Durée</Imdb_Time>
+  <Imdb_Info>Générer fichier info</Imdb_Info>
+</Imdb>

@@ -23,8 +23,6 @@ Force_DB_Update=""
 Database="${Movies_Path}SRJG/movies.db"
 Sqlite="${Jukebox_Path}sqlite3"
 
-mkdir -p "${Movies_Path}SRJG/"
-
 usage()
 # Display help menu
 {
@@ -84,7 +82,7 @@ if [ ! -d "${Movies_Path}" ]; then			# ctrl directory cfg file
   exit 1
 fi
 
-
+[ -d "${Movies_Path}" ] && mkdir -p "${Movies_Path}SRJG/"
 
 CreateMovieDB()
 # Create the Movie Database
@@ -93,7 +91,7 @@ CreateMovieDB()
 {
 echo "Creating Database..."
 ${Sqlite} "${Database}" \
-   "create table t1 (Movie_ID INTEGER PRIMARY KEY AUTOINCREMENT,genre TEXT,title TEXT,year TEXT,poster TEXT,info TEXT,file TEXT,watched INTEGER,dateStamp DATE DEFAULT CURRENT_DATE)";
+   "create table t1 (Movie_ID INTEGER PRIMARY KEY AUTOINCREMENT,genre TEXT,title TEXT,year TEXT,path TEXT,poster TEXT,info TEXT,file TEXT,ext TEXT,watched INTEGER,dateStamp DATE DEFAULT CURRENT_DATE)";
 ${Sqlite} "${Database}" "create table t2 (header TEXT, footer TEXT, IdMovhead TEXT, IdMovFoot TEXT, WatchedHead TEXT, WatchedFoot TEXT)";
 ${Sqlite} "${Database}" "insert into t2 values ('<item>','</item>','<IdMovie>','</IdMovie>','<Watched>','</Watched>')";
 }
@@ -164,12 +162,13 @@ while read LINE
 do
    MOVIEPATH="${LINE%/*}"  # Shell builtins instead of dirname
    MOVIEFILE="${LINE##*/}" # Shell builtins instead of basename
-   MOVIENAME="${MOVIEFILE%.*}"  # Strip off .ext       
+   MOVIENAME="${MOVIEFILE%.*}"  # Strip off .ext
+   MOVIEEXT="${MOVIEFILE##*.}"  # only ext
 
    # Initialize defaults, replace later
    MOVIETITLE="$MOVIENAME</title>"
-   MOVIESHEET=${Jukebox_Path}images/NoMovieinfo.jpg
-   MOVIEPOSTER=${Jukebox_Path}images/nofolder.jpg
+   MOVIESHEET=NoMovieinfo.jpg
+   MOVIEPOSTER=nofolder.jpg
    GENRE="<name>Unknown</name>"
    MovieYear=""
 		
@@ -182,27 +181,29 @@ do
    for FILE in "folder.jpg" "${MOVIENAME}.jpg"
    do
     [ ! -e "$MOVIEPATH/$FILE" ] && continue
-    MOVIEPOSTER="$MOVIEPATH/$FILE"
+    MOVIEPOSTER="$FILE"
     break
    done
 
    for FILE in "about.jpg" "0001.jpg" "${MOVIENAME}_sheet.jpg"
    do
     [ ! -e "$MOVIEPATH/$FILE" ] && continue
-    MOVIESHEET="$MOVIEPATH/$FILE"
+    MOVIESHEET="$FILE"
     break
    done
 
 dbgenre=$GENRE 
 dbtitle=`echo "<title>$MOVIETITLE" | sed "s/'/''/g"`
+dbpath=`echo "<path>$MOVIEPATH</path>" | sed "s/'/''/g"`
 dbposter=`echo "<poster>$MOVIEPOSTER</poster>" | sed "s/'/''/g"`
 dbinfo=`echo "<info>$MOVIESHEET</info>" | sed "s/'/''/g"`
-dbfile=`echo "<file>$MOVIEPATH/$MOVIEFILE</file>" | sed "s/'/''/g"`
+dbfile=`echo "<file>$MOVIENAME</file>" | sed "s/'/''/g"`
+dbext=`echo "<ext>$MOVIEEXT</ext>" | sed "s/'/''/g"`
 dbYear=$MovieYear
 
 ${Sqlite} "${Database}" \
-  "insert into t1 (genre,title,year,poster,info,file) \
-  values ('$dbgenre','$dbtitle','$dbYear','$dbposter','$dbinfo','$dbfile');";
+  "insert into t1 (genre,title,year,path,poster,info,file,ext) \
+  values ('$dbgenre','$dbtitle','$dbYear','$dbpath','$dbposter','$dbinfo','$dbfile','$dbext');";
 
 done < $InsertList
 }

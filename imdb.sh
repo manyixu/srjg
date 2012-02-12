@@ -14,8 +14,6 @@ fi
 sed '1d;$d;s:<\(.*\)>\(.*\)</.*>:\1=\2:' ${CfgFile} >/tmp/srjg.cfg
 . /tmp/srjg.cfg
 
-if [ ${Lang} != "fr" ]; then Lang="en"; fi
-
 IMDB_LINK="http://playon.unixstorm.org/IMDB/movie.php?name="			# Link to IMDB API [DO NOT CHANGE, unless you are requested to do so]
 IMDB_INFO="&mode=info"													# Parameters for generating info file
 IMDB_MOVIE="&mode=sheet&backdrop=y&box=bluray&source=y&tagline=y&lang=${Lang}"		# Parameters for generating moviesheet
