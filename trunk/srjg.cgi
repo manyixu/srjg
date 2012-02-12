@@ -115,6 +115,7 @@ ${Sqlite} "${Database}"  "VACUUM";
 DBMovieInsert()
 # Add movies to the Database and extract movies posters/folders
 {
+rm "${UpdateLog}" 2>/dev/null
 while read LINE
 do
    MOVIEPATH="${LINE%/*}"  # Shell builtins instead of dirname
@@ -158,8 +159,8 @@ dbfile=`echo "<file>$MOVIENAME</file>" | sed "s/'/''/g"`
 dbext=`echo "<ext>$MOVIEEXT</ext>" | sed "s/'/''/g"`
 dbYear=$MovieYear
 
-${Sqlite} "${Database}" "insert into t1 (genre,title,year,path,poster,info,file,ext) values('$dbgenre','$dbtitle','$dbYear','$dbpath','$dbposter','$dbinfo','$dbfile','$dbext');";
-
+${Sqlite} "${Database}" "insert into t1 (genre,title,year,path,poster,info,file,ext) values('$dbgenre','$dbtitle','$dbYear','$dbpath','$dbposter','$dbinfo','$dbfile','$dbext');"; >> "${UpdateLog}"
+echo '<channel> </channel>' # to maintain the signal
 done < $InsertList
 }
 
@@ -189,7 +190,7 @@ GenerateMovieList;
 [ ! -f "${Database}" ] && CreateMovieDB
 GenerateInsDelFiles;
 [[ -s $DeleteList ]] && DBMovieDelete
-[[ -s $InsertList ]] && DBMovieInsert >"${UpdateLog}" 2>&1
+[[ -s $InsertList ]] && DBMovieInsert
 
 echo '<channel>'
 Footer;
