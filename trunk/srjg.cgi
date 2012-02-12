@@ -19,6 +19,7 @@ Search=${CategoryTitle}
 # Setting up other variable
 
 Database=${Movies_Path}"SRJG/movies.db"
+UpdateLog=${Movies_Path}"SRJG/update.log"
 Sqlite=${Jukebox_Path}"sqlite3"
 
 # Genre "All Movies" depending of the language
@@ -41,7 +42,7 @@ CreateMovieDB()
 # DB as an automatic datestamp but unfortunately it relies on the player having the
 # correct date which can be trivial with some players.
 {
-${Sqlite} "${Database}" "create table t1 (Movie_ID INTEGER PRIMARY KEY AUTOINCREMENT,genre TEXT,title TEXT,year TEXT,poster TEXT,info TEXT,file TEXT,watched INTEGER,dateStamp DATE DEFAULT CURRENT_DATE)";
+${Sqlite} "${Database}" "create table t1 (Movie_ID INTEGER PRIMARY KEY AUTOINCREMENT,genre TEXT,title TEXT,year TEXT,path TEXT,poster TEXT,info TEXT,file TEXT,ext TEXT,watched INTEGER,dateStamp DATE DEFAULT CURRENT_DATE)";
 ${Sqlite} "${Database}" "create table t2 (header TEXT, footer TEXT, IdMovhead TEXT, IdMovFoot TEXT,WatchedHead TEXT, WatchedFoot TEXT)";
 ${Sqlite} "${Database}" "insert into t2 values ('<item>','</item>','<IdMovie>','</IdMovie>','<Watched>','</Watched>')";
 }
@@ -118,12 +119,13 @@ while read LINE
 do
    MOVIEPATH="${LINE%/*}"  # Shell builtins instead of dirname
    MOVIEFILE="${LINE##*/}" # Shell builtins instead of basename
-   MOVIENAME="${MOVIEFILE%.*}"  # Strip off .ext       
+   MOVIENAME="${MOVIEFILE%.*}"  # Strip off .ext
+   MOVIEEXT="${MOVIEFILE##*.}"  # only ext
 
    # Initialize defaults, replace later
    MOVIETITLE="$MOVIENAME</title>"
-   MOVIESHEET=${Jukebox_Path}images/NoMovieinfo.jpg
-   MOVIEPOSTER=${Jukebox_Path}images/nofolder.jpg
+   MOVIESHEET=NoMovieinfo.jpg
+   MOVIEPOSTER=nofolder.jpg
    GENRE="<name>Unknown</name>"
    MovieYear=""
 		
@@ -136,25 +138,27 @@ do
    for FILE in "folder.jpg" "${MOVIENAME}.jpg"
    do
     [ ! -e "$MOVIEPATH/$FILE" ] && continue
-    MOVIEPOSTER="$MOVIEPATH/$FILE"
+    MOVIEPOSTER="$FILE"
     break
    done
 
    for FILE in "about.jpg" "0001.jpg" "${MOVIENAME}_sheet.jpg"
    do
     [ ! -e "$MOVIEPATH/$FILE" ] && continue
-    MOVIESHEET="$MOVIEPATH/$FILE"
+    MOVIESHEET="$FILE"
     break
    done
 
 dbgenre=$GENRE 
 dbtitle=`echo "<title>$MOVIETITLE" | sed "s/'/''/g"`
+dbpath=`echo "<path>$MOVIEPATH</path>" | sed "s/'/''/g"`
 dbposter=`echo "<poster>$MOVIEPOSTER</poster>" | sed "s/'/''/g"`
 dbinfo=`echo "<info>$MOVIESHEET</info>" | sed "s/'/''/g"`
-dbfile=`echo "<file>$MOVIEPATH/$MOVIEFILE</file>" | sed "s/'/''/g"`
+dbfile=`echo "<file>$MOVIENAME</file>" | sed "s/'/''/g"`
+dbext=`echo "<ext>$MOVIEEXT</ext>" | sed "s/'/''/g"`
 dbYear=$MovieYear
 
-${Sqlite} "${Database}" "insert into t1 (genre,title,year,poster,info,file) values('$dbgenre','$dbtitle','$dbYear','$dbposter','$dbinfo','$dbfile');";
+${Sqlite} "${Database}" "insert into t1 (genre,title,year,path,poster,info,file,ext) values('$dbgenre','$dbtitle','$dbYear','$dbpath','$dbposter','$dbinfo','$dbfile','$dbext');";
 
 done < $InsertList
 }
@@ -176,16 +180,16 @@ InsertList="/tmp/srjg_insert.list"
 DeleteList="/tmp/srjg_delete.list"
 PreviousMovieList="${Movies_Path}SRJG/prevmovies.list"
 
-mkdir -p "${Movies_Path}SRJG/"
+[ -d "${Movies_Path}" ] && mkdir -p "${Movies_Path}SRJG/"
 
 GenerateMovieList;
 
-[ "$Imdb"="yes" ] &&  ${Jukebox_Path}imdb.sh >/dev/null 2>&1
+[ "$Imdb" = "yes" ] &&  ${Jukebox_Path}imdb.sh >/dev/null 2>&1
 [ -n "$Force_DB_Update" ] && Force_DB_Creation
 [ ! -f "${Database}" ] && CreateMovieDB
 GenerateInsDelFiles;
 [[ -s $DeleteList ]] && DBMovieDelete
-[[ -s $InsertList ]] && DBMovieInsert
+[[ -s $InsertList ]] && DBMovieInsert >"${UpdateLog}" 2>&1
 
 echo '<channel>'
 Footer;
@@ -319,8 +323,11 @@ EOF
 MoviesheetView()
 #Display moviesheet
 {
-ImgLink="`${Sqlite} -separator ''  "${Database}"  "SELECT info FROM t1 WHERE Movie_ID like '$Search'" | sed '/<info/!d;s:.*>\(.*\)</.*:\1:'| grep "[!-~]";`"
-FileLink="`${Sqlite} -separator ''  "${Database}"  "SELECT file FROM t1 WHERE Movie_ID like '$Search'" | sed '/<file/!d;s:.*>\(.*\)</.*:\1:'| grep "[!-~]";`"
+InfoMediabd="`${Sqlite} -separator ''  "${Database}"  "SELECT path,file,ext,info FROM t1 WHERE Movie_ID like '$Search'`"
+PathLink="`echo $InfoMediabd | sed 's:.*path>\(.*\)</path.*:\1:' | grep "[!-~]";`"
+ImgLink="$PathLink/`echo $InfoMediabd | sed 's:.*info>\(.*\)</info.*:\1:'`"
+FileLink="$PathLink/`echo $InfoMediabd | sed 's:.*file>\(.*\)</file.*:\1:'`"
+extLink="$PathLink/`echo $InfoMediabd | sed 's:.*ext>\(.*\)</ext.*:\1:'`"
 
 cat <<EOF
 <onEnter>showIdle();</onEnter>
@@ -459,7 +466,7 @@ cat <<EOF
 		
 		<image type="image/jpeg" redraw="yes" offsetXPC="0" offsetYPC="0" widthPC="100" heightPC="80">
 				<script>
-					getItemInfo(-1, "info");
+					getItemInfo(-1, "path") +"/"+ getItemInfo(-1, "info");
 				</script>
 </image>
 EOF
@@ -474,7 +481,7 @@ cat <<EOF
 		
 		<image type="image/jpeg" redraw="yes" offsetXPC="0" offsetYPC="0" widthPC="100" heightPC="100">
 				<script>
-					getItemInfo(-1, "info");
+					getItemInfo(-1, "path") +"/"+ getItemInfo(-1, "info");
 				</script>
 </image>
 EOF
@@ -549,7 +556,7 @@ EOF
 
 cat << EOF
 				  else if (userInput == "video_play") {
-                                        Current_Movie_File=getItemInfo(-1, "file");
+  Current_Movie_File=getItemInfo(-1, "path") +"/"+ getItemInfo(-1, "file") +"."+ getItemInfo(-1, "ext");
                                         playItemURL(Current_Movie_File, 10);
 					"false";
 					}
@@ -629,12 +636,36 @@ echo -e '
 
 
 else
+
+  if [ "$mode" = "genreSelection" ]; then
 echo -e '
 
 <!-- Top Layer folder.jpg -->
 <image type="image/jpeg" offsetXPC="8.2" offsetYPC="5.5" widthPC="84.25" heightPC="89.25">
  <script>
-  thumbnailPath = getItemInfo(-1, "poster");
+  thumbnailPath = getItemInfo(-1, "path") +"/"+ getItemInfo(-1, "poster");
+  thumbnailPath;
+ </script>
+</image>
+'
+  else
+echo -e '
+
+<!-- Top Layer folder.jpg -->
+<image type="image/jpeg" offsetXPC="8.2" offsetYPC="5.5" widthPC="84.25" heightPC="89.25">
+ <script>
+  ItemPath  = getItemInfo(-1, "path");
+  Thumbnail = getItemInfo(-1, "poster");
+  ItemFile = getItemInfo(-1, "file");
+  thumbnailPath = ItemPath +"/"+ ItemFile +".jpg";
+  Etat = readStringFromFile(thumbnailPath);
+  if (Etat==null){
+    thumbnailPath = ItemPath +"/folder.jpg";
+    Etat = readStringFromFile(thumbnailPath);
+    if (Etat==null){
+      thumbnailPath = "'${Jukebox_Path}'images/nofolder.jpg";
+    }
+  } else thumbnailPath = ItemPath +"/"+ Thumbnail;
   thumbnailPath;
  </script>
 </image>
@@ -661,6 +692,7 @@ echo -e '
   }
 </script>
 </image>'
+  fi
 
 if [ "$mode" = "genreSelection" ]; then
 echo -e '
@@ -669,7 +701,7 @@ echo -e '
 	getItemInfo(-1, "title");
 </script>
 </text>'
-     
+
   fi # if "$mode" = "genreSelection"
 fi
 
@@ -749,34 +781,34 @@ EOF
 
 if [ "$mode" = "genre" ]; then
    if [ "$Search" = "$AllMovies" ]; then
-     ${Sqlite} -separator ''  "${Database}"  "SELECT header,IdMovhead,Movie_ID,IdMovFoot,title,poster,info,file,WatchedHead,watched,WatchedFoot,footer FROM t1,t2 ORDER BY title COLLATE NOCASE"; # All Movies
+     ${Sqlite} -separator ''  "${Database}"  "SELECT header,IdMovhead,Movie_ID,IdMovFoot,title,path,poster,info,file,ext,WatchedHead,watched,WatchedFoot,footer FROM t1,t2 ORDER BY title COLLATE NOCASE"; # All Movies
    else
-      ${Sqlite} -separator ''  "${Database}"  "SELECT header,IdMovhead,Movie_ID,IdMovFoot,title,poster,info,file,WatchedHead,watched,WatchedFoot,footer FROM t1,t2 WHERE genre LIKE '%$Search%' ORDER BY title COLLATE NOCASE";
+      ${Sqlite} -separator ''  "${Database}"  "SELECT header,IdMovhead,Movie_ID,IdMovFoot,title,path,poster,info,file,ext,WatchedHead,watched,WatchedFoot,footer FROM t1,t2 WHERE genre LIKE '%$Search%' ORDER BY title COLLATE NOCASE";
    fi   
 fi
 
 if [ "$mode" = "alpha" ]; then
 if [ "$Search" = "0-9" ]; then
-${Sqlite} -separator ''  "${Database}"  "SELECT header,IdMovhead,Movie_ID,IdMovFoot,title,poster,info,file,WatchedHead,watched,WatchedFoot,footer FROM t1,t2 WHERE title LIKE '<title>9%' OR title LIKE '<title>8%' OR title LIKE '<title>7%' OR title LIKE '<title>6%' OR title LIKE '<title>5%' OR title LIKE '<title>4%' OR title LIKE '<title>3%' OR title LIKE '<title>2%' OR title LIKE '<title>1%' OR title LIKE '<title>0%'";
+${Sqlite} -separator ''  "${Database}"  "SELECT header,IdMovhead,Movie_ID,IdMovFoot,title,path,poster,info,file,ext,WatchedHead,watched,WatchedFoot,footer FROM t1,t2 WHERE title LIKE '<title>9%' OR title LIKE '<title>8%' OR title LIKE '<title>7%' OR title LIKE '<title>6%' OR title LIKE '<title>5%' OR title LIKE '<title>4%' OR title LIKE '<title>3%' OR title LIKE '<title>2%' OR title LIKE '<title>1%' OR title LIKE '<title>0%'";
 else
-${Sqlite} -separator ''  "${Database}"  "SELECT header,IdMovhead,Movie_ID,IdMovFoot,title,poster,info,file,WatchedHead,watched,WatchedFoot,footer FROM t1,t2 WHERE title LIKE '<title>$Search%' ORDER BY title COLLATE NOCASE";
+${Sqlite} -separator ''  "${Database}"  "SELECT header,IdMovhead,Movie_ID,IdMovFoot,title,path,poster,info,file,ext,WatchedHead,watched,WatchedFoot,footer FROM t1,t2 WHERE title LIKE '<title>$Search%' ORDER BY title COLLATE NOCASE";
 fi
 fi
 
 if [ "$mode" = "year" ]; then
-${Sqlite} -separator ''  "${Database}"  "SELECT header,IdMovhead,Movie_ID,IdMovFoot,title,poster,info,file,WatchedHead,watched,WatchedFoot,footer FROM t1,t2 WHERE year ='$Search' ORDER BY title COLLATE NOCASE";
+${Sqlite} -separator ''  "${Database}"  "SELECT header,IdMovhead,Movie_ID,IdMovFoot,title,path,poster,info,file,ext,WatchedHead,watched,WatchedFoot,footer FROM t1,t2 WHERE year ='$Search' ORDER BY title COLLATE NOCASE";
 fi
 
 if [ "$mode" = "recent" ]; then
-${Sqlite} -separator ''  "${Database}"  "SELECT header,IdMovhead,Movie_ID,IdMovFoot,title,poster,info,file,WatchedHead,watched,WatchedFoot,footer FROM t1,t2 ORDER BY datestamp DESC LIMIT "$Recent_Max;
+${Sqlite} -separator ''  "${Database}"  "SELECT header,IdMovhead,Movie_ID,IdMovFoot,title,path,poster,info,file,ext,WatchedHead,watched,WatchedFoot,footer FROM t1,t2 ORDER BY datestamp DESC LIMIT "$Recent_Max;
 fi
 
 if [ "$mode" = "notwatched" ]; then
-${Sqlite} -separator ''  "${Database}"  "SELECT header,IdMovhead,Movie_ID,IdMovFoot,title,poster,info,file,WatchedHead,watched,WatchedFoot,footer FROM t1,t2 WHERE watched <>'1' OR watched IS NULL ORDER BY title COLLATE NOCASE";
+${Sqlite} -separator ''  "${Database}"  "SELECT header,IdMovhead,Movie_ID,IdMovFoot,title,path,poster,info,file,ext,WatchedHead,watched,WatchedFoot,footer FROM t1,t2 WHERE watched <>'1' OR watched IS NULL ORDER BY title COLLATE NOCASE";
 fi
 
 if [ "$mode" = "moviesearch" ]; then
-${Sqlite} -separator ''  "${Database}"  "SELECT header,IdMovhead,Movie_ID,IdMovFoot,title,poster,info,file,WatchedHead,watched,WatchedFoot,footer FROM t1,t2 WHERE title LIKE '<title>%$Search%' ORDER BY title COLLATE NOCASE";
+${Sqlite} -separator ''  "${Database}"  "SELECT header,IdMovhead,Movie_ID,IdMovFoot,title,path,poster,info,file,ext,WatchedHead,watched,WatchedFoot,footer FROM t1,t2 WHERE title LIKE '<title>%$Search%' ORDER BY title COLLATE NOCASE";
 fi
 
 if [ "$mode" = "yearSelection" ]; then
@@ -792,23 +824,24 @@ fi
 
 
 if [ "$mode" = "genreSelection" ]; then
-# pulls out the genre of the movies
-# The first line does the following: Pull data from database; remove all leading/trailing white spaces; sort and remove duplicate
-# remove possible empty line that may exist; remove any blank line
-# that may be still present.
-${Sqlite} -separator ''  "${Database}"  "SELECT genre FROM t1" | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//' | sort -u | sed '/<name/!d;s:.*>\(.*\)</.*:\1:' | grep "[!-~]" > /tmp/srjg_genre.list
+  # pulls out the genre of the movies
+  # The first line does the following: Pull data from database; remove all leading/trailing white spaces; sort and remove duplicate
+  # remove possible empty line that may exist; remove any blank line
+  # that may be still present.
+  ${Sqlite} -separator ''  "${Database}"  "SELECT genre FROM t1" | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//' | sort -u | sed '/<name/!d;s:.*>\(.*\)</.*:\1:' | grep "[!-~]" > /tmp/srjg_genre.list
 
-# Add "All Movies" depending of the language, into the genre list
-sed -i 1i"$AllMovies" /tmp/srjg_genre.list
-while read LINE
-do
-  # translate to find genre thumbnails 
-  Img_genre=`sed "/|$LINE>/!d;s:.*>\(.*\)|:\1:" "${Jukebox_Path}lang/${Language}_genre"`
-  if [ -z "$Img_genre" ] ; then Img_genre="Unknown"; fi
-  echo -e '<item>
-     <title>'$LINE'</title>
-     <poster>'${Jukebox_Path}'images/genre/'$Img_genre'.jpg</poster>
-     </item>'
+  # Add "All Movies" depending of the language, into the genre list
+  sed -i 1i"$AllMovies" /tmp/srjg_genre.list
+  while read LINE
+  do
+    # translate to find genre thumbnails 
+    Img_genre=`sed "/|$LINE>/!d;s:.*>\(.*\)|:\1:" "${Jukebox_Path}lang/${Language}_genre"`
+    if [ -z "$Img_genre" ] ; then Img_genre="Unknown"; fi
+    echo -e '
+    <item>
+    <title>'$LINE'</title>
+    <poster>'${Jukebox_Path}'images/genre/'$Img_genre'.jpg</poster>
+    </item>'
   done < /tmp/srjg_genre.list
 fi
 
@@ -866,6 +899,15 @@ cat <<EOF
 		Port = getXMLText("Config", "Port");
 		Recent_Max = getXMLText("Config", "Recent_Max");
     Imdb = getXMLText("Config", "Imdb");
+		Imdb_Lang = getXMLText("Config", "Imdb_Lang");
+		Imdb_Backdrop = getXMLText("Config", "Imdb_Backdrop");
+		Imdb_Box = getXMLText("Config", "Imdb_Box");
+		Imdb_Font = getXMLText("Config", "Imdb_Font");
+		Imdb_Genres = getXMLText("Config", "Imdb_Genres");
+		Imdb_Source = getXMLText("Config", "Imdb_Source");
+    Imdb_Tagline = getXMLText("Config", "Imdb_Tagline");
+    Imdb_Time = getXMLText("Config", "Imdb_Time");
+    Imdb_Info = getXMLText("Config", "Imdb_Info");
   }
 	 
   srjgconf="/tmp/srjg.cfg";
@@ -877,6 +919,15 @@ cat <<EOF
   tmpconfigArray=pushBackStringArray(tmpconfigArray, "Port="+Port);
   tmpconfigArray=pushBackStringArray(tmpconfigArray, "Recent_Max="+Recent_Max);
   tmpconfigArray=pushBackStringArray(tmpconfigArray, "Imdb="+Imdb);
+  tmpconfigArray=pushBackStringArray(tmpconfigArray, "Imdb_Lang="+Imdb_Lang);
+  tmpconfigArray=pushBackStringArray(tmpconfigArray, "Imdb_Backdrop="+Imdb_Backdrop);
+  tmpconfigArray=pushBackStringArray(tmpconfigArray, "Imdb_Box="+Imdb_Box);
+  tmpconfigArray=pushBackStringArray(tmpconfigArray, "Imdb_Font="+Imdb_Font);
+  tmpconfigArray=pushBackStringArray(tmpconfigArray, "Imdb_Genres="+Imdb_Genres);
+  tmpconfigArray=pushBackStringArray(tmpconfigArray, "Imdb_Source="+Imdb_Source);
+  tmpconfigArray=pushBackStringArray(tmpconfigArray, "Imdb_Tagline="+Imdb_Tagline);
+  tmpconfigArray=pushBackStringArray(tmpconfigArray, "Imdb_Time="+Imdb_Time);
+  tmpconfigArray=pushBackStringArray(tmpconfigArray, "Imdb_Info="+Imdb_Info);
   writeStringToFile(srjgconf, tmpconfigArray);
 	 
   langpath = Jukebox_Path + "lang/" + Language;
@@ -999,7 +1050,7 @@ cat <<EOF
           SelParam=inputFilter;
 					jumpToLink("SelectionEntered");
         }
-			} else {
+      } else
         SelParam=getItemInfo(indx, "param");
         YPos=getItemInfo(indx, "pos");
         jumpToLink("SelectionEntered");
@@ -1110,9 +1161,9 @@ cat <<EOF
 		print(cfg_Imdb);
 	</script>
 </title>
-<selection>Imdb</selection>
-<param>yes%20no</param>
-<pos>70</pos>
+<selection>ImdbCfgEdit</selection>
+<param></param>
+<pos>0</pos>
 </item>
 
 </channel>
@@ -1455,6 +1506,429 @@ cat <<EOF
 EOF
 }
 
+ImdbSheetDspl()
+# fullscreen display demo Imdb sheet
+{
+cat <<EOF
+<?xml version="1.0"?>
+<rss version="2.0" xmlns:media="http://purl.org/dc/elements/1.1/" xmlns:dc="http://purl.org/dc/elements/1.1/">
+
+<onEnter>
+  showIdle();
+  redrawDisplay();
+</onEnter>
+
+<mediaDisplay name=photoView showHeader=no showDefaultInfo=no drawItemBorder=no viewAreaXPC=0 viewAreaYPC=0 viewAreaWidthPC=100 viewAreaHeightPC=100 itemOffsetXPC=0 itemOffsetYPC=0 sideTopHeightPC=0 sideBottomHeightPC=0 bottomYPC=100 backgroundColor=0:0:0 >
+<idleImage> image/POPUP_LOADING_01.png </idleImage> 
+<idleImage> image/POPUP_LOADING_02.png </idleImage> 
+<idleImage> image/POPUP_LOADING_03.png </idleImage> 
+<idleImage> image/POPUP_LOADING_04.png </idleImage> 
+<idleImage> image/POPUP_LOADING_05.png </idleImage> 
+<idleImage> image/POPUP_LOADING_06.png </idleImage> 
+<idleImage> image/POPUP_LOADING_07.png </idleImage> 
+<idleImage> image/POPUP_LOADING_08.png </idleImage> 
+
+<backgroundDisplay>
+
+<text redraw="no" align="left" offsetXPC="25" offsetYPC="50" widthPC="100" heightPC="6" fontSize="20" backgroundColor="-1:-1:-1" foregroundColor="255:255:255">
+  <script>print("Press 1 to refresh...");</script>
+</text>
+
+<script>
+	LnParam="name=avatar&amp;box="+Imdb_Box+"&amp;mode=sheet&amp;font="+Imdb_Font+"&amp;lang="+Imdb_Lang;
+  if ( "$Imdb_Backdrop" != "no" ) LnParam=LnParam+"&amp;backdrop=y";
+	if ( "$Imdb_Source" != "no" ) LnParam=LnParam+"&amp;source=y";
+	if ( "$Imdb_Tagline" != "no" ) LnParam=LnParam+"&amp;tagline=y";
+	if ( "$Imdb_Time" != "no" ) LnParam=LnParam+"&amp;time="+Imdb_Time;
+	if ( "$Imdb_Genres" != "no" ) LnParam=LnParam+"&amp;genres="+"$Imdb_Genres";
+  ImdbLink = "http://playon.unixstorm.org/IMDB/movie.php?" + LnParam;
+</script>
+	
+<image offsetXPC=5 offsetYPC=5 widthPC=90 heightPC=90><script> print(ImdbLink); </script></image>
+
+</backgroundDisplay>
+
+<onUserInput>
+	userInput = currentUserInput();
+  redrawDisplay();
+</onUserInput>
+</mediaDisplay>
+
+<channel>
+<title>SheetView Imdb</title>
+
+</channel>
+</rss>
+EOF
+}
+
+ImdbCfgEdit()
+# Imdb Config editor
+{
+
+cat <<EOF
+<?xml version="1.0" encoding="UTF-8" ?>
+<rss version="2.0" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:media="http://purl.org/dc/elements/1.1/">
+
+<onEnter>
+  showIdle();
+	Config = "/usr/local/etc/srjg.cfg";
+  Config_ok = loadXMLFile(Config);
+    
+	if (Config_ok == null) {
+		print("Load Config fail ", Config);
+	}
+    else {
+        Config_itemSize = getXMLElementCount("Config");
+	}
+    
+  if (Config_itemSize > 0) {
+    Language = getXMLText("Config", "Lang");
+		Jukebox_Path = getXMLText("Config", "Jukebox_Path");
+		Jukebox_Size = getXMLText("Config", "Jukebox_Size");
+		Movies_Path = getXMLText("Config", "Movies_Path");
+		Movie_Filter = getXMLText("Config", "Movie_Filter");
+		Port = getXMLText("Config", "Port");
+		Recent_Max = getXMLText("Config", "Recent_Max");
+    Imdb = getXMLText("Config", "Imdb");
+		Imdb_Lang = getXMLText("Config", "Imdb_Lang");
+		Imdb_Backdrop = getXMLText("Config", "Imdb_Backdrop");
+		Imdb_Box = getXMLText("Config", "Imdb_Box");
+		Imdb_Font = getXMLText("Config", "Imdb_Font");
+		Imdb_Genres = getXMLText("Config", "Imdb_Genres");
+		Imdb_Source = getXMLText("Config", "Imdb_Source");
+    Imdb_Tagline = getXMLText("Config", "Imdb_Tagline");
+    Imdb_Time = getXMLText("Config", "Imdb_Time");
+    Imdb_Info = getXMLText("Config", "Imdb_Info");
+  }
+	 
+  srjgconf="/tmp/srjg.cfg";
+  tmpconfigArray=null;
+  tmpconfigArray=pushBackStringArray(tmpconfigArray, "Language="+Language);
+  tmpconfigArray=pushBackStringArray(tmpconfigArray, "Jukebox_Path="+Jukebox_Path);
+  tmpconfigArray=pushBackStringArray(tmpconfigArray, "Movies_Path="+Movies_Path);
+  tmpconfigArray=pushBackStringArray(tmpconfigArray, "Movie_Filter="+Movie_Filter);
+  tmpconfigArray=pushBackStringArray(tmpconfigArray, "Port="+Port);
+  tmpconfigArray=pushBackStringArray(tmpconfigArray, "Recent_Max="+Recent_Max);
+  tmpconfigArray=pushBackStringArray(tmpconfigArray, "Imdb="+Imdb);
+  tmpconfigArray=pushBackStringArray(tmpconfigArray, "Imdb_Lang="+Imdb_Lang);
+  tmpconfigArray=pushBackStringArray(tmpconfigArray, "Imdb_Backdrop="+Imdb_Backdrop);
+  tmpconfigArray=pushBackStringArray(tmpconfigArray, "Imdb_Box="+Imdb_Box);
+  tmpconfigArray=pushBackStringArray(tmpconfigArray, "Imdb_Font="+Imdb_Font);
+  tmpconfigArray=pushBackStringArray(tmpconfigArray, "Imdb_Genres="+Imdb_Genres);
+  tmpconfigArray=pushBackStringArray(tmpconfigArray, "Imdb_Source="+Imdb_Source);
+  tmpconfigArray=pushBackStringArray(tmpconfigArray, "Imdb_Tagline="+Imdb_Tagline);
+  tmpconfigArray=pushBackStringArray(tmpconfigArray, "Imdb_Time="+Imdb_Time);
+  tmpconfigArray=pushBackStringArray(tmpconfigArray, "Imdb_Info="+Imdb_Info);
+  writeStringToFile(srjgconf, tmpconfigArray);
+	
+  /* Translated values */ 
+  langpath = Jukebox_Path + "lang/" + Language;
+  langfile = loadXMLFile(langpath);
+  if (langfile != null) {
+    cfg_Imdb = getXMLText("cfg", "Imdb");
+    cfg_Yes = getXMLText("cfg", "yes");
+    cfg_No = getXMLText("cfg", "no");
+    cfgI_Use=getXMLText("Imdb", "Imdb_Use");
+    cfgI_Lang=getXMLText("Imdb", "Imdb_Lang");
+    cfgI_Backdrop=getXMLText("Imdb", "Imdb_Backdrop");
+    cfgI_Box=getXMLText("Imdb", "Imdb_Box");
+    cfgI_Font=getXMLText("Imdb", "Imdb_Font");
+    cfgI_Genres=getXMLText("Imdb", "Imdb_Genres");
+    cfgI_Source=getXMLText("Imdb", "Imdb_Source");
+    cfgI_Tagline=getXMLText("Imdb", "Imdb_Tagline");
+    cfgI_Time=getXMLText("Imdb", "Imdb_Time");
+    cfgI_Info=getXMLText("Imdb", "Imdb_Info");
+  }
+</onEnter>
+
+<mediaDisplay name="photoView" rowCount="10" columnCount="1" drawItemText="no" showHeader="no" showDefaultInfo="no" menuBorderColor="255:255:255" sideColorBottom="-1:-1:-1" sideColorTop="-1:-1:-1" itemAlignt="left" itemOffsetXPC="4" itemOffsetYPC="15" itemWidthPC="32" itemHeightPC="7.2" backgroundColor="-1:-1:-1" itemBackgroundColor="-1:-1:-1" sliding="no" itemGap="0" idleImageXPC="90" idleImageYPC="5" idleImageWidthPC="5" idleImageHeightPC="8" imageUnFocus="null" imageParentFocus="null" imageBorderPC="0" forceFocusOnItem="no" cornerRounding="yes" itemBorderColor="-1:-1:-1" focusBorderColor="-1:-1:-1" unFocusBorderColor="-1:-1:-1">
+<idleImage> image/POPUP_LOADING_01.png </idleImage> 
+<idleImage> image/POPUP_LOADING_02.png </idleImage> 
+<idleImage> image/POPUP_LOADING_03.png </idleImage> 
+<idleImage> image/POPUP_LOADING_04.png </idleImage> 
+<idleImage> image/POPUP_LOADING_05.png </idleImage> 
+<idleImage> image/POPUP_LOADING_06.png </idleImage> 
+<idleImage> image/POPUP_LOADING_07.png </idleImage> 
+<idleImage> image/POPUP_LOADING_08.png </idleImage> 
+
+<!-- covert display -->
+<image type="image/jpeg" offsetXPC="68" offsetYPC="4" widthPC="14" heightPC="40">
+ <script>
+	 LnParam="name=avatar&amp;box="+Imdb_Box+"&amp;mode=poster&amp;lang="+Imdb_Lang;
+	 if ( Imdb_Source != "no" ) LnParam=LnParam+"&amp;source=y";
+	 if ( Imdb_Tagline != "no" ) LnParam=LnParam+"&amp;tagline=y";
+	 if ( Imdb_Time != "no" ) LnParam=LnParam+"&amp;time="+Imdb_Time;
+   ImdbLink = "http://playon.unixstorm.org/IMDB/movie.php?" + LnParam;
+ </script>
+</image>
+
+<script>
+
+</script>
+	
+<image offsetXPC="47" offsetYPC="46" widthPC="68" heightPC="50">
+  <script>
+	  LnParam="name=avatar&amp;box="+Imdb_Box+"&amp;mode=sheet&amp;font="+Imdb_Font+"&amp;lang="+Imdb_Lang;
+    if ( Imdb_Backdrop != "no" ) LnParam=LnParam+"&amp;backdrop=y";
+	  if ( Imdb_Source != "no" ) LnParam=LnParam+"&amp;source=y";
+	  if ( Imdb_Tagline != "no" ) LnParam=LnParam+"&amp;tagline=y";
+	  if ( Imdb_Time != "no" ) LnParam=LnParam+"&amp;time="+Imdb_Time;
+	 if ( Imdb_Genres != "no" ) LnParam=LnParam+"&amp;genres="+Imdb_Genres;
+    ImdbLink = "http://playon.unixstorm.org/IMDB/movie.php?" + LnParam;
+  </script>
+</image>
+
+
+<!-- comment menu display -->
+<text redraw="no" backgroundColor="-1:-1:-1" foregroundColor="200:200:200" offsetXPC="36" offsetYPC="18" widthPC="57" heightPC="4" fontSize="16" lines="1" align="left">
+	<script>
+		if ( Imdb == "yes" ) print( cfg_Yes );
+    else print( cfg_No );
+	</script>
+</text>
+
+<text redraw="no" backgroundColor="-1:-1:-1" foregroundColor="200:200:200" offsetXPC="36" offsetYPC="26" widthPC="57" heightPC="4" fontSize="16" lines="1" align="left">
+	<script>
+		print(Imdb_Lang);
+	</script>
+</text>
+
+<text redraw="no" backgroundColor="-1:-1:-1" foregroundColor="200:200:200" offsetXPC="36" offsetYPC="34" widthPC="57" heightPC="4" fontSize="16" lines="1" align="left">
+	<script>
+		if ( Imdb_Backdrop == "yes" ) print( cfg_Yes );
+    else print( cfg_No );
+	</script>
+</text>
+
+<text redraw="no" backgroundColor="-1:-1:-1" foregroundColor="200:200:200" offsetXPC="36" offsetYPC="42" widthPC="57" heightPC="4" fontSize="16" lines="1" align="left">
+	<script>
+		print(Imdb_Box);
+	</script>
+</text>
+
+<text redraw="no" backgroundColor="-1:-1:-1" foregroundColor="200:200:200" offsetXPC="36" offsetYPC="50" widthPC="57" heightPC="4" fontSize="16" lines="1" align="left">
+	<script>
+		print(Imdb_Font);
+	</script>
+</text>
+
+<text redraw="no" backgroundColor="-1:-1:-1" foregroundColor="200:200:200" offsetXPC="36" offsetYPC="58" widthPC="57" heightPC="4" fontSize="16" lines="1" align="left">
+	<script>
+		if ( Imdb_Genres == "yes" ) print( cfg_Yes );
+    else print( cfg_No );
+	</script>
+</text>
+
+<text redraw="no" backgroundColor="-1:-1:-1" foregroundColor="200:200:200" offsetXPC="36" offsetYPC="66" widthPC="57" heightPC="4" fontSize="16" lines="1" align="left">
+	<script>
+		if ( Imdb_Source == "yes" ) print( cfg_Yes );
+    else print( cfg_No );
+	</script>
+</text>
+
+<text redraw="no" backgroundColor="-1:-1:-1" foregroundColor="200:200:200" offsetXPC="36" offsetYPC="74" widthPC="57" heightPC="4" fontSize="16" lines="1" align="left">
+	<script>
+		if ( Imdb_Tagline == "yes" ) print( cfg_Yes );
+    else print( cfg_No );
+	</script>
+</text>
+
+
+<text redraw="no" backgroundColor="-1:-1:-1" foregroundColor="200:200:200" offsetXPC="36" offsetYPC="82" widthPC="57" heightPC="4" fontSize="16" lines="1" align="left">
+	<script>
+		if ( Imdb_Time == "no" ) print( cfg_No );
+    else print( Imdb_Time );
+	</script>
+</text>
+
+<text redraw="no" backgroundColor="-1:-1:-1" foregroundColor="200:200:200" offsetXPC="36" offsetYPC="90" widthPC="57" heightPC="4" fontSize="16" lines="1" align="left">
+	<script>
+		if ( Imdb_Info == "yes" ) print( cfg_Yes );
+    else print( cfg_No );
+	</script>
+</text>
+
+<onUserInput>
+  <script>
+    userInput = currentUserInput();
+	
+    if (userInput == "enter" ) {
+      indx=getFocusItemIndex();
+      mode=getItemInfo(indx, "selection");
+      SelParam=getItemInfo(indx, "param");
+      YPos=getItemInfo(indx, "pos");
+      jumpToLink("SelectionEntered");
+      "false";
+    }	else if (userInput == "one") {
+		  mode="ImdbSheetDspl";
+			jumpToLink("SelectionEntered");
+			"false";
+    }	else if (userInput == "two") {
+      redrawDisplay();
+			"false";
+    }
+  </script>
+</onUserInput>
+
+ 
+<itemDisplay>
+
+<image type="image/png" offsetXPC="0" offsetYPC="0" widthPC="100" heightPC="100">
+ <script>
+  if (getDrawingItemState() == "focus")
+  {
+      print(Jukebox_Path + "images/focus_on.png");
+  }
+ else
+  {
+      print(Jukebox_Path + "images/focus_off.png");
+  }
+ </script>
+</image>
+
+<text redraw="no" offsetXPC="0" offsetYPC="0" widthPC="94" heightPC="100" backgroundColor="-1:-1:-1" foregroundColor="200:200:200" fontSize="16" align="center">
+ <script>
+    getItemInfo(-1, "title");
+ </script>
+</text>
+</itemDisplay>  
+
+  <backgroundDisplay>
+    <image type="image/jpeg" redraw="no" offsetXPC="0" offsetYPC="0" widthPC="100" heightPC="100">
+      <script>
+        print(Jukebox_Path + "images/srjgMainMenu.jpg");
+      </script>
+    </image>
+  </backgroundDisplay> 
+</mediaDisplay>
+
+<SelectionEntered>
+    <link>
+       <script>
+           print("http://127.0.0.1:"+Port+"/cgi-bin/srjg.cgi?"+mode+"@"+SelParam+"@"+YPos);
+       </script>
+    </link>
+</SelectionEntered>
+
+<channel>
+<title>Imdb Config menu</title>
+
+<item>
+<title>
+	<script>
+		print(cfgI_Use);
+	</script>
+</title>
+<selection>Imdb</selection>
+<param>yes%20no</param>
+<pos>10</pos>
+</item>
+
+<item>
+<title>
+	<script>
+		print(cfgI_Lang);
+	</script>
+</title>
+<selection>Imdb_Lang</selection>
+<param>en%20fr</param>
+<pos>17</pos>
+</item>
+
+<item>
+<title>
+	<script>
+		print(cfgI_Backdrop);
+	</script>
+</title>
+<selection>Imdb_Backdrop</selection>
+<param>yes%20no</param>
+<pos>25</pos>
+</item>
+
+<item>
+<title>
+	<script>
+		print(cfgI_Box);
+	</script>
+</title>
+<selection>Imdb_Box</selection>
+<param>bdrip%20bluray%20dtheater%20dvd%20generic%20hddvd%20hdtv%20itunes</param>
+<pos>21</pos>
+</item>
+
+<item>
+<title>
+	<script>
+		print(cfgI_Font);
+	</script>
+</title>
+<selection>Imdb_Font</selection>
+<param>arial%20bookman%20comic%20tahoma%20times%20verdana</param>
+<pos>43</pos>
+</item>
+
+<item>
+<title>
+	<script>
+		print(cfgI_Genres);
+	</script>
+</title>
+<selection>Imdb_Genres</selection>
+<param>yes%20no</param>
+<pos>50</pos>
+</item>
+
+<item>
+<title>
+	<script>
+		print(cfgI_Source);
+	</script>
+</title>
+<selection>Imdb_Source</selection>
+<param>yes%20no</param>
+<pos>60</pos>
+</item>
+
+<item>
+<title>
+	<script>
+		print(cfgI_Tagline);
+	</script>
+</title>
+<selection>Imdb_Tagline</selection>
+<param>yes%20no</param>
+<pos>70</pos>
+</item>
+
+<item>
+<title>
+	<script>
+		print(cfgI_Time);
+	</script>
+</title>
+<selection>Imdb_Time</selection>
+<param>no%20real%20hours</param>
+<pos>70</pos>
+</item>
+
+<item>
+<title>
+	<script>
+		print(cfgI_Info);
+	</script>
+</title>
+<selection>Imdb_Info</selection>
+<param>yes%20no</param>
+<pos>70</pos>
+</item>
+
+</channel>
+</rss>
+EOF
+}
+
 #***********************Main Program*********************************
 
 case $mode in
@@ -1473,11 +1947,15 @@ case $mode in
     Header
     MoviesheetView
     Footer;;
-  "Lang"|"Jukebox_Size"|"Port"|"Recent_Max"|"Imdb") SubMenucfg;;
+  Lang|Jukebox_Size|Port|Recent_Max|Imdb|Imdb_Lang|\
+  Imdb_Backdrop|Imdb_Box|Imdb_Font|Imdb_Genres|\
+  Imdb_Source|Imdb_Tagline|Imdb_Time|Imdb_Info) SubMenucfg;;
   "UpdateCfg") UpdateCfg;;
   "DirList") DirList;;
   "FBrowser") FBrowser;;
   "MenuCfg") MenuCfg;;
+	"ImdbSheetDspl") ImdbSheetDspl;;
+  "ImdbCfgEdit") ImdbCfgEdit;;
   *)
     SetVar
     Header

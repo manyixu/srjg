@@ -2,7 +2,7 @@
 <rss version="2.0" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:media="http://purl.org/dc/elements/1.1/">
 
 <onEnter>
-    showIdle();
+  showIdle();
 	Config = "/usr/local/etc/srjg.cfg";
     Config_ok = loadXMLFile(Config);
     
@@ -13,8 +13,8 @@
         Config_itemSize = getXMLElementCount("Config");
 	}
     
-	if (Config_itemSize > 0) {
-		Language = getXMLText("Config", "Lang");
+  if (Config_itemSize > 0) {
+    Language = getXMLText("Config", "Lang");
 		Jukebox_Path = getXMLText("Config", "Jukebox_Path");
 		Jukebox_Size = getXMLText("Config", "Jukebox_Size");
 		Movies_Path = getXMLText("Config", "Movies_Path");
@@ -22,9 +22,18 @@
 		Port = getXMLText("Config", "Port");
 		Recent_Max = getXMLText("Config", "Recent_Max");
     Imdb = getXMLText("Config", "Imdb");
+		Imdb_Lang = getXMLText("Config", "Imdb_Lang");
+		Imdb_Backdrop = getXMLText("Config", "Imdb_Backdrop");
+		Imdb_Box = getXMLText("Config", "Imdb_Box");
+		Imdb_Font = getXMLText("Config", "Imdb_Font");
+		Imdb_Genres = getXMLText("Config", "Imdb_Genres");
+		Imdb_Source = getXMLText("Config", "Imdb_Source");
+    Imdb_Tagline = getXMLText("Config", "Imdb_Tagline");
+    Imdb_Time = getXMLText("Config", "Imdb_Time");
+    Imdb_Info = getXMLText("Config", "Imdb_Info");
   }
 	 
-  srjgconf="/tmp/srjg.cfg";	
+  srjgconf="/tmp/srjg.cfg";
   tmpconfigArray=null;
   tmpconfigArray=pushBackStringArray(tmpconfigArray, "Language="+Language);
   tmpconfigArray=pushBackStringArray(tmpconfigArray, "Jukebox_Path="+Jukebox_Path);
@@ -33,21 +42,30 @@
   tmpconfigArray=pushBackStringArray(tmpconfigArray, "Port="+Port);
   tmpconfigArray=pushBackStringArray(tmpconfigArray, "Recent_Max="+Recent_Max);
   tmpconfigArray=pushBackStringArray(tmpconfigArray, "Imdb="+Imdb);
+  tmpconfigArray=pushBackStringArray(tmpconfigArray, "Imdb_Lang="+Imdb_Lang);
+  tmpconfigArray=pushBackStringArray(tmpconfigArray, "Imdb_Backdrop="+Imdb_Backdrop);
+  tmpconfigArray=pushBackStringArray(tmpconfigArray, "Imdb_Box="+Imdb_Box);
+  tmpconfigArray=pushBackStringArray(tmpconfigArray, "Imdb_Font="+Imdb_Font);
+  tmpconfigArray=pushBackStringArray(tmpconfigArray, "Imdb_Genres="+Imdb_Genres);
+  tmpconfigArray=pushBackStringArray(tmpconfigArray, "Imdb_Source="+Imdb_Source);
+  tmpconfigArray=pushBackStringArray(tmpconfigArray, "Imdb_Tagline="+Imdb_Tagline);
+  tmpconfigArray=pushBackStringArray(tmpconfigArray, "Imdb_Time="+Imdb_Time);
+  tmpconfigArray=pushBackStringArray(tmpconfigArray, "Imdb_Info="+Imdb_Info);
   writeStringToFile(srjgconf, tmpconfigArray);
 	 
-	 langpath = Jukebox_Path + "lang/" + Language;
-	 langfile = loadXMLFile(langpath);
-	 if (langfile != null) {
-		main_alpha = getXMLText("main", "alpha");
-		main_genre = getXMLText("main", "genre");
-		main_recent = getXMLText("main", "recent");
-		main_select = getXMLText("main", "select");
-		main_update = getXMLText("main", "update");
-		main_notwatched = getXMLText("main", "notwatched");
-		main_year = getXMLText("main", "year");
-		main_search = getXMLText("main", "search");
+  langpath = Jukebox_Path + "lang/" + Language;
+  langfile = loadXMLFile(langpath);
+  if (langfile != null) {
+    main_alpha = getXMLText("main", "alpha");
+    main_genre = getXMLText("main", "genre");
+    main_recent = getXMLText("main", "recent");
+    main_select = getXMLText("main", "select");
+    main_update = getXMLText("main", "update");
+    main_notwatched = getXMLText("main", "notwatched");
+    main_year = getXMLText("main", "year");
+    main_search = getXMLText("main", "search");
     main_config = getXMLText("main", "config");
-	 }
+  }
 </onEnter>
 
 
