@@ -71,9 +71,10 @@ do
   MOVIETITLE="$SHORT"
   break   # Found <title>, quit looking
 done <"$MOVIEPATH/$INFONAME"
-        
-GENRE=`sed -e '/<genre/,/\/genre>/!d;/genre>/d' -f "${Jukebox_Path}lang/${Language}_genreGrp" "$MOVIEPATH/$INFONAME"`
-MovieYear=`sed '/<year/!d;s:.*>\(.*\)</.*:\1:' "$MOVIEPATH/$INFONAME"`            
+
+# if genre not exist <genre />
+GENRE=`sed -e '/<genre>/,/\/genre>/!d;/genre>/d' -f "${Jukebox_Path}lang/${Language}_genreGrp" "$MOVIEPATH/$INFONAME"`
+MovieYear=`sed '/<year>/!d;s:.*>\(.*\)</.*:\1:' "$MOVIEPATH/$INFONAME"`            
 }
 
 GenerateMovieList()
@@ -150,7 +151,7 @@ do
     break
    done
 
-dbgenre=$GENRE 
+if [ -z "$GENRE" ]; then dbgenre="<name>Unknown</name>"; else dbgenre="$GENRE"; fi
 dbtitle=`echo "<title>$MOVIETITLE" | sed "s/'/''/g"`
 dbpath=`echo "<path>$MOVIEPATH</path>" | sed "s/'/''/g"`
 dbposter=`echo "<poster>$MOVIEPOSTER</poster>" | sed "s/'/''/g"`
@@ -159,7 +160,7 @@ dbfile=`echo "<file>$MOVIENAME</file>" | sed "s/'/''/g"`
 dbext=`echo "<ext>$MOVIEEXT</ext>" | sed "s/'/''/g"`
 dbYear=$MovieYear
 
-${Sqlite} "${Database}" "insert into t1 (genre,title,year,path,poster,info,file,ext) values('$dbgenre','$dbtitle','$dbYear','$dbpath','$dbposter','$dbinfo','$dbfile','$dbext');"; >> "${UpdateLog}"
+${Sqlite} "${Database}" "insert into t1 (genre,title,year,path,poster,info,file,ext) values('$dbgenre','$dbtitle','$dbYear','$dbpath','$dbposter','$dbinfo','$dbfile','$dbext');"; 2>> "${UpdateLog}"
 echo '<channel> </channel>' # to maintain the signal
 done < $InsertList
 }
