@@ -133,9 +133,10 @@ do
   MOVIETITLE="$SHORT"
   break   # Found <title>, quit looking
 done <"$MOVIEPATH/$INFONAME"
-        
-GENRE=`sed -e '/<genre/,/\/genre>/!d;/genre>/d' -f "${Jukebox_Path}lang/${Lang}_genreGrp" "$MOVIEPATH/$INFONAME"`
-MovieYear=`sed '/<year/!d;s:.*>\(.*\)</.*:\1:' "$MOVIEPATH/$INFONAME"`            
+
+# if genre not exist <genre />
+GENRE=`sed -e '/<genre>/,/\/genre>/!d;/genre>/d' -f "${Jukebox_Path}lang/${Lang}_genreGrp" "$MOVIEPATH/$INFONAME"`
+MovieYear=`sed '/<year>/!d;s:.*>\(.*\)</.*:\1:' "$MOVIEPATH/$INFONAME"`            
 }
 
 
@@ -192,7 +193,7 @@ do
     break
    done
 
-dbgenre=$GENRE 
+if [ -z "$GENRE" ]; then dbgenre="<name>Unknown</name>"; else dbgenre="$GENRE"; fi
 dbtitle=`echo "<title>$MOVIETITLE" | sed "s/'/''/g"`
 dbpath=`echo "<path>$MOVIEPATH</path>" | sed "s/'/''/g"`
 dbposter=`echo "<poster>$MOVIEPOSTER</poster>" | sed "s/'/''/g"`
