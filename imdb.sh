@@ -62,7 +62,7 @@ do
 		echo "Processing $MOVIENAMETEMP poster.."
 		NAME="$MOVIEPATH/${MOVIEFILE}.jpg"
 		wget -q "$PAR_LINK$MOVIENAME$PAR_POSTER" -O "$NAME";
-echo "$PAR_LINK$MOVIENAME$PAR_POSTER"
+
 		# Check generated poster
 		PATT=`grep Movie "$NAME"`
 		if ( [ -e "$NAME" ] && [ -n "$PATT" ] )
