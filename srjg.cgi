@@ -53,7 +53,7 @@ CreateMovieDB()
 # DB as an automatic datestamp but unfortunately it relies on the player having the
 # correct date which can be trivial with some players.
 {
-${Sqlite} "${Database}" "create table t1 (Movie_ID INTEGER PRIMARY KEY AUTOINCREMENT,genre TEXT,title TEXT,year TEXT,path TEXT,poster TEXT,info TEXT,file TEXT,ext TEXT,watched INTEGER,dateStamp DATE DEFAULT CURRENT_DATE)";
+${Sqlite} "${Database}" "create table t1 (Movie_ID INTEGER PRIMARY KEY AUTOINCREMENT,genre TEXT,title TEXT,year TEXT,path TEXT,file TEXT,ext TEXT,watched INTEGER,dateStamp DATE DEFAULT CURRENT_DATE)";
 ${Sqlite} "${Database}" "create table t2 (header TEXT, footer TEXT, IdMovhead TEXT, IdMovFoot TEXT,WatchedHead TEXT, WatchedFoot TEXT)";
 ${Sqlite} "${Database}" "insert into t2 values ('<item>','</item>','<IdMovie>','</IdMovie>','<Watched>','</Watched>')";
 }
@@ -138,7 +138,6 @@ do
    # Initialize defaults, replace later
    MOVIETITLE="$MOVIENAME</title>"
    MOVIESHEET=NoMovieinfo.jpg
-   MOVIEPOSTER=nofolder.jpg
    GENRE="<name>Unknown</name>"
    MovieYear=""
 		
@@ -147,31 +146,14 @@ do
         
    [ -e "$MOVIEPATH/$INFONAME" ] && Infoparsing
 
-   # Check for any files of known purpose inside the movie's folder.
-   for FILE in "folder.jpg" "${MOVIENAME}.jpg"
-   do
-    [ ! -e "$MOVIEPATH/$FILE" ] && continue
-    MOVIEPOSTER="$FILE"
-    break
-   done
-
-   for FILE in "about.jpg" "0001.jpg" "${MOVIENAME}_sheet.jpg"
-   do
-    [ ! -e "$MOVIEPATH/$FILE" ] && continue
-    MOVIESHEET="$FILE"
-    break
-   done
-
 if [ -z "$GENRE" ]; then dbgenre="<name>Unknown</name>"; else dbgenre="$GENRE"; fi
 dbtitle=`echo "<title>$MOVIETITLE" | sed "s/'/''/g"`
 dbpath=`echo "<path>$MOVIEPATH</path>" | sed "s/'/''/g"`
-dbposter=`echo "<poster>$MOVIEPOSTER</poster>" | sed "s/'/''/g"`
-dbinfo=`echo "<info>$MOVIESHEET</info>" | sed "s/'/''/g"`
 dbfile=`echo "<file>$MOVIENAME</file>" | sed "s/'/''/g"`
 dbext=`echo "<ext>$MOVIEEXT</ext>" | sed "s/'/''/g"`
 dbYear=$MovieYear
 
-${Sqlite} "${Database}" "insert into t1 (genre,title,year,path,poster,info,file,ext) values('$dbgenre','$dbtitle','$dbYear','$dbpath','$dbposter','$dbinfo','$dbfile','$dbext');"; 2>> "${UpdateLog}"
+${Sqlite} "${Database}" "insert into t1 (genre,title,year,path,file,ext) values('$dbgenre','$dbtitle','$dbYear','$dbpath','$dbfile','$dbext');"; 2>> "${UpdateLog}"
 echo '<channel> </channel>' # to maintain the signal
 done < $InsertList
 }
@@ -327,11 +309,21 @@ EOF
 MoviesheetView()
 #Display moviesheet
 {
-InfoMediabd="`${Sqlite} -separator ''  "${Database}"  "SELECT path,file,ext,info FROM t1 WHERE Movie_ID like '$Search'`"
+InfoMediabd="`${Sqlite} -separator ''  "${Database}"  "SELECT path,file,ext FROM t1 WHERE Movie_ID like '$Search'`"
 PathLink="`echo $InfoMediabd | sed 's:.*path>\(.*\)</path.*:\1:' | grep "[!-~]";`"
-ImgLink="$PathLink/`echo $InfoMediabd | sed 's:.*info>\(.*\)</info.*:\1:'`"
-FileLink="$PathLink/`echo $InfoMediabd | sed 's:.*file>\(.*\)</file.*:\1:'`"
-extLink="$PathLink/`echo $InfoMediabd | sed 's:.*ext>\(.*\)</ext.*:\1:'`"
+SheetFile="`echo $InfoMediabd | sed 's:.*file>\(.*\)</file.*:\1:'`"
+FileLink="${PathLink}/${SheetFile}.`echo $InfoMediabd | sed 's:.*ext>\(.*\)</ext.*:\1:'`"
+
+ImgLink="${PathLink}/${SheetFile}_sheet.jpg"
+if [ ! -f "${ImgLink}" ]; then
+  ImgLink="${PathLink}/about.jpg"
+  if [ ! -f "${ImgLink}" ]; then
+    ImgLink="${PathLink}/0001.jpg"
+    if [ ! -f "${ImgLink}" ]; then
+      ImgLink="${Jukebox_Path}images/NoMovieinfo.jpg"
+    fi
+  fi
+fi
 
 cat <<EOF
 <onEnter>showIdle();</onEnter>
@@ -461,34 +453,64 @@ cat <<EOF
 EOF
 
 elif [ $Jukebox_Size = "sheetwall" ]; then
-cat <<EOF
+echo -e '
 		<backgroundDisplay>
-                        <script>
-                                Jukebox_itemSize = getPageInfo("itemCount"); 
-			</script>    
+    <script>
+      Jukebox_itemSize = getPageInfo("itemCount"); 
+    </script>    
 		</backgroundDisplay>
 		
 		<image type="image/jpeg" redraw="yes" offsetXPC="0" offsetYPC="0" widthPC="100" heightPC="80">
-				<script>
-					getItemInfo(-1, "path") +"/"+ getItemInfo(-1, "info");
-				</script>
+  <script>
+    ItemPath  = getItemInfo(-1, "path");
+    ItemFile = getItemInfo(-1, "file");
+    SheetPath = ItemPath +"/"+ ItemFile +"_sheet.jpg";
+    Etat = readStringFromFile(SheetPath);
+    if (Etat==null){
+      SheetPath = ItemPath +"/about.jpg";
+      Etat = readStringFromFile(SheetPath);
+      if (Etat==null){
+        SheetPath = ItemPath +"/0001.jpg";
+        Etat = readStringFromFile(SheetPath);
+        if (Etat==null){
+          SheetPath = "'${Jukebox_Path}'images/NoMovieinfo.jpg";
+        }
+      }
+    }
+    SheetPath;
+  </script>
 </image>
-EOF
+'
 
 else
-cat <<EOF
-		<backgroundDisplay>
-                        <script>
-                                Jukebox_itemSize = getPageInfo("itemCount"); 
-			</script>    
-		</backgroundDisplay>
+echo -e '
+<backgroundDisplay>
+  <script>
+    Jukebox_itemSize = getPageInfo("itemCount"); 
+  </script>    
+</backgroundDisplay>
 		
-		<image type="image/jpeg" redraw="yes" offsetXPC="0" offsetYPC="0" widthPC="100" heightPC="100">
-				<script>
-					getItemInfo(-1, "path") +"/"+ getItemInfo(-1, "info");
-				</script>
+<image type="image/jpeg" redraw="yes" offsetXPC="0" offsetYPC="0" widthPC="100" heightPC="100">
+  <script>
+    ItemPath  = getItemInfo(-1, "path");
+    ItemFile = getItemInfo(-1, "file");
+    SheetPath = ItemPath +"/"+ ItemFile +"_sheet.jpg";
+    Etat = readStringFromFile(SheetPath);
+    if (Etat==null){
+      SheetPath = ItemPath +"/about.jpg";
+      Etat = readStringFromFile(SheetPath);
+      if (Etat==null){
+        SheetPath = ItemPath +"/0001.jpg";
+        Etat = readStringFromFile(SheetPath);
+        if (Etat==null){
+          SheetPath = "'${Jukebox_Path}'images/NoMovieinfo.jpg";
+        }
+      }
+    }
+    SheetPath;
+  </script>
 </image>
-EOF
+'
 
 fi
 
@@ -638,28 +660,14 @@ echo -e '
 </script>
 </text>'
 
-
 else
 
-  if ( [ $mode = "genreSelection" ] || [ $mode = "alphaSelection" ] ); then
-echo -e '
-
-<!-- Top Layer folder.jpg -->
-<image type="image/jpeg" offsetXPC="8.2" offsetYPC="5.5" widthPC="84.25" heightPC="89.25">
- <script>
-  thumbnailPath = getItemInfo(-1, "path") +"/"+ getItemInfo(-1, "poster");
-  thumbnailPath;
- </script>
-</image>
-'
-  else
 echo -e '
 
 <!-- Top Layer folder.jpg -->
 <image type="image/jpeg" offsetXPC="8.2" offsetYPC="5.5" widthPC="84.25" heightPC="89.25">
  <script>
   ItemPath  = getItemInfo(-1, "path");
-  Thumbnail = getItemInfo(-1, "poster");
   ItemFile = getItemInfo(-1, "file");
   thumbnailPath = ItemPath +"/"+ ItemFile +".jpg";
   Etat = readStringFromFile(thumbnailPath);
@@ -669,7 +677,7 @@ echo -e '
     if (Etat==null){
       thumbnailPath = "'${Jukebox_Path}'images/nofolder.jpg";
     }
-  } else thumbnailPath = ItemPath +"/"+ Thumbnail;
+  }
   thumbnailPath;
  </script>
 </image>
@@ -696,7 +704,6 @@ echo -e '
   }
 </script>
 </image>'
-  fi
 
 if [ "$mode" = "genreSelection" ]; then
 echo -e '
@@ -785,34 +792,34 @@ EOF
 
 if [ "$mode" = "genre" ]; then
    if [ "$Search" = "$AllMovies" ]; then
-     ${Sqlite} -separator ''  "${Database}"  "SELECT header,IdMovhead,Movie_ID,IdMovFoot,title,path,poster,info,file,ext,WatchedHead,watched,WatchedFoot,footer FROM t1,t2 ORDER BY title COLLATE NOCASE"; # All Movies
+     ${Sqlite} -separator ''  "${Database}"  "SELECT header,IdMovhead,Movie_ID,IdMovFoot,title,path,file,ext,WatchedHead,watched,WatchedFoot,footer FROM t1,t2 ORDER BY title COLLATE NOCASE"; # All Movies
    else
-      ${Sqlite} -separator ''  "${Database}"  "SELECT header,IdMovhead,Movie_ID,IdMovFoot,title,path,poster,info,file,ext,WatchedHead,watched,WatchedFoot,footer FROM t1,t2 WHERE genre LIKE '%$Search%' ORDER BY title COLLATE NOCASE";
+      ${Sqlite} -separator ''  "${Database}"  "SELECT header,IdMovhead,Movie_ID,IdMovFoot,title,path,file,ext,WatchedHead,watched,WatchedFoot,footer FROM t1,t2 WHERE genre LIKE '%$Search%' ORDER BY title COLLATE NOCASE";
    fi   
 fi
 
 if [ "$mode" = "alpha" ]; then
 if [ "$Search" = "0-9" ]; then
-${Sqlite} -separator ''  "${Database}"  "SELECT header,IdMovhead,Movie_ID,IdMovFoot,title,path,poster,info,file,ext,WatchedHead,watched,WatchedFoot,footer FROM t1,t2 WHERE title LIKE '<title>9%' OR title LIKE '<title>8%' OR title LIKE '<title>7%' OR title LIKE '<title>6%' OR title LIKE '<title>5%' OR title LIKE '<title>4%' OR title LIKE '<title>3%' OR title LIKE '<title>2%' OR title LIKE '<title>1%' OR title LIKE '<title>0%'";
+${Sqlite} -separator ''  "${Database}"  "SELECT header,IdMovhead,Movie_ID,IdMovFoot,title,path,file,ext,WatchedHead,watched,WatchedFoot,footer FROM t1,t2 WHERE title LIKE '<title>9%' OR title LIKE '<title>8%' OR title LIKE '<title>7%' OR title LIKE '<title>6%' OR title LIKE '<title>5%' OR title LIKE '<title>4%' OR title LIKE '<title>3%' OR title LIKE '<title>2%' OR title LIKE '<title>1%' OR title LIKE '<title>0%'";
 else
-${Sqlite} -separator ''  "${Database}"  "SELECT header,IdMovhead,Movie_ID,IdMovFoot,title,path,poster,info,file,ext,WatchedHead,watched,WatchedFoot,footer FROM t1,t2 WHERE title LIKE '<title>$Search%' ORDER BY title COLLATE NOCASE";
+${Sqlite} -separator ''  "${Database}"  "SELECT header,IdMovhead,Movie_ID,IdMovFoot,title,path,file,ext,WatchedHead,watched,WatchedFoot,footer FROM t1,t2 WHERE title LIKE '<title>$Search%' ORDER BY title COLLATE NOCASE";
 fi
 fi
 
 if [ "$mode" = "year" ]; then
-${Sqlite} -separator ''  "${Database}"  "SELECT header,IdMovhead,Movie_ID,IdMovFoot,title,path,poster,info,file,ext,WatchedHead,watched,WatchedFoot,footer FROM t1,t2 WHERE year ='$Search' ORDER BY title COLLATE NOCASE";
+${Sqlite} -separator ''  "${Database}"  "SELECT header,IdMovhead,Movie_ID,IdMovFoot,title,path,file,ext,WatchedHead,watched,WatchedFoot,footer FROM t1,t2 WHERE year ='$Search' ORDER BY title COLLATE NOCASE";
 fi
 
 if [ "$mode" = "recent" ]; then
-${Sqlite} -separator ''  "${Database}"  "SELECT header,IdMovhead,Movie_ID,IdMovFoot,title,path,poster,info,file,ext,WatchedHead,watched,WatchedFoot,footer FROM t1,t2 ORDER BY datestamp DESC LIMIT "$Recent_Max;
+${Sqlite} -separator ''  "${Database}"  "SELECT header,IdMovhead,Movie_ID,IdMovFoot,title,path,file,ext,WatchedHead,watched,WatchedFoot,footer FROM t1,t2 ORDER BY datestamp DESC LIMIT "$Recent_Max;
 fi
 
 if [ "$mode" = "notwatched" ]; then
-${Sqlite} -separator ''  "${Database}"  "SELECT header,IdMovhead,Movie_ID,IdMovFoot,title,path,poster,info,file,ext,WatchedHead,watched,WatchedFoot,footer FROM t1,t2 WHERE watched <>'1' OR watched IS NULL ORDER BY title COLLATE NOCASE";
+${Sqlite} -separator ''  "${Database}"  "SELECT header,IdMovhead,Movie_ID,IdMovFoot,title,path,file,ext,WatchedHead,watched,WatchedFoot,footer FROM t1,t2 WHERE watched <>'1' OR watched IS NULL ORDER BY title COLLATE NOCASE";
 fi
 
 if [ "$mode" = "moviesearch" ]; then
-${Sqlite} -separator ''  "${Database}"  "SELECT header,IdMovhead,Movie_ID,IdMovFoot,title,path,poster,info,file,ext,WatchedHead,watched,WatchedFoot,footer FROM t1,t2 WHERE title LIKE '<title>%$Search%' ORDER BY title COLLATE NOCASE";
+${Sqlite} -separator ''  "${Database}"  "SELECT header,IdMovhead,Movie_ID,IdMovFoot,title,path,file,ext,WatchedHead,watched,WatchedFoot,footer FROM t1,t2 WHERE title LIKE '<title>%$Search%' ORDER BY title COLLATE NOCASE";
 fi
 
 if [ "$mode" = "yearSelection" ]; then
@@ -844,7 +851,8 @@ if [ "$mode" = "genreSelection" ]; then
     echo -e '
     <item>
     <title>'$LINE'</title>
-    <poster>'${Jukebox_Path}'images/genre/'$Img_genre'.jpg</poster>
+    <path>'${Jukebox_Path}'images/genre</path>
+    <file>'$Img_genre'</file>
     </item>'
   done < /tmp/srjg_genre.list
 fi
@@ -862,13 +870,15 @@ if [ $iteration = "0" ]; then
 iteration="1";
 echo "<item>"
 echo "<title>"0-9"</title>"
-echo "<poster>"${Jukebox_Path}"images/alpha/JukeMenu_Number.jpg</poster>"
+echo "<path>"${Jukebox_Path}"images/alpha</path>"
+echo "<file>JukeMenu_Number</file>"
 echo "</item>"
 fi
 else
 echo "<item>"
 echo "<title>"$LINE"</title>"
-echo "<poster>"${Jukebox_Path}"images/alpha/JukeMenu_"$LINE".jpg</poster>"
+echo "<path>"${Jukebox_Path}"images/alpha</path>"
+echo "<file>JukeMenu_"$LINE"</file>"
 echo "</item>"
 fi
 done < /tmp/srjg_alpha.list
