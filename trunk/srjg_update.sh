@@ -98,7 +98,7 @@ CreateMovieDB()
 {
 echo "Creating Database..."
 ${Sqlite} "${Database}" \
-   "create table t1 (Movie_ID INTEGER PRIMARY KEY AUTOINCREMENT,genre TEXT,title TEXT,year TEXT,path TEXT,poster TEXT,info TEXT,file TEXT,ext TEXT,watched INTEGER,dateStamp DATE DEFAULT CURRENT_DATE)";
+   "create table t1 (Movie_ID INTEGER PRIMARY KEY AUTOINCREMENT,genre TEXT,title TEXT,year TEXT,path TEXT,file TEXT,ext TEXT,watched INTEGER,dateStamp DATE DEFAULT CURRENT_DATE)";
 ${Sqlite} "${Database}" "create table t2 (header TEXT, footer TEXT, IdMovhead TEXT, IdMovFoot TEXT, WatchedHead TEXT, WatchedFoot TEXT)";
 ${Sqlite} "${Database}" "insert into t2 values ('<item>','</item>','<IdMovie>','</IdMovie>','<Watched>','</Watched>')";
 }
@@ -176,7 +176,6 @@ do
    # Initialize defaults, replace later
    MOVIETITLE="$MOVIENAME</title>"
    MOVIESHEET=NoMovieinfo.jpg
-   MOVIEPOSTER=nofolder.jpg
    GENRE="<name>Unknown</name>"
    MovieYear=""
 		
@@ -185,33 +184,16 @@ do
         
    [ -e "$MOVIEPATH/$INFONAME" ] && Infoparsing
 
-   # Check for any files of known purpose inside the movie's folder.
-   for FILE in "folder.jpg" "${MOVIENAME}.jpg"
-   do
-    [ ! -e "$MOVIEPATH/$FILE" ] && continue
-    MOVIEPOSTER="$FILE"
-    break
-   done
-
-   for FILE in "about.jpg" "0001.jpg" "${MOVIENAME}_sheet.jpg"
-   do
-    [ ! -e "$MOVIEPATH/$FILE" ] && continue
-    MOVIESHEET="$FILE"
-    break
-   done
-
 if [ -z "$GENRE" ]; then dbgenre="<name>Unknown</name>"; else dbgenre="$GENRE"; fi
 dbtitle=`echo "<title>$MOVIETITLE" | sed "s/'/''/g"`
 dbpath=`echo "<path>$MOVIEPATH</path>" | sed "s/'/''/g"`
-dbposter=`echo "<poster>$MOVIEPOSTER</poster>" | sed "s/'/''/g"`
-dbinfo=`echo "<info>$MOVIESHEET</info>" | sed "s/'/''/g"`
 dbfile=`echo "<file>$MOVIENAME</file>" | sed "s/'/''/g"`
 dbext=`echo "<ext>$MOVIEEXT</ext>" | sed "s/'/''/g"`
 dbYear=$MovieYear
 
 ${Sqlite} "${Database}" \
-  "insert into t1 (genre,title,year,path,poster,info,file,ext) \
-  values ('$dbgenre','$dbtitle','$dbYear','$dbpath','$dbposter','$dbinfo','$dbfile','$dbext');";
+  "insert into t1 (genre,title,year,path,file,ext) \
+  values ('$dbgenre','$dbtitle','$dbYear','$dbpath','$dbfile','$dbext');";
 
 done < $InsertList
 }
