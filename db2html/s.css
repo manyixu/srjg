@@ -2,6 +2,12 @@ body {
 	font-family: Arial;
 	font-size: 16pt;
 	color: #FFFFFF;
+	
+	background: none;
+	background-color: #000000;
+	background-image: url(images/b.jpg);
+	background-repeat: repeat;
+	background-attachment: fixed;
 }
 
 .title {
