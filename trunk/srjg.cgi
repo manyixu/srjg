@@ -1410,7 +1410,7 @@ EOF
 Cfg_Tag=$Jukebox_Size
 Cfg_Par=$CategoryTitle
 
-if [ Cfg_Tag = "Movies_Path" ]; then
+if [ $Cfg_Tag = "Movies_Path" ]; then
   sed -i "s:<$Cfg_Tag>.*</$Cfg_Tag>:<$Cfg_Tag>\"$Cfg_Par\"</$Cfg_Tag>:" /usr/local/etc/srjg.cfg
 else
   sed -i "s:<$Cfg_Tag>.*</$Cfg_Tag>:<$Cfg_Tag>$Cfg_Par</$Cfg_Tag>:" /usr/local/etc/srjg.cfg
