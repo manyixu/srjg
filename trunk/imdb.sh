@@ -14,46 +14,28 @@ fi
 sed '1d;$d;s:<\(.*\)>\(.*\)</.*>:\1=\2:' ${CfgFile} >/tmp/srjg.cfg
 . /tmp/srjg.cfg
 
-IMDB_LINK="http://playon.unixstorm.org/IMDB/movie.php?name="			# Link to IMDB API [DO NOT CHANGE, unless you are requested to do so]
-IMDB_INFO="&mode=info"													# Parameters for generating info file
-IMDB_MOVIE="&mode=sheet&backdrop=y&box=bluray&post=y&tagline=y&lang=${Lang}"		# Parameters for generating moviesheet
-IMDB_POSTER="&mode=poster"												# Parameters for generating poster
+PAR_LINK="http://playon.unixstorm.org/IMDB/movie.php?name="			# Link to IMDB API [DO NOT CHANGE, unless you are requested to do so]
+PAR_INFO="&mode=info"													# Parameters for generating info file
+
+PAR_SHEET="&mode=sheet&box=$Imdb_SBox&lang=$Imdb_Lang&font=$Imdb_Font"		# Parameters for generating moviesheet
+if [ $Imdb_Backdrop != "no" ]; then PAR_SHEET="$PAR_SHEET&backdrop=y"; fi
+if [ $Imdb_SBox != "no" ]; then PAR_SHEET="$PAR_SHEET&box=$Imdb_SBox"; fi
+if [ $Imdb_SPost != "no" ]; then PAR_SHEET="$PAR_SHEET&post=y"; fi
+if [ $Imdb_Tagline != "no" ]; then PAR_SHEET="$PAR_SHEET&tagline=y"; fi
+if [ $Imdb_Time != "no" ]; then PAR_SHEET="$PAR_SHEET&time=$Imdb_Time"; fi
+if [ $Imdb_Genres != "no" ]; then PAR_SHEET="$PAR_SHEET&genres=$Imdb_Genres"; fi
+
+PAR_POSTER="&mode=poster"												# Parameters for generating poster
+if [ $Imdb_PBox != "no" ]; then PAR_POSTER="$PAR_POSTER&box=$Imdb_PBox"; fi
+if [ $Imdb_PPost != "no" ]; then PAR_POSTER="$PAR_POSTER&post=y"; fi
 
 IMDB_TMP="/tmp/srjg_movies.list"				# Path to the list of movies [DO NOT CHANGE, unless you are requested to do so]
-IMDB_MODE="all"							# all: Generate everything (moviesheet, nfo, poster)
-										# images: Generate both moviesheet and poster
-										# moviesheet: Generate only moviesheet
-										# nfo: Generate .nfo file only
-										# poster: Generate only poster
 										
 IMDB_TITLE="filename"					# directory: Use directory name for IMDB search
 										# filename: Use filename for IMDB search
-
-
-# Initialize variables
-MOVIESHEET=""
-POSTER=""									
-INFO=""
 						
 # Create moviesheets by calling IMDB API
 echo "Starting IMDB API.."
-
-# Check running mode
-if ( [ $IMDB_MODE = "moviesheet" ] || [ $IMDB_MODE = "images" ] || [ $IMDB_MODE = "all" ] )
-then
-  MOVIESHEET="y"
-fi
-
-if ( [ $IMDB_MODE = "poster" ] || [ $IMDB_MODE = "images" ] || [ $IMDB_MODE = "all" ] )
-then
-  POSTER="y"
-fi
-
-if ( [ $IMDB_MODE = "nfo" ] || [ $IMDB_MODE = "all" ] )
-then
-  INFO="y"
-fi
-
 
 # Loop through all movies
 while read LINE
@@ -75,12 +57,12 @@ do
     MOVIENAME=`echo $MOVIENAMETEMP | sed "s/[cC][dD]*[1-9]//g" | sed "s/[ &']/+/g"`
 	
 	# Download poster
-	if ( [ -n $POSTER ] && [ ! -e "$MOVIEPATH/folder.jpg" ] && [ ! -e "$MOVIEPATH/${MOVIEFILE}.jpg" ] )
+	if ( [ $Imdb_Poster = "yes" ] && [ ! -e "$MOVIEPATH/folder.jpg" ] && [ ! -e "$MOVIEPATH/${MOVIEFILE}.jpg" ] )
 	then
 		echo "Processing $MOVIENAMETEMP poster.."
 		NAME="$MOVIEPATH/${MOVIEFILE}.jpg"
-		wget -q "$IMDB_LINK$MOVIENAME$IMDB_POSTER" -O "$NAME";
-
+		wget -q "$PAR_LINK$MOVIENAME$PAR_POSTER" -O "$NAME";
+echo "$PAR_LINK$MOVIENAME$PAR_POSTER"
 		# Check generated poster
 		PATT=`grep Movie "$NAME"`
 		if ( [ -e "$NAME" ] && [ -n "$PATT" ] )
@@ -91,11 +73,11 @@ do
 	fi
 
 	# Download moviesheet
-	if ( [ -n $MOVIESHEET ] && [ ! -e "$MOVIEPATH/about.jpg" ] && [ ! -e "$MOVIEPATH/0001.jpg" ] && [ ! -e "$MOVIEPATH/${MOVIEFILE}_sheet.jpg" ] )
+	if ( [ $Imdb_Sheet = "yes" ] && [ ! -e "$MOVIEPATH/about.jpg" ] && [ ! -e "$MOVIEPATH/0001.jpg" ] && [ ! -e "$MOVIEPATH/${MOVIEFILE}_sheet.jpg" ] )
 	then
 		echo "Processing $MOVIENAMETEMP moviesheet.."
 		NAME="$MOVIEPATH/${MOVIEFILE}_sheet.jpg"
-		wget -q "$IMDB_LINK$MOVIENAME$IMDB_MOVIE" -O "$NAME" ;
+		wget -q "$PAR_LINK$MOVIENAME$PAR_SHEET" -O "$NAME" ;
 		
 		# Check generated moviesheet
 		PATT=`grep Movie "$NAME"`
@@ -107,11 +89,11 @@ do
 	fi
 	
 	# Download NFO file
-	if ( [ -n $INFO ] && [ ! -e "$MOVIEPATH/$MOVIEFILE.nfo" ] && [ ! -e "$MOVIEPATH/MovieInfo.nfo" ] )
+	if ( [ $Imdb_Info = "yes" ] && [ ! -e "$MOVIEPATH/$MOVIEFILE.nfo" ] && [ ! -e "$MOVIEPATH/MovieInfo.nfo" ] )
 	then
 		echo "Processing $MOVIENAMETEMP nfo file.."
 		NAME="$MOVIEPATH/${MOVIEFILE}.nfo"
-		wget -q "$IMDB_LINK$MOVIENAME$IMDB_INFO" -O "$NAME" ;
+		wget -q "$PAR_LINK$MOVIENAME$PAR_INFO" -O "$NAME" ;
 		
 		# Check generated nfo file
 		PATT=`grep title "$NAME"`
