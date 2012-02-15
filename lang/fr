@@ -22,6 +22,7 @@
   <Jukebox_Size>Vue</Jukebox_Size>
   <Movies_Path>Chemin des Films</Movies_Path>
   <Movie_Filter>Filtre</Movie_Filter>
+  <SingleDb>Base unique</SingleDb>
   <Recent_Max>Max films récents</Recent_Max>
   <Imdb>Utiliser Imdb</Imdb>
   <Jukebox_Path>Chemin du Jukebox:</Jukebox_Path>
@@ -37,12 +38,17 @@
 <Imdb>
   <Imdb_Use>Activer Imdb</Imdb_Use>
   <Imdb_Lang>Synopsis</Imdb_Lang>
+  <Imdb_Poster>Télécharger Pochette</Imdb_Poster>
+  <Imdb_PBox>Cadre de la pochette</Imdb_PBox>
+  <Imdb_PPost>Pochette aléatoire</Imdb_PPost>
+  <Imdb_Sheet>Télécharger Sheet</Imdb_Sheet>
+  <Imdb_SBox>Cadre Pochette dans Sheet</Imdb_SBox>
+  <Imdb_SPost>Pochette aléatoire dans Sheet</Imdb_SPost>
   <Imdb_Backdrop>Image du fond aléatoire</Imdb_Backdrop>
-  <Imdb_Box>Cadre de la pochette</Imdb_Box>
   <Imdb_Font>Police de caractère</Imdb_Font>
   <Imdb_Genres>Genres en images</Imdb_Genres>
-  <Imdb_Source>Pochette aléatoire</Imdb_Source>
   <Imdb_Tagline>Ligne Tag</Imdb_Tagline>
   <Imdb_Time>Format de la Durée</Imdb_Time>
   <Imdb_Info>Générer fichier info</Imdb_Info>
 </Imdb>
+

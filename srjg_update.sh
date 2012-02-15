@@ -12,15 +12,22 @@ fi
 sed '1d;$d;s:<\(.*\)>\(.*\)</.*>:\1=\2:' ${CfgFile} >/tmp/srjg.cfg
 . /tmp/srjg.cfg
 
+# Setting up other variable
+if [ "${SingleDb}" = "yes" ]; then 
+  Database="${Jukebox_Path}movies.db"
+  PreviousMovieList="${Jukebox_Path}prevmovies.list"
+else
+  Database="${Movies_Path}SRJG/movies.db"
+  PreviousMovieList="${Movies_Path}SRJG/prevmovies.list"
+fi
+
 # Initialize some Variables
 
 MoviesList="/tmp/srjg_movies.list"
 InsertList="/tmp/srjg_insert.list"
 DeleteList="/tmp/srjg_delete.list"
-PreviousMovieList="${Movies_Path}SRJG/prevmovies.list"
 IMDB=""
 Force_DB_Update=""
-Database="${Movies_Path}SRJG/movies.db"
 Sqlite="${Jukebox_Path}sqlite3"
 
 usage()
@@ -82,7 +89,7 @@ if [ ! -d "${Movies_Path}" ]; then			# ctrl directory cfg file
   exit 1
 fi
 
-[ -d "${Movies_Path}" ] && mkdir -p "${Movies_Path}SRJG/"
+([ -d "${Movies_Path}" ] && [ "${SingleDb}" = "no" ]) && mkdir -p "${Movies_Path}SRJG/"
 
 CreateMovieDB()
 # Create the Movie Database
@@ -225,7 +232,7 @@ ${Sqlite} "${Database}"  "VACUUM";
 #*****************  Main Program  *****************************************
 
 GenerateMovieList;
-[ -n "$IMDB" ] &&  ${Jukebox_Path}imdb.sh
+([ "$Imdb" = "yes" ] || [ -n "$IMDB" ]) &&  ${Jukebox_Path}imdb.sh
 [ -n "$Force_DB_Update" ] && Force_DB_Creation
 [ ! -f "${Database}" ] && CreateMovieDB
 echo Indexing $Movies_Path;

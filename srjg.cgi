@@ -17,10 +17,21 @@ Search=${CategoryTitle}
 . /tmp/srjg.cfg
 
 # Setting up other variable
+if [ "${SingleDb}" = "yes" ]; then 
+  Database="${Jukebox_Path}movies.db"
+  UpdateLog="${Jukebox_Path}update.log"
+  PreviousMovieList="${Jukebox_Path}prevmovies.list"
+else
+  Database="${Movies_Path}SRJG/movies.db"
+  UpdateLog="${Movies_Path}SRJG/update.log"
+  [ -d "${Movies_Path}" ] && mkdir -p "${Movies_Path}SRJG/"
+  PreviousMovieList="${Movies_Path}SRJG/prevmovies.list"
+fi
 
-Database=${Movies_Path}"SRJG/movies.db"
-UpdateLog=${Movies_Path}"SRJG/update.log"
 Sqlite=${Jukebox_Path}"sqlite3"
+MoviesList="/tmp/srjg_movies.list"
+InsertList="/tmp/srjg_insert.list"
+DeleteList="/tmp/srjg_delete.list"
 
 # Genre "All Movies" depending of the language
 AllMovies=`sed "/>All Movies|/!d;s:|\(.*\)>.*:\1:" "${Jukebox_Path}lang/${Language}_genre"`
@@ -174,15 +185,6 @@ echo -e '<onEnter>
 showIdle();
 postMessage("return");
 </onEnter>'
-
-# Initialize some Variables
-
-MoviesList="/tmp/srjg_movies.list"
-InsertList="/tmp/srjg_insert.list"
-DeleteList="/tmp/srjg_delete.list"
-PreviousMovieList="${Movies_Path}SRJG/prevmovies.list"
-
-[ -d "${Movies_Path}" ] && mkdir -p "${Movies_Path}SRJG/"
 
 GenerateMovieList;
 
@@ -639,7 +641,7 @@ echo -e '
 
 else
 
-  if [ "$mode" = "genreSelection" ]; then
+  if ( [ $mode = "genreSelection" ] || [ $mode = "alphaSelection" ] ); then
 echo -e '
 
 <!-- Top Layer folder.jpg -->
@@ -891,22 +893,27 @@ cat <<EOF
     else {
         Config_itemSize = getXMLElementCount("Config");
 	}
-    
+
   if (Config_itemSize > 0) {
     Language = getXMLText("Config", "Lang");
 		Jukebox_Path = getXMLText("Config", "Jukebox_Path");
 		Jukebox_Size = getXMLText("Config", "Jukebox_Size");
 		Movies_Path = getXMLText("Config", "Movies_Path");
+    SingleDb = getXMLText("Config", "SingleDb");
 		Movie_Filter = getXMLText("Config", "Movie_Filter");
 		Port = getXMLText("Config", "Port");
 		Recent_Max = getXMLText("Config", "Recent_Max");
     Imdb = getXMLText("Config", "Imdb");
 		Imdb_Lang = getXMLText("Config", "Imdb_Lang");
+		Imdb_Poster = getXMLText("Config", "Imdb_Poster");
+		Imdb_PBox = getXMLText("Config", "Imdb_PBox");
+		Imdb_PPost = getXMLText("Config", "Imdb_PPost");
+		Imdb_Sheet = getXMLText("Config", "Imdb_Sheet");
+		Imdb_SBox = getXMLText("Config", "Imdb_SBox");
+		Imdb_SPost = getXMLText("Config", "Imdb_SPost");
 		Imdb_Backdrop = getXMLText("Config", "Imdb_Backdrop");
-		Imdb_Box = getXMLText("Config", "Imdb_Box");
 		Imdb_Font = getXMLText("Config", "Imdb_Font");
 		Imdb_Genres = getXMLText("Config", "Imdb_Genres");
-		Imdb_Source = getXMLText("Config", "Imdb_Source");
     Imdb_Tagline = getXMLText("Config", "Imdb_Tagline");
     Imdb_Time = getXMLText("Config", "Imdb_Time");
     Imdb_Info = getXMLText("Config", "Imdb_Info");
@@ -918,15 +925,20 @@ cat <<EOF
   tmpconfigArray=pushBackStringArray(tmpconfigArray, "Jukebox_Path="+Jukebox_Path);
   tmpconfigArray=pushBackStringArray(tmpconfigArray, "Movies_Path="+Movies_Path);
   tmpconfigArray=pushBackStringArray(tmpconfigArray, "Movie_Filter="+Movie_Filter);
+  tmpconfigArray=pushBackStringArray(tmpconfigArray, "SingleDb="+SingleDb);
   tmpconfigArray=pushBackStringArray(tmpconfigArray, "Port="+Port);
   tmpconfigArray=pushBackStringArray(tmpconfigArray, "Recent_Max="+Recent_Max);
   tmpconfigArray=pushBackStringArray(tmpconfigArray, "Imdb="+Imdb);
   tmpconfigArray=pushBackStringArray(tmpconfigArray, "Imdb_Lang="+Imdb_Lang);
+  tmpconfigArray=pushBackStringArray(tmpconfigArray, "Imdb_Poster="+Imdb_Poster);
+  tmpconfigArray=pushBackStringArray(tmpconfigArray, "Imdb_PBox="+Imdb_PBox);
+  tmpconfigArray=pushBackStringArray(tmpconfigArray, "Imdb_PPost="+Imdb_PPost);
+  tmpconfigArray=pushBackStringArray(tmpconfigArray, "Imdb_Sheet="+Imdb_Sheet);
+  tmpconfigArray=pushBackStringArray(tmpconfigArray, "Imdb_SBox="+Imdb_SBox);
+  tmpconfigArray=pushBackStringArray(tmpconfigArray, "Imdb_SPost="+Imdb_SPost);
   tmpconfigArray=pushBackStringArray(tmpconfigArray, "Imdb_Backdrop="+Imdb_Backdrop);
-  tmpconfigArray=pushBackStringArray(tmpconfigArray, "Imdb_Box="+Imdb_Box);
   tmpconfigArray=pushBackStringArray(tmpconfigArray, "Imdb_Font="+Imdb_Font);
   tmpconfigArray=pushBackStringArray(tmpconfigArray, "Imdb_Genres="+Imdb_Genres);
-  tmpconfigArray=pushBackStringArray(tmpconfigArray, "Imdb_Source="+Imdb_Source);
   tmpconfigArray=pushBackStringArray(tmpconfigArray, "Imdb_Tagline="+Imdb_Tagline);
   tmpconfigArray=pushBackStringArray(tmpconfigArray, "Imdb_Time="+Imdb_Time);
   tmpconfigArray=pushBackStringArray(tmpconfigArray, "Imdb_Info="+Imdb_Info);
@@ -939,6 +951,7 @@ cat <<EOF
     cfg_Jukebox_Path = getXMLText("cfg", "Jukebox_Path");
     cfg_Jukebox_Size = getXMLText("cfg", "Jukebox_Size");
     cfg_Movies_Path = getXMLText("cfg", "Movies_Path");
+    cfg_SingleDb = getXMLText("cfg", "SingleDb");
     cfg_Movie_Filter = getXMLText("cfg", "Movie_Filter");
     cfg_Imdb = getXMLText("cfg", "Imdb");
     cfg_Port = getXMLText("cfg", "Port");
@@ -952,7 +965,7 @@ cat <<EOF
   if ( Version == null ) print ("Version File not found");
 </onEnter>
 
-<mediaDisplay name="photoView" rowCount="6" columnCount="1" drawItemText="no" showHeader="no" showDefaultInfo="no" menuBorderColor="255:255:255" sideColorBottom="-1:-1:-1" sideColorTop="-1:-1:-1" itemAlignt="left" itemOffsetXPC="4" itemOffsetYPC="32" itemWidthPC="32" itemHeightPC="7.2" backgroundColor="-1:-1:-1" itemBackgroundColor="-1:-1:-1" sliding="no" itemGap="0" idleImageXPC="90" idleImageYPC="5" idleImageWidthPC="5" idleImageHeightPC="8" imageUnFocus="null" imageParentFocus="null" imageBorderPC="0" forceFocusOnItem="no" cornerRounding="yes" itemBorderColor="-1:-1:-1" focusBorderColor="-1:-1:-1" unFocusBorderColor="-1:-1:-1">
+<mediaDisplay name="photoView" rowCount="7" columnCount="1" drawItemText="no" showHeader="no" showDefaultInfo="no" menuBorderColor="255:255:255" sideColorBottom="-1:-1:-1" sideColorTop="-1:-1:-1" itemAlignt="left" itemOffsetXPC="4" itemOffsetYPC="32" itemWidthPC="32" itemHeightPC="7.2" backgroundColor="-1:-1:-1" itemBackgroundColor="-1:-1:-1" sliding="no" itemGap="0" idleImageXPC="90" idleImageYPC="5" idleImageWidthPC="5" idleImageHeightPC="8" imageUnFocus="null" imageParentFocus="null" imageBorderPC="0" forceFocusOnItem="no" cornerRounding="yes" itemBorderColor="-1:-1:-1" focusBorderColor="-1:-1:-1" unFocusBorderColor="-1:-1:-1">
 <idleImage> image/POPUP_LOADING_01.png </idleImage> 
 <idleImage> image/POPUP_LOADING_02.png </idleImage> 
 <idleImage> image/POPUP_LOADING_03.png </idleImage> 
@@ -977,23 +990,30 @@ cat <<EOF
 
 <text redraw="no" backgroundColor="-1:-1:-1" foregroundColor="200:200:200" offsetXPC="36" offsetYPC="51" widthPC="57" heightPC="4" fontSize="16" lines="1" align="left">
 	<script>
-		print(Movie_Filter);
+		if ( SingleDb == "yes" ) print( cfg_Yes );
+    else print( cfg_No );
 	</script>
 </text>
 
 <text redraw="no" backgroundColor="-1:-1:-1" foregroundColor="200:200:200" offsetXPC="36" offsetYPC="59" widthPC="57" heightPC="4" fontSize="16" lines="1" align="left">
 	<script>
-		print(Jukebox_Size);
+		print(Movie_Filter);
 	</script>
 </text>
 
 <text redraw="no" backgroundColor="-1:-1:-1" foregroundColor="200:200:200" offsetXPC="36" offsetYPC="67" widthPC="57" heightPC="4" fontSize="16" lines="1" align="left">
 	<script>
-		print(Recent_Max);
+		print(Jukebox_Size);
 	</script>
 </text>
 
 <text redraw="no" backgroundColor="-1:-1:-1" foregroundColor="200:200:200" offsetXPC="36" offsetYPC="75" widthPC="57" heightPC="4" fontSize="16" lines="1" align="left">
+	<script>
+		print(Recent_Max);
+	</script>
+</text>
+
+<text redraw="no" backgroundColor="-1:-1:-1" foregroundColor="200:200:200" offsetXPC="36" offsetYPC="83" widthPC="57" heightPC="4" fontSize="16" lines="1" align="left">
 	<script>
 		if ( Imdb == "yes" ) print( cfg_Yes );
     else print( cfg_No );
@@ -1124,6 +1144,19 @@ cat <<EOF
 	</script>
 </title>
 <selection>FBrowser</selection>
+<param></param>
+<pos></pos>
+</item>
+
+<item>
+<title>
+	<script>
+		print(cfg_SingleDb);
+	</script>
+</title>
+<selection>SingleDb</selection>
+<param>yes%20no</param>
+<pos>43</pos>
 </item>
 
 <item>
@@ -1133,6 +1166,8 @@ cat <<EOF
 	</script>
 </title>
 <selection>Movie_Filter</selection>
+<param></param>
+<pos></pos>
 </item>
 
 <item>
@@ -1165,7 +1200,7 @@ cat <<EOF
 </title>
 <selection>ImdbCfgEdit</selection>
 <param></param>
-<pos>0</pos>
+<pos></pos>
 </item>
 
 </channel>
@@ -1537,12 +1572,13 @@ cat <<EOF
 </text>
 
 <script>
-	LnParam="name=avatar&amp;box="+Imdb_Box+"&amp;mode=sheet&amp;font="+Imdb_Font+"&amp;lang="+Imdb_Lang;
+	LnParam="name=avatar&amp;box=$Imdb_SBox&amp;mode=sheet&amp;font=$Imdb_Font&amp;lang=$Imdb_Lang";
   if ( "$Imdb_Backdrop" != "no" ) LnParam=LnParam+"&amp;backdrop=y";
-	if ( "$Imdb_Source" != "no" ) LnParam=LnParam+"&amp;source=y";
+  if ( "$Imdb_SPost" != "no" ) LnParam=LnParam+"&amp;post=y";
+  if ( "$Imdb_SBox" != "no" ) LnParam=LnParam+"&amp;box=$Imdb_SBox";
 	if ( "$Imdb_Tagline" != "no" ) LnParam=LnParam+"&amp;tagline=y";
-	if ( "$Imdb_Time" != "no" ) LnParam=LnParam+"&amp;time="+Imdb_Time;
-	if ( "$Imdb_Genres" != "no" ) LnParam=LnParam+"&amp;genres="+"$Imdb_Genres";
+	if ( "$Imdb_Time" != "no" ) LnParam=LnParam+"&amp;time=$Imdb_Time";
+  if ( "$Imdb_Genres" != "no" ) LnParam=LnParam+"&amp;genres=$Imdb_Genres";
   ImdbLink = "http://playon.unixstorm.org/IMDB/movie.php?" + LnParam;
 </script>
 	
@@ -1589,16 +1625,21 @@ cat <<EOF
 		Jukebox_Path = getXMLText("Config", "Jukebox_Path");
 		Jukebox_Size = getXMLText("Config", "Jukebox_Size");
 		Movies_Path = getXMLText("Config", "Movies_Path");
+    SingleDb = getXMLText("Config", "SingleDb");
 		Movie_Filter = getXMLText("Config", "Movie_Filter");
 		Port = getXMLText("Config", "Port");
 		Recent_Max = getXMLText("Config", "Recent_Max");
     Imdb = getXMLText("Config", "Imdb");
 		Imdb_Lang = getXMLText("Config", "Imdb_Lang");
+		Imdb_Poster = getXMLText("Config", "Imdb_Poster");
+		Imdb_PBox = getXMLText("Config", "Imdb_PBox");
+		Imdb_PPost = getXMLText("Config", "Imdb_PPost");
+		Imdb_Sheet = getXMLText("Config", "Imdb_Sheet");
+		Imdb_SBox = getXMLText("Config", "Imdb_SBox");
+		Imdb_SPost = getXMLText("Config", "Imdb_SPost");
 		Imdb_Backdrop = getXMLText("Config", "Imdb_Backdrop");
-		Imdb_Box = getXMLText("Config", "Imdb_Box");
 		Imdb_Font = getXMLText("Config", "Imdb_Font");
 		Imdb_Genres = getXMLText("Config", "Imdb_Genres");
-		Imdb_Source = getXMLText("Config", "Imdb_Source");
     Imdb_Tagline = getXMLText("Config", "Imdb_Tagline");
     Imdb_Time = getXMLText("Config", "Imdb_Time");
     Imdb_Info = getXMLText("Config", "Imdb_Info");
@@ -1610,15 +1651,20 @@ cat <<EOF
   tmpconfigArray=pushBackStringArray(tmpconfigArray, "Jukebox_Path="+Jukebox_Path);
   tmpconfigArray=pushBackStringArray(tmpconfigArray, "Movies_Path="+Movies_Path);
   tmpconfigArray=pushBackStringArray(tmpconfigArray, "Movie_Filter="+Movie_Filter);
+  tmpconfigArray=pushBackStringArray(tmpconfigArray, "SingleDb="+SingleDb);
   tmpconfigArray=pushBackStringArray(tmpconfigArray, "Port="+Port);
   tmpconfigArray=pushBackStringArray(tmpconfigArray, "Recent_Max="+Recent_Max);
   tmpconfigArray=pushBackStringArray(tmpconfigArray, "Imdb="+Imdb);
   tmpconfigArray=pushBackStringArray(tmpconfigArray, "Imdb_Lang="+Imdb_Lang);
+  tmpconfigArray=pushBackStringArray(tmpconfigArray, "Imdb_Poster="+Imdb_Poster);
+  tmpconfigArray=pushBackStringArray(tmpconfigArray, "Imdb_PBox="+Imdb_PBox);
+  tmpconfigArray=pushBackStringArray(tmpconfigArray, "Imdb_PPost="+Imdb_PPost);
+  tmpconfigArray=pushBackStringArray(tmpconfigArray, "Imdb_Sheet="+Imdb_Sheet);
+  tmpconfigArray=pushBackStringArray(tmpconfigArray, "Imdb_SBox="+Imdb_SBox);
+  tmpconfigArray=pushBackStringArray(tmpconfigArray, "Imdb_SPost="+Imdb_SPost);
   tmpconfigArray=pushBackStringArray(tmpconfigArray, "Imdb_Backdrop="+Imdb_Backdrop);
-  tmpconfigArray=pushBackStringArray(tmpconfigArray, "Imdb_Box="+Imdb_Box);
   tmpconfigArray=pushBackStringArray(tmpconfigArray, "Imdb_Font="+Imdb_Font);
   tmpconfigArray=pushBackStringArray(tmpconfigArray, "Imdb_Genres="+Imdb_Genres);
-  tmpconfigArray=pushBackStringArray(tmpconfigArray, "Imdb_Source="+Imdb_Source);
   tmpconfigArray=pushBackStringArray(tmpconfigArray, "Imdb_Tagline="+Imdb_Tagline);
   tmpconfigArray=pushBackStringArray(tmpconfigArray, "Imdb_Time="+Imdb_Time);
   tmpconfigArray=pushBackStringArray(tmpconfigArray, "Imdb_Info="+Imdb_Info);
@@ -1633,18 +1679,22 @@ cat <<EOF
     cfg_No = getXMLText("cfg", "no");
     cfgI_Use=getXMLText("Imdb", "Imdb_Use");
     cfgI_Lang=getXMLText("Imdb", "Imdb_Lang");
+    cfgI_Poster=getXMLText("Imdb", "Imdb_Poster");
+    cfgI_PBox=getXMLText("Imdb", "Imdb_PBox");
+    cfgI_PPost=getXMLText("Imdb", "Imdb_PPost");
+    cfgI_Sheet=getXMLText("Imdb", "Imdb_Sheet");
+    cfgI_SBox=getXMLText("Imdb", "Imdb_SBox");
+    cfgI_SPost=getXMLText("Imdb", "Imdb_SPost");
     cfgI_Backdrop=getXMLText("Imdb", "Imdb_Backdrop");
-    cfgI_Box=getXMLText("Imdb", "Imdb_Box");
     cfgI_Font=getXMLText("Imdb", "Imdb_Font");
     cfgI_Genres=getXMLText("Imdb", "Imdb_Genres");
-    cfgI_Source=getXMLText("Imdb", "Imdb_Source");
     cfgI_Tagline=getXMLText("Imdb", "Imdb_Tagline");
     cfgI_Time=getXMLText("Imdb", "Imdb_Time");
     cfgI_Info=getXMLText("Imdb", "Imdb_Info");
   }
 </onEnter>
 
-<mediaDisplay name="photoView" rowCount="10" columnCount="1" drawItemText="no" showHeader="no" showDefaultInfo="no" menuBorderColor="255:255:255" sideColorBottom="-1:-1:-1" sideColorTop="-1:-1:-1" itemAlignt="left" itemOffsetXPC="4" itemOffsetYPC="15" itemWidthPC="32" itemHeightPC="7.2" backgroundColor="-1:-1:-1" itemBackgroundColor="-1:-1:-1" sliding="no" itemGap="0" idleImageXPC="90" idleImageYPC="5" idleImageWidthPC="5" idleImageHeightPC="8" imageUnFocus="null" imageParentFocus="null" imageBorderPC="0" forceFocusOnItem="no" cornerRounding="yes" itemBorderColor="-1:-1:-1" focusBorderColor="-1:-1:-1" unFocusBorderColor="-1:-1:-1">
+<mediaDisplay name="photoView" rowCount="14" columnCount="1" drawItemText="no" showHeader="no" showDefaultInfo="no" menuBorderColor="255:255:255" sideColorBottom="-1:-1:-1" sideColorTop="-1:-1:-1" itemAlignt="left" itemOffsetXPC="4" itemOffsetYPC="10" itemWidthPC="30" itemHeightPC="5" backgroundColor="-1:-1:-1" itemBackgroundColor="-1:-1:-1" sliding="no" itemGap="0" idleImageXPC="90" idleImageYPC="5" idleImageWidthPC="5" idleImageHeightPC="8" imageUnFocus="null" imageParentFocus="null" imageBorderPC="0" forceFocusOnItem="no" cornerRounding="yes" itemBorderColor="-1:-1:-1" focusBorderColor="-1:-1:-1" unFocusBorderColor="-1:-1:-1">
 <idleImage> image/POPUP_LOADING_01.png </idleImage> 
 <idleImage> image/POPUP_LOADING_02.png </idleImage> 
 <idleImage> image/POPUP_LOADING_03.png </idleImage> 
@@ -1656,95 +1706,129 @@ cat <<EOF
 
 <!-- covert display -->
 <image type="image/jpeg" offsetXPC="68" offsetYPC="4" widthPC="14" heightPC="40">
- <script>
-	 LnParam="name=avatar&amp;box="+Imdb_Box+"&amp;mode=poster&amp;lang="+Imdb_Lang;
-	 if ( Imdb_Source != "no" ) LnParam=LnParam+"&amp;source=y";
-	 if ( Imdb_Tagline != "no" ) LnParam=LnParam+"&amp;tagline=y";
-	 if ( Imdb_Time != "no" ) LnParam=LnParam+"&amp;time="+Imdb_Time;
-   ImdbLink = "http://playon.unixstorm.org/IMDB/movie.php?" + LnParam;
- </script>
+  <script>
+    if ( Imdb == "no" || Imdb_Poster == "no" ) "${Jukebox_Path}images/nofolder.jpg";
+    else {
+	    LnParam="name=avatar&amp;mode=poster";
+      if ( Imdb_PBox != "no" ) LnParam=LnParam+"&amp;box="+Imdb_PBox;
+	    if ( Imdb_PPost != "no" ) LnParam=LnParam+"&amp;post=y";
+      "http://playon.unixstorm.org/IMDB/movie.php?" + LnParam;
+    }
+  </script>
 </image>
 
 <script>
 
 </script>
 	
-<image offsetXPC="47" offsetYPC="46" widthPC="68" heightPC="50">
+<image offsetXPC="47" offsetYPC="46" widthPC="65" heightPC="50">
   <script>
-	  LnParam="name=avatar&amp;box="+Imdb_Box+"&amp;mode=sheet&amp;font="+Imdb_Font+"&amp;lang="+Imdb_Lang;
-    if ( Imdb_Backdrop != "no" ) LnParam=LnParam+"&amp;backdrop=y";
-	  if ( Imdb_Source != "no" ) LnParam=LnParam+"&amp;source=y";
-	  if ( Imdb_Tagline != "no" ) LnParam=LnParam+"&amp;tagline=y";
-	  if ( Imdb_Time != "no" ) LnParam=LnParam+"&amp;time="+Imdb_Time;
-	 if ( Imdb_Genres != "no" ) LnParam=LnParam+"&amp;genres="+Imdb_Genres;
-    ImdbLink = "http://playon.unixstorm.org/IMDB/movie.php?" + LnParam;
+    if ( Imdb == "no" || Imdb_Sheet == "no" ) "${Jukebox_Path}images/NoMovieinfo.jpg";
+    else {
+	    LnParam="name=avatar&amp;box="+Imdb_SBox+"&amp;mode=sheet&amp;font="+Imdb_Font+"&amp;lang="+Imdb_Lang;
+      if ( Imdb_Backdrop != "no" ) LnParam=LnParam+"&amp;backdrop=y";
+      if ( Imdb_SPost != "no" ) LnParam=LnParam+"&amp;post=y";
+      if ( Imdb_SBox != "no" ) LnParam=LnParam+"&amp;box="+Imdb_SBox;
+	    if ( Imdb_Tagline != "no" ) LnParam=LnParam+"&amp;tagline=y";
+	    if ( Imdb_Time != "no" ) LnParam=LnParam+"&amp;time="+Imdb_Time;
+      if ( Imdb_Genres != "no" ) LnParam=LnParam+"&amp;genres="+Imdb_Genres;
+      "http://playon.unixstorm.org/IMDB/movie.php?" + LnParam;
+    }
   </script>
 </image>
 
 
 <!-- comment menu display -->
-<text redraw="no" backgroundColor="-1:-1:-1" foregroundColor="200:200:200" offsetXPC="36" offsetYPC="18" widthPC="57" heightPC="4" fontSize="16" lines="1" align="left">
+<text redraw="no" backgroundColor="-1:-1:-1" foregroundColor="200:200:200" offsetXPC="34" offsetYPC="12" widthPC="57" heightPC="4" fontSize="16" lines="1" align="left">
 	<script>
 		if ( Imdb == "yes" ) print( cfg_Yes );
     else print( cfg_No );
 	</script>
 </text>
 
-<text redraw="no" backgroundColor="-1:-1:-1" foregroundColor="200:200:200" offsetXPC="36" offsetYPC="26" widthPC="57" heightPC="4" fontSize="16" lines="1" align="left">
+<text redraw="no" backgroundColor="-1:-1:-1" foregroundColor="200:200:200" offsetXPC="34" offsetYPC="18" widthPC="57" heightPC="4" fontSize="16" lines="1" align="left">
 	<script>
 		print(Imdb_Lang);
 	</script>
 </text>
 
-<text redraw="no" backgroundColor="-1:-1:-1" foregroundColor="200:200:200" offsetXPC="36" offsetYPC="34" widthPC="57" heightPC="4" fontSize="16" lines="1" align="left">
+<text redraw="no" backgroundColor="-1:-1:-1" foregroundColor="200:200:200" offsetXPC="34" offsetYPC="24" widthPC="57" heightPC="4" fontSize="16" lines="1" align="left">
+	<script>
+		if ( Imdb_Poster == "yes" ) print( cfg_Yes );
+    else print( cfg_No );
+	</script>
+</text>
+
+<text redraw="no" backgroundColor="-1:-1:-1" foregroundColor="200:200:200" offsetXPC="34" offsetYPC="30" widthPC="57" heightPC="4" fontSize="16" lines="1" align="left">
+	<script>
+		if ( Imdb_PBox == "no" ) print( cfg_No );
+    else print( Imdb_PBox );
+	</script>
+</text>
+
+<text redraw="no" backgroundColor="-1:-1:-1" foregroundColor="200:200:200" offsetXPC="34" offsetYPC="36" widthPC="57" heightPC="4" fontSize="16" lines="1" align="left">
+	<script>
+		if ( Imdb_PPost == "yes" ) print( cfg_Yes );
+    else print( cfg_No );
+	</script>
+</text>
+
+<text redraw="no" backgroundColor="-1:-1:-1" foregroundColor="200:200:200" offsetXPC="34" offsetYPC="42" widthPC="57" heightPC="4" fontSize="16" lines="1" align="left">
+	<script>
+		if ( Imdb_Sheet == "yes" ) print( cfg_Yes );
+    else print( cfg_No );
+	</script>
+</text>
+
+<text redraw="no" backgroundColor="-1:-1:-1" foregroundColor="200:200:200" offsetXPC="34" offsetYPC="48" widthPC="57" heightPC="4" fontSize="16" lines="1" align="left">
+	<script>
+		if ( Imdb_SBox == "no" ) print( cfg_No );
+    else print( Imdb_SBox );
+	</script>
+</text>
+
+<text redraw="no" backgroundColor="-1:-1:-1" foregroundColor="200:200:200" offsetXPC="34" offsetYPC="54" widthPC="57" heightPC="4" fontSize="16" lines="1" align="left">
+	<script>
+		if ( Imdb_SPost == "yes" ) print( cfg_Yes );
+    else print( cfg_No );
+	</script>
+</text>
+
+<text redraw="no" backgroundColor="-1:-1:-1" foregroundColor="200:200:200" offsetXPC="34" offsetYPC="60" widthPC="57" heightPC="4" fontSize="16" lines="1" align="left">
 	<script>
 		if ( Imdb_Backdrop == "yes" ) print( cfg_Yes );
     else print( cfg_No );
 	</script>
 </text>
 
-<text redraw="no" backgroundColor="-1:-1:-1" foregroundColor="200:200:200" offsetXPC="36" offsetYPC="42" widthPC="57" heightPC="4" fontSize="16" lines="1" align="left">
-	<script>
-		print(Imdb_Box);
-	</script>
-</text>
-
-<text redraw="no" backgroundColor="-1:-1:-1" foregroundColor="200:200:200" offsetXPC="36" offsetYPC="50" widthPC="57" heightPC="4" fontSize="16" lines="1" align="left">
+<text redraw="no" backgroundColor="-1:-1:-1" foregroundColor="200:200:200" offsetXPC="34" offsetYPC="66" widthPC="57" heightPC="4" fontSize="16" lines="1" align="left">
 	<script>
 		print(Imdb_Font);
 	</script>
 </text>
 
-<text redraw="no" backgroundColor="-1:-1:-1" foregroundColor="200:200:200" offsetXPC="36" offsetYPC="58" widthPC="57" heightPC="4" fontSize="16" lines="1" align="left">
+<text redraw="no" backgroundColor="-1:-1:-1" foregroundColor="200:200:200" offsetXPC="34" offsetYPC="72" widthPC="57" heightPC="4" fontSize="16" lines="1" align="left">
 	<script>
 		if ( Imdb_Genres == "yes" ) print( cfg_Yes );
     else print( cfg_No );
 	</script>
 </text>
 
-<text redraw="no" backgroundColor="-1:-1:-1" foregroundColor="200:200:200" offsetXPC="36" offsetYPC="66" widthPC="57" heightPC="4" fontSize="16" lines="1" align="left">
-	<script>
-		if ( Imdb_Source == "yes" ) print( cfg_Yes );
-    else print( cfg_No );
-	</script>
-</text>
-
-<text redraw="no" backgroundColor="-1:-1:-1" foregroundColor="200:200:200" offsetXPC="36" offsetYPC="74" widthPC="57" heightPC="4" fontSize="16" lines="1" align="left">
+<text redraw="no" backgroundColor="-1:-1:-1" foregroundColor="200:200:200" offsetXPC="34" offsetYPC="78" widthPC="57" heightPC="4" fontSize="16" lines="1" align="left">
 	<script>
 		if ( Imdb_Tagline == "yes" ) print( cfg_Yes );
     else print( cfg_No );
 	</script>
 </text>
 
-
-<text redraw="no" backgroundColor="-1:-1:-1" foregroundColor="200:200:200" offsetXPC="36" offsetYPC="82" widthPC="57" heightPC="4" fontSize="16" lines="1" align="left">
+<text redraw="no" backgroundColor="-1:-1:-1" foregroundColor="200:200:200" offsetXPC="34" offsetYPC="84" widthPC="57" heightPC="4" fontSize="16" lines="1" align="left">
 	<script>
 		if ( Imdb_Time == "no" ) print( cfg_No );
     else print( Imdb_Time );
 	</script>
 </text>
 
-<text redraw="no" backgroundColor="-1:-1:-1" foregroundColor="200:200:200" offsetXPC="36" offsetYPC="90" widthPC="57" heightPC="4" fontSize="16" lines="1" align="left">
+<text redraw="no" backgroundColor="-1:-1:-1" foregroundColor="200:200:200" offsetXPC="34" offsetYPC="90" widthPC="57" heightPC="4" fontSize="16" lines="1" align="left">
 	<script>
 		if ( Imdb_Info == "yes" ) print( cfg_Yes );
     else print( cfg_No );
@@ -1789,7 +1873,7 @@ cat <<EOF
  </script>
 </image>
 
-<text redraw="no" offsetXPC="0" offsetYPC="0" widthPC="94" heightPC="100" backgroundColor="-1:-1:-1" foregroundColor="200:200:200" fontSize="16" align="center">
+<text redraw="no" offsetXPC="0" offsetYPC="0" widthPC="94" heightPC="100" backgroundColor="-1:-1:-1" foregroundColor="200:200:200" fontSize="13" align="center">
  <script>
     getItemInfo(-1, "title");
  </script>
@@ -1841,23 +1925,78 @@ cat <<EOF
 <item>
 <title>
 	<script>
+		print(cfgI_Poster);
+	</script>
+</title>
+<selection>Imdb_Poster</selection>
+<param>yes%20no</param>
+<pos>10</pos>
+</item>
+
+<item>
+<title>
+	<script>
+		print(cfgI_PBox);
+	</script>
+</title>
+<selection>Imdb_PBox</selection>
+<param>no%20bdrip%20bluray%20dtheater%20dvd%20generic%20hddvd%20hdtv%20itunes</param>
+<pos>21</pos>
+</item>
+
+<item>
+<title>
+	<script>
+		print(cfgI_PPost);
+	</script>
+</title>
+<selection>Imdb_PPost</selection>
+<param>yes%20no</param>
+<pos>60</pos>
+</item>
+
+<item>
+<title>
+	<script>
+		print(cfgI_Sheet);
+	</script>
+</title>
+<selection>Imdb_Sheet</selection>
+<param>yes%20no</param>
+<pos>10</pos>
+</item>
+
+<item>
+<title>
+	<script>
+		print(cfgI_SBox);
+	</script>
+</title>
+<selection>Imdb_SBox</selection>
+<param>no%20bdrip%20bluray%20dtheater%20dvd%20generic%20hddvd%20hdtv%20itunes</param>
+<pos>21</pos>
+</item>
+
+<item>
+<title>
+	<script>
+		print(cfgI_SPost);
+	</script>
+</title>
+<selection>Imdb_SPost</selection>
+<param>yes%20no</param>
+<pos>60</pos>
+</item>
+
+<item>
+<title>
+	<script>
 		print(cfgI_Backdrop);
 	</script>
 </title>
 <selection>Imdb_Backdrop</selection>
 <param>yes%20no</param>
 <pos>25</pos>
-</item>
-
-<item>
-<title>
-	<script>
-		print(cfgI_Box);
-	</script>
-</title>
-<selection>Imdb_Box</selection>
-<param>bdrip%20bluray%20dtheater%20dvd%20generic%20hddvd%20hdtv%20itunes</param>
-<pos>21</pos>
 </item>
 
 <item>
@@ -1880,17 +2019,6 @@ cat <<EOF
 <selection>Imdb_Genres</selection>
 <param>yes%20no</param>
 <pos>50</pos>
-</item>
-
-<item>
-<title>
-	<script>
-		print(cfgI_Source);
-	</script>
-</title>
-<selection>Imdb_Source</selection>
-<param>yes%20no</param>
-<pos>60</pos>
 </item>
 
 <item>
@@ -1949,9 +2077,10 @@ case $mode in
     Header
     MoviesheetView
     Footer;;
-  Lang|Jukebox_Size|Port|Recent_Max|Imdb|Imdb_Lang|\
-  Imdb_Backdrop|Imdb_Box|Imdb_Font|Imdb_Genres|\
-  Imdb_Source|Imdb_Tagline|Imdb_Time|Imdb_Info) SubMenucfg;;
+  Lang|Jukebox_Size|SingleDb|Port|Recent_Max|Imdb|Imdb_Lang|\
+  Imdb_Poster|Imdb_PBox|Imdb_PPost|Imdb_Sheet|\
+  Imdb_SBox|Imdb_SPost|Imdb_Backdrop|Imdb_Font|\
+  Imdb_Genres|Imdb_Tagline|Imdb_Time|Imdb_Info) SubMenucfg;;
   "UpdateCfg") UpdateCfg;;
   "DirList") DirList;;
   "FBrowser") FBrowser;;
