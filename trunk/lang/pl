@@ -51,4 +51,5 @@
   <Imdb_Tagline>Tagline</Imdb_Tagline>
   <Imdb_Time>Format time</Imdb_Time>
   <Imdb_Info>Create file info</Imdb_Info>
+  <Imdb_MaxDl>Simultaneus downloads</Imdb_MaxDl>
 </Imdb>

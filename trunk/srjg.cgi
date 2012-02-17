@@ -170,7 +170,7 @@ postMessage("return");
 
 GenerateMovieList;
 
-[ "$Imdb" = "yes" ] &&  ${Jukebox_Path}imdb.sh >/dev/null 2>&1
+[ "$Imdb" = "yes" ] &&  ${Jukebox_Path}imdb.sh RSS_mode
 [ -n "$Force_DB_Update" ] && Force_DB_Creation
 [ ! -f "${Database}" ] && CreateMovieDB
 GenerateInsDelFiles;
@@ -927,6 +927,7 @@ cat <<EOF
     Imdb_Tagline = getXMLText("Config", "Imdb_Tagline");
     Imdb_Time = getXMLText("Config", "Imdb_Time");
     Imdb_Info = getXMLText("Config", "Imdb_Info");
+    Imdb_MaxDl = getXMLText("Config", "Imdb_MaxDl");
   }
 	 
   srjgconf="/tmp/srjg.cfg";
@@ -952,6 +953,7 @@ cat <<EOF
   tmpconfigArray=pushBackStringArray(tmpconfigArray, "Imdb_Tagline="+Imdb_Tagline);
   tmpconfigArray=pushBackStringArray(tmpconfigArray, "Imdb_Time="+Imdb_Time);
   tmpconfigArray=pushBackStringArray(tmpconfigArray, "Imdb_Info="+Imdb_Info);
+  tmpconfigArray=pushBackStringArray(tmpconfigArray, "Imdb_MaxDl="+Imdb_MaxDl);
   writeStringToFile(srjgconf, tmpconfigArray);
 	 
   langpath = Jukebox_Path + "lang/" + Language;
@@ -1653,6 +1655,7 @@ cat <<EOF
     Imdb_Tagline = getXMLText("Config", "Imdb_Tagline");
     Imdb_Time = getXMLText("Config", "Imdb_Time");
     Imdb_Info = getXMLText("Config", "Imdb_Info");
+    Imdb_MaxDl = getXMLText("Config", "Imdb_MaxDl");
   }
 	 
   srjgconf="/tmp/srjg.cfg";
@@ -1678,6 +1681,7 @@ cat <<EOF
   tmpconfigArray=pushBackStringArray(tmpconfigArray, "Imdb_Tagline="+Imdb_Tagline);
   tmpconfigArray=pushBackStringArray(tmpconfigArray, "Imdb_Time="+Imdb_Time);
   tmpconfigArray=pushBackStringArray(tmpconfigArray, "Imdb_Info="+Imdb_Info);
+  tmpconfigArray=pushBackStringArray(tmpconfigArray, "Imdb_MaxDl="+Imdb_MaxDl);
   writeStringToFile(srjgconf, tmpconfigArray);
 	
   /* Translated values */ 
@@ -1701,10 +1705,11 @@ cat <<EOF
     cfgI_Tagline=getXMLText("Imdb", "Imdb_Tagline");
     cfgI_Time=getXMLText("Imdb", "Imdb_Time");
     cfgI_Info=getXMLText("Imdb", "Imdb_Info");
+    cfgI_MaxDl=getXMLText("Imdb", "Imdb_MaxDl");
   }
 </onEnter>
 
-<mediaDisplay name="photoView" rowCount="14" columnCount="1" drawItemText="no" showHeader="no" showDefaultInfo="no" menuBorderColor="255:255:255" sideColorBottom="-1:-1:-1" sideColorTop="-1:-1:-1" itemAlignt="left" itemOffsetXPC="4" itemOffsetYPC="10" itemWidthPC="30" itemHeightPC="5" backgroundColor="-1:-1:-1" itemBackgroundColor="-1:-1:-1" sliding="no" itemGap="0" idleImageXPC="90" idleImageYPC="5" idleImageWidthPC="5" idleImageHeightPC="8" imageUnFocus="null" imageParentFocus="null" imageBorderPC="0" forceFocusOnItem="no" cornerRounding="yes" itemBorderColor="-1:-1:-1" focusBorderColor="-1:-1:-1" unFocusBorderColor="-1:-1:-1">
+<mediaDisplay name="photoView" rowCount="15" columnCount="1" drawItemText="no" showHeader="no" showDefaultInfo="no" menuBorderColor="255:255:255" sideColorBottom="-1:-1:-1" sideColorTop="-1:-1:-1" itemAlignt="left" itemOffsetXPC="4" itemOffsetYPC="4" itemWidthPC="30" itemHeightPC="5" backgroundColor="-1:-1:-1" itemBackgroundColor="-1:-1:-1" sliding="no" itemGap="0" idleImageXPC="90" idleImageYPC="5" idleImageWidthPC="5" idleImageHeightPC="8" imageUnFocus="null" imageParentFocus="null" imageBorderPC="0" forceFocusOnItem="no" cornerRounding="yes" itemBorderColor="-1:-1:-1" focusBorderColor="-1:-1:-1" unFocusBorderColor="-1:-1:-1">
 <idleImage> image/POPUP_LOADING_01.png </idleImage> 
 <idleImage> image/POPUP_LOADING_02.png </idleImage> 
 <idleImage> image/POPUP_LOADING_03.png </idleImage> 
@@ -1749,99 +1754,105 @@ cat <<EOF
 
 
 <!-- comment menu display -->
-<text redraw="no" backgroundColor="-1:-1:-1" foregroundColor="200:200:200" offsetXPC="34" offsetYPC="12" widthPC="57" heightPC="4" fontSize="16" lines="1" align="left">
+<text redraw="no" backgroundColor="-1:-1:-1" foregroundColor="200:200:200" offsetXPC="34" offsetYPC="6" widthPC="57" heightPC="4" fontSize="16" lines="1" align="left">
 	<script>
 		if ( Imdb == "yes" ) print( cfg_Yes );
     else print( cfg_No );
 	</script>
 </text>
 
-<text redraw="no" backgroundColor="-1:-1:-1" foregroundColor="200:200:200" offsetXPC="34" offsetYPC="18" widthPC="57" heightPC="4" fontSize="16" lines="1" align="left">
+<text redraw="no" backgroundColor="-1:-1:-1" foregroundColor="200:200:200" offsetXPC="34" offsetYPC="12" widthPC="57" heightPC="4" fontSize="16" lines="1" align="left">
 	<script>
 		print(Imdb_Lang);
 	</script>
 </text>
 
-<text redraw="no" backgroundColor="-1:-1:-1" foregroundColor="200:200:200" offsetXPC="34" offsetYPC="24" widthPC="57" heightPC="4" fontSize="16" lines="1" align="left">
+<text redraw="no" backgroundColor="-1:-1:-1" foregroundColor="200:200:200" offsetXPC="34" offsetYPC="18" widthPC="57" heightPC="4" fontSize="16" lines="1" align="left">
 	<script>
 		if ( Imdb_Poster == "yes" ) print( cfg_Yes );
     else print( cfg_No );
 	</script>
 </text>
 
-<text redraw="no" backgroundColor="-1:-1:-1" foregroundColor="200:200:200" offsetXPC="34" offsetYPC="30" widthPC="57" heightPC="4" fontSize="16" lines="1" align="left">
+<text redraw="no" backgroundColor="-1:-1:-1" foregroundColor="200:200:200" offsetXPC="34" offsetYPC="24" widthPC="57" heightPC="4" fontSize="16" lines="1" align="left">
 	<script>
 		if ( Imdb_PBox == "no" ) print( cfg_No );
     else print( Imdb_PBox );
 	</script>
 </text>
 
-<text redraw="no" backgroundColor="-1:-1:-1" foregroundColor="200:200:200" offsetXPC="34" offsetYPC="36" widthPC="57" heightPC="4" fontSize="16" lines="1" align="left">
+<text redraw="no" backgroundColor="-1:-1:-1" foregroundColor="200:200:200" offsetXPC="34" offsetYPC="30" widthPC="57" heightPC="4" fontSize="16" lines="1" align="left">
 	<script>
 		if ( Imdb_PPost == "yes" ) print( cfg_Yes );
     else print( cfg_No );
 	</script>
 </text>
 
-<text redraw="no" backgroundColor="-1:-1:-1" foregroundColor="200:200:200" offsetXPC="34" offsetYPC="42" widthPC="57" heightPC="4" fontSize="16" lines="1" align="left">
+<text redraw="no" backgroundColor="-1:-1:-1" foregroundColor="200:200:200" offsetXPC="34" offsetYPC="36" widthPC="57" heightPC="4" fontSize="16" lines="1" align="left">
 	<script>
 		if ( Imdb_Sheet == "yes" ) print( cfg_Yes );
     else print( cfg_No );
 	</script>
 </text>
 
-<text redraw="no" backgroundColor="-1:-1:-1" foregroundColor="200:200:200" offsetXPC="34" offsetYPC="48" widthPC="57" heightPC="4" fontSize="16" lines="1" align="left">
+<text redraw="no" backgroundColor="-1:-1:-1" foregroundColor="200:200:200" offsetXPC="34" offsetYPC="42" widthPC="57" heightPC="4" fontSize="16" lines="1" align="left">
 	<script>
 		if ( Imdb_SBox == "no" ) print( cfg_No );
     else print( Imdb_SBox );
 	</script>
 </text>
 
-<text redraw="no" backgroundColor="-1:-1:-1" foregroundColor="200:200:200" offsetXPC="34" offsetYPC="54" widthPC="57" heightPC="4" fontSize="16" lines="1" align="left">
+<text redraw="no" backgroundColor="-1:-1:-1" foregroundColor="200:200:200" offsetXPC="34" offsetYPC="48" widthPC="57" heightPC="4" fontSize="16" lines="1" align="left">
 	<script>
 		if ( Imdb_SPost == "yes" ) print( cfg_Yes );
     else print( cfg_No );
 	</script>
 </text>
 
-<text redraw="no" backgroundColor="-1:-1:-1" foregroundColor="200:200:200" offsetXPC="34" offsetYPC="60" widthPC="57" heightPC="4" fontSize="16" lines="1" align="left">
+<text redraw="no" backgroundColor="-1:-1:-1" foregroundColor="200:200:200" offsetXPC="34" offsetYPC="54" widthPC="57" heightPC="4" fontSize="16" lines="1" align="left">
 	<script>
 		if ( Imdb_Backdrop == "yes" ) print( cfg_Yes );
     else print( cfg_No );
 	</script>
 </text>
 
-<text redraw="no" backgroundColor="-1:-1:-1" foregroundColor="200:200:200" offsetXPC="34" offsetYPC="66" widthPC="57" heightPC="4" fontSize="16" lines="1" align="left">
+<text redraw="no" backgroundColor="-1:-1:-1" foregroundColor="200:200:200" offsetXPC="34" offsetYPC="60" widthPC="57" heightPC="4" fontSize="16" lines="1" align="left">
 	<script>
 		print(Imdb_Font);
 	</script>
 </text>
 
-<text redraw="no" backgroundColor="-1:-1:-1" foregroundColor="200:200:200" offsetXPC="34" offsetYPC="72" widthPC="57" heightPC="4" fontSize="16" lines="1" align="left">
+<text redraw="no" backgroundColor="-1:-1:-1" foregroundColor="200:200:200" offsetXPC="34" offsetYPC="66" widthPC="57" heightPC="4" fontSize="16" lines="1" align="left">
 	<script>
 		if ( Imdb_Genres == "yes" ) print( cfg_Yes );
     else print( cfg_No );
 	</script>
 </text>
 
-<text redraw="no" backgroundColor="-1:-1:-1" foregroundColor="200:200:200" offsetXPC="34" offsetYPC="78" widthPC="57" heightPC="4" fontSize="16" lines="1" align="left">
+<text redraw="no" backgroundColor="-1:-1:-1" foregroundColor="200:200:200" offsetXPC="34" offsetYPC="72" widthPC="57" heightPC="4" fontSize="16" lines="1" align="left">
 	<script>
 		if ( Imdb_Tagline == "yes" ) print( cfg_Yes );
     else print( cfg_No );
 	</script>
 </text>
 
-<text redraw="no" backgroundColor="-1:-1:-1" foregroundColor="200:200:200" offsetXPC="34" offsetYPC="84" widthPC="57" heightPC="4" fontSize="16" lines="1" align="left">
+<text redraw="no" backgroundColor="-1:-1:-1" foregroundColor="200:200:200" offsetXPC="34" offsetYPC="78" widthPC="57" heightPC="4" fontSize="16" lines="1" align="left">
 	<script>
 		if ( Imdb_Time == "no" ) print( cfg_No );
     else print( Imdb_Time );
 	</script>
 </text>
 
-<text redraw="no" backgroundColor="-1:-1:-1" foregroundColor="200:200:200" offsetXPC="34" offsetYPC="90" widthPC="57" heightPC="4" fontSize="16" lines="1" align="left">
+<text redraw="no" backgroundColor="-1:-1:-1" foregroundColor="200:200:200" offsetXPC="34" offsetYPC="84" widthPC="57" heightPC="4" fontSize="16" lines="1" align="left">
 	<script>
 		if ( Imdb_Info == "yes" ) print( cfg_Yes );
     else print( cfg_No );
+	</script>
+</text>
+
+<text redraw="no" backgroundColor="-1:-1:-1" foregroundColor="200:200:200" offsetXPC="34" offsetYPC="90" widthPC="57" heightPC="4" fontSize="16" lines="1" align="left">
+	<script>
+		print( Imdb_MaxDl );
 	</script>
 </text>
 
@@ -1918,7 +1929,7 @@ cat <<EOF
 </title>
 <selection>Imdb</selection>
 <param>yes%20no</param>
-<pos>10</pos>
+<pos>4</pos>
 </item>
 
 <item>
@@ -1929,7 +1940,7 @@ cat <<EOF
 </title>
 <selection>Imdb_Lang</selection>
 <param>en%20fr</param>
-<pos>17</pos>
+<pos>8</pos>
 </item>
 
 <item>
@@ -1962,7 +1973,7 @@ cat <<EOF
 </title>
 <selection>Imdb_PPost</selection>
 <param>yes%20no</param>
-<pos>60</pos>
+<pos>25</pos>
 </item>
 
 <item>
@@ -1973,7 +1984,7 @@ cat <<EOF
 </title>
 <selection>Imdb_Sheet</selection>
 <param>yes%20no</param>
-<pos>10</pos>
+<pos>30</pos>
 </item>
 
 <item>
@@ -1995,7 +2006,7 @@ cat <<EOF
 </title>
 <selection>Imdb_SPost</selection>
 <param>yes%20no</param>
-<pos>60</pos>
+<pos>40</pos>
 </item>
 
 <item>
@@ -2006,7 +2017,7 @@ cat <<EOF
 </title>
 <selection>Imdb_Backdrop</selection>
 <param>yes%20no</param>
-<pos>25</pos>
+<pos>47</pos>
 </item>
 
 <item>
@@ -2028,7 +2039,7 @@ cat <<EOF
 </title>
 <selection>Imdb_Genres</selection>
 <param>yes%20no</param>
-<pos>50</pos>
+<pos>57</pos>
 </item>
 
 <item>
@@ -2039,7 +2050,7 @@ cat <<EOF
 </title>
 <selection>Imdb_Tagline</selection>
 <param>yes%20no</param>
-<pos>70</pos>
+<pos>65</pos>
 </item>
 
 <item>
@@ -2061,7 +2072,18 @@ cat <<EOF
 </title>
 <selection>Imdb_Info</selection>
 <param>yes%20no</param>
-<pos>70</pos>
+<pos>75</pos>
+</item>
+
+<item>
+<title>
+	<script>
+		print(cfgI_MaxDl);
+	</script>
+</title>
+<selection>Imdb_MaxDl</selection>
+<param>1%202%203%204%205%206%207%208%209%2010</param>
+<pos>10</pos>
 </item>
 
 </channel>
@@ -2090,9 +2112,10 @@ case $mode in
   Lang|Jukebox_Size|SingleDb|Port|Recent_Max|Imdb|Imdb_Lang|\
   Imdb_Poster|Imdb_PBox|Imdb_PPost|Imdb_Sheet|\
   Imdb_SBox|Imdb_SPost|Imdb_Backdrop|Imdb_Font|\
-  Imdb_Genres|Imdb_Tagline|Imdb_Time|Imdb_Info) SubMenucfg;;
-  "UpdateCfg") UpdateCfg;;
-  "DirList") DirList;;
+  Imdb_Genres|Imdb_Tagline|Imdb_Time|Imdb_Info|\
+  Imdb_MaxDl ) SubMenucfg;;   # display submenu to chose settings
+  "UpdateCfg") UpdateCfg;;    # update the cfg file
+  "DirList") DirList;;        # FBrowser list directorys
   "FBrowser") FBrowser;;
   "MenuCfg") MenuCfg;;
 	"ImdbSheetDspl") ImdbSheetDspl;;
