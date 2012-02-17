@@ -50,5 +50,6 @@
   <Imdb_Tagline>Ligne Tag</Imdb_Tagline>
   <Imdb_Time>Format de la Durée</Imdb_Time>
   <Imdb_Info>Générer fichier info</Imdb_Info>
+  <Imdb_MaxDl>Téléchargements simultanés</Imdb_MaxDl>
 </Imdb>
 

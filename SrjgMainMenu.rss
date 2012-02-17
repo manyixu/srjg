@@ -36,6 +36,7 @@
     Imdb_Tagline = getXMLText("Config", "Imdb_Tagline");
     Imdb_Time = getXMLText("Config", "Imdb_Time");
     Imdb_Info = getXMLText("Config", "Imdb_Info");
+    Imdb_MaxDl = getXMLText("Config", "Imdb_MaxDl");
   }
 	 
   srjgconf="/tmp/srjg.cfg";
@@ -61,6 +62,7 @@
   tmpconfigArray=pushBackStringArray(tmpconfigArray, "Imdb_Tagline="+Imdb_Tagline);
   tmpconfigArray=pushBackStringArray(tmpconfigArray, "Imdb_Time="+Imdb_Time);
   tmpconfigArray=pushBackStringArray(tmpconfigArray, "Imdb_Info="+Imdb_Info);
+  tmpconfigArray=pushBackStringArray(tmpconfigArray, "Imdb_MaxDl="+Imdb_MaxDl);
   writeStringToFile(srjgconf, tmpconfigArray);
 	 
   langpath = Jukebox_Path + "lang/" + Language;
