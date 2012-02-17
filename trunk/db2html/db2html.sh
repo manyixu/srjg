@@ -4,21 +4,18 @@
 # Modified by Snappy46 [levesque.marcel@gmail.com]
 # Demo: http://members.home.nl/hellmann/
 
+# Note: script is assuming that moviesheet is named filename_sheet.jpg and poster is named filename.jpg
+
 # Paths
 SRJGPATH="`sed '/<Jukebox_Path/!d;s:.*>\(.*\)</.*:\1:' /usr/local/etc/srjg.cfg | grep "[!-~]"`"
 MOVPATH="`sed '/<Movies_Path/!d;s:.*>\(.*\)</.*:\1:' /usr/local/etc/srjg.cfg | grep "[!-~]"`"
 SINGLEDB="`sed '/<SingleDb/!d;s:.*>\(.*\)</.*:\1:' /usr/local/etc/srjg.cfg | grep "[!-~]"`"
-SRJGPATH=$(echo ${SRJGPATH%\/})
 
-DB2HTML="$SRJGPATH/db2html";		# Main path to db2html
-SQLPATH="$SRJGPATH/sqlite3";		# Path to sqlite binary
 DEFPOSTER="nofolder.jpg"
 DEFSHEET="NoMovieinfo.jpg"
 TMPPATH="/tmp/db2html_path"
 TMPHDD="/tmp/db2html_hdd"
 TMPTITLE="/tmp/db2html_title"
-TMPPOSTER="/tmp/db2html_poster"
-TMPSHEET="/tmp/db2html_sheet"
 TMPFILE="/tmp/db2html_file"
 TMPEXT="/tmp/db2html_ext"
 
@@ -28,9 +25,9 @@ HEIGHT=128;						# Height of poster to be displayed
 IDX=1;							# Starting index
 COUNT=1;						# Starting counter
 
-USECATEG=0;						# Create categories (default Off)
+USECATEG=0;						# Create alphabetical page categories (default Off)
 USEDATE=0;						# Display creation date (default Off)
-USEPOSTER=0;					# Include posters (default Off)
+USESHEET=0;						# Include moviesheets (default Off)
 USESYMLINK=0;					# Use symlinks (default Off)
 USETITLE=0;						# Show title (default Off)
 
@@ -53,7 +50,6 @@ OPTIONS:
    -t	   Display movie title (Optional, no argument needed)
    
 NOTES:  If any of the path arguments have spaces in them they must be surrounded by quotes: ""
-        Output path has to be ending with slash: /
 EOF
 exit 1
 }
@@ -73,14 +69,22 @@ do
 done
 
 
-
 # If output path to HTML jukebox has NOT been provided, use main path from movies.db
 if [ -z "$MAINPATH" ]
 then
   MAINPATH="$MOVPATH"
 fi
 
+
+# Remove last character (which should be '/')
+MOVPATH=$(echo ${MOVPATH%\/})
+MAINPATH=$(echo ${MAINPATH%\/})
+SRJGPATH=$(echo ${SRJGPATH%\/})
+
 # Initialize title and paths
+DB2HTML="$SRJGPATH/db2html";		# Main path to db2html
+SQLPATH="$SRJGPATH/sqlite3";		# Path to sqlite binary
+
 HTMLPATH="$MAINPATH/SRJG"
 IMGPATH="$MAINPATH/SRJG/images"
 echo "Starting jukebox generation in $MAINPATH.."
@@ -154,10 +158,6 @@ cat "$TMPPATH" | sed "s|$MOVPATH|/hdd|" > "$TMPHDD"
 
 "$SQLPATH" -separator '' "$DBFILE" "SELECT title FROM t1 ORDER BY title COLLATE NOCASE" | sed -n '/<title>/,/<\/title>/s/.*<title>\(.*\)<\/title>/\1/p' > "$TMPTITLE"
 
-"$SQLPATH" -separator '' "$DBFILE" "SELECT poster FROM t1 ORDER BY title COLLATE NOCASE" | sed -n '/<poster>/,/<\/poster>/s/.*<poster>\(.*\)<\/poster>/\1/p' > "$TMPPOSTER"
-
-"$SQLPATH" -separator '' "$DBFILE" "SELECT info FROM t1 ORDER BY title COLLATE NOCASE" | sed -n '/<info>/,/<\/info>/s/.*<info>\(.*\)<\/info>/\1/p' > "$TMPSHEET"
-
 "$SQLPATH" -separator '' "$DBFILE" "SELECT file FROM t1 ORDER BY title COLLATE NOCASE" | sed -n '/<file>/,/<\/file>/s/.*<file>\(.*\)<\/file>/\1/p' > "$TMPFILE"
 
 "$SQLPATH" -separator '' "$DBFILE" "SELECT ext FROM t1 ORDER BY title COLLATE NOCASE" | sed -n '/<ext>/,/<\/ext>/s/.*<ext>\(.*\)<\/ext>/\1/p' > "$TMPEXT"
@@ -174,22 +174,47 @@ while read MOVIE
 do
   echo "Processing $IDX: $MOVIE.."
   MPATH="`sed -n "$IDX"p "$TMPPATH"`"
-  MPOST="`sed -n "$IDX"p "$TMPPOSTER"`"
+  MHDD="`sed -n "$IDX"p "$TMPHDD"`"
+  MFILE="`sed -n "$IDX"p "$TMPFILE"`"
+  MEXT="`sed -n "$IDX"p "$TMPEXT"`"
   
-  if [ "$MPOST" != "$DEFPOSTER" ];
+  if [ $USESYMLINK = 0 ];
   then
-	echo "Copying poster.."
-	cp "$MPATH/$MPOST" "$IMGPATH/p$IDX.jpg" 
-	SHOWPOSTER="images/p$IDX.jpg"
+	if [ -e "$MPATH/$MFILE.jpg" ];
+	then
+	  cp "$MPATH/$MFILE.jpg" "$IMGPATH/p$IDX.jpg" 
+	  SHOWPOSTER="images/p$IDX.jpg"
+	else
+      SHOWPOSTER="images/defposter.jpg"
+	fi 
+  
   else
-    SHOWPOSTER="images/defposter.jpg"
-  fi 
+	SHOWPOSTER="$MHDD/$MFILE.jpg"
+  fi
  
+ 
+  if ( [ $USESHEET = 1 ] && [ $USESYMLINK = 0 ] );
+  then
+	if [ -e "${MPATH}/${MFILE}_sheet.jpg" ];
+	then
+	  cp "${MPATH}/${MFILE}_sheet.jpg" "$IMGPATH/m$IDX.jpg"
+	  SHOWSHEET="images/m$IDX.jpg"
+	else
+      SHOWSHEET="images/defsheet.jpg"
+	fi
+	
+  elif ( [ $USESHEET = 1 ] && [ $USESYMLINK = 1 ] );
+  then
+	SHOWSHEET="${MHDD}/${MFILE}_sheet.jpg"
+	
+  else
+    SHOWSHEET="#"
+  fi
+  
   
   if [ $USETITLE = 1 ];
   then
-    TITLE="`sed -n "$IDX"p "$TMPFILE"`"
-	SHOWTITLE='<br><strong><a href="'"$TITLE"'">'$MOVIE'</a></strong><br><br>'
+	SHOWTITLE='<br><strong><a href="'"$MHDD/$MFILE.$MEXT"'">'$MOVIE'</a></strong><br><br>'
   else
     SHOWTITLE=""
   fi
@@ -220,7 +245,7 @@ done < "$TMPTITLE"
 # Default template footer
 echo '</tr></tbody></table></td></tr>'$SHOWDATE'</tbody></table></body></html>' >> "$HTMLPATH/index.html"
 
-echo "Jukebox saved into $HTMLPATH/"
+echo "Jukebox saved into $HTMLPATH"
 
 # Pack everything
 if [ "$PACK" == "tar" ];
