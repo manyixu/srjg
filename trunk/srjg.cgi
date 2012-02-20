@@ -10,6 +10,8 @@ mode=`echo $1`
 CategoryTitle=$(echo $2 | sed 's/+/ /g;s/%\(..\)/\\x\1/g;')
 CategoryTitle=`echo -n -e $CategoryTitle`
 Jukebox_Size=`echo $3`
+Item_Pos=`echo $4`
+[ -z $Item_Pos ] && Item_Pos=0
 IFS=$SAVEIFS
 Search=${CategoryTitle}
 
@@ -306,56 +308,6 @@ cat <<EOF
 EOF
 }
 
-MoviesheetView()
-#Display moviesheet
-{
-InfoMediabd="`${Sqlite} -separator ''  "${Database}"  "SELECT path,file,ext FROM t1 WHERE Movie_ID like '$Search'`"
-PathLink="`echo $InfoMediabd | sed 's:.*path>\(.*\)</path.*:\1:' | grep "[!-~]";`"
-SheetFile="`echo $InfoMediabd | sed 's:.*file>\(.*\)</file.*:\1:'`"
-FileLink="${PathLink}/${SheetFile}.`echo $InfoMediabd | sed 's:.*ext>\(.*\)</ext.*:\1:'`"
-
-ImgLink="${PathLink}/${SheetFile}_sheet.jpg"
-if [ ! -f "${ImgLink}" ]; then
-  ImgLink="${PathLink}/about.jpg"
-  if [ ! -f "${ImgLink}" ]; then
-    ImgLink="${PathLink}/0001.jpg"
-    if [ ! -f "${ImgLink}" ]; then
-      ImgLink="${Jukebox_Path}images/NoMovieinfo.jpg"
-    fi
-  fi
-fi
-
-cat <<EOF
-<onEnter>showIdle();</onEnter>
-<mediaDisplay name="onePartView" backgroundColor="0:0:0" sideColorBottom="0:0:0" sideColorTop="0:0:0" sideTopHeightPC="0" sideBottomHeightPC="0" imageBorderPC="0" centerHeightPC="100" showHeader="no" showDefaultInfo="no" idleImageWidthPC="9" idleImageHeightPC="16">
-<idleImage> image/POPUP_LOADING_01.png </idleImage>
-<idleImage> image/POPUP_LOADING_02.png </idleImage>
-<idleImage> image/POPUP_LOADING_03.png </idleImage>
-<idleImage> image/POPUP_LOADING_04.png </idleImage>
-<idleImage> image/POPUP_LOADING_05.png </idleImage>
-<idleImage> image/POPUP_LOADING_06.png </idleImage>
-<idleImage> image/POPUP_LOADING_07.png </idleImage>
-<idleImage> image/POPUP_LOADING_08.png </idleImage>
-<backgroundDisplay>
-<image type="image/jpeg" redraw="no" offsetXPC="0" offsetYPC="0" widthPC="100" heightPC="100">$ImgLink</image>
-</backgroundDisplay>
-<onUserInput>
-<script>
-userInput = currentUserInput();
-if (userInput == "enter") {
-    playItemURL("$FileLink", 10);
-    "true";
-}
-else if (userInput == "left" || userInput == "right") {"true"; }
-
-</script>
-</onUserInput>
-</mediaDisplay>
-<channel>
-EOF
-}
-
-
 DisplayRss()
 #Display many of the RSS required based on various parameters/variables
 {
@@ -370,7 +322,6 @@ elif [ $Jukebox_Size = "sheetwall" ]; then
  elif [ $Jukebox_Size = "sheetmovie" ]; then
    row="1"; col="8"; itemWidth="10.3"; itemHeight="20"; itemXPC="5.5"; itemYPC="20";
    NewView="3x8";
-   
 else
    row="3"; col="8"; itemWidth="10.3"; itemHeight="23.42"; itemXPC="5.5"; itemYPC="12.75";
    NewView="2x6";
@@ -393,8 +344,8 @@ echo -e '
 		
 		DefaultView = getXMLText("Config", "Jukebox_Size");
             Category_Title = "'$CategoryTitle'";
-	    Category_Background = "'${Jukebox_Path}'images/background.jpg";						           
-            setFocusItemIndex(0);
+	    Category_Background = "'${Jukebox_Path}'images/background.jpg";
+            setFocusItemIndex('$Item_Pos');
             Current_Item_index=0;
             NewView = "'$NewView'";
             Genre_Title = Category_Title;
@@ -524,7 +475,7 @@ cat <<EOF
 EOF
 fi
 	
-cat <<EOF	
+cat <<EOF
 	<onUserInput>
 				userInput = currentUserInput();
 				Current_Item_index=getFocusItemIndex();
@@ -546,15 +497,22 @@ cat <<EOF
 					"false";
 				} else if (userInput == "right") {
 					"false";                                 
-                                } else if (userInput == "enter") {
-					if (nextmode == "moviesheet") {
-					   Genre_Title=getItemInfo(-1, "IdMovie");}
-					else {
-					   Genre_Title=urlEncode(getItemInfo(-1, "title"));}
+        } else if (userInput == "enter") {
+          if ( "$Jukebox_Size" == "sheetmovie" ) {
+             Current_Movie_File=getItemInfo(-1, "path") +"/"+ getItemInfo(-1, "file") +"."+ getItemInfo(-1, "ext");
+             playItemURL(Current_Movie_File, 10);
+					} else if (nextmode == "moviesheet") {
+             Item_Pos=getFocusItemIndex();
+					   Genre_Title=urlEncode("$CategoryTitle");
+             jumpToLink("ViewSheet");
+          } else {
+					   Genre_Title=urlEncode(getItemInfo(-1, "title"));
 					   jumpToLink("NextView");
-					   "false";
+          }
+				  "false";
 				}
 EOF
+
 	if ([ $mode = "genreSelection" ] || [ $mode = "alphaSelection" ] || [ $mode = "yearSelection" ]); then
 cat <<EOF	
 				else if (userInput == "one") {
@@ -736,6 +694,19 @@ cat << EOF
     </link>
 </SRJGView>
 EOF
+
+if [ $mode = "genre" ] || [ $mode = "year" ] || [ $mode = "alpha" ] || [ $mode = "recent" ] || [ $mode = "notwatched" ] || [ $mode = "moviesearch" ]; then
+cat <<EOF	
+
+<ViewSheet>
+    <link>
+       <script>
+          print("http://127.0.0.1:$Port/cgi-bin/srjg.cgi?"+mode+"@"+Genre_Title+"@sheetmovie@"+Item_Pos);
+       </script>
+    </link>
+</ViewSheet>
+EOF
+fi
 
 if ([ $mode = "genreSelection" ] || [ $mode = "alphaSelection" ] || [ $mode = "yearSelection" ]); then
 cat <<EOF	
@@ -2105,10 +2076,6 @@ case $mode in
     else
       UpdateMenu;
     fi;;
-  "moviesheet")
-    Header
-    MoviesheetView
-    Footer;;
   Lang|Jukebox_Size|SingleDb|Port|Recent_Max|Imdb|Imdb_Lang|\
   Imdb_Poster|Imdb_PBox|Imdb_PPost|Imdb_Sheet|\
   Imdb_SBox|Imdb_SPost|Imdb_Backdrop|Imdb_Font|\
