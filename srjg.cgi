@@ -325,10 +325,44 @@ elif [ $Jukebox_Size = "sheetmovie" ]; then
 else
    row="3"; col="8"; itemWidth="10.3"; itemHeight="23.42"; itemXPC="5.5"; itemYPC="12.75";
 fi
-   
-cat <<EOF
-	<onEnter>redrawDisplay();</onEnter>
 
+# return the sheetmovie watched array to previous 
+if [ $Jukebox_Size = "sheetmovie" ]; then
+cat <<EOF
+<onEnter>redrawDisplay();</onEnter>
+<onExit>
+  setEnv("EAWatched", AWatched);
+  setEnv("EAWatched_size", AWatched_size);
+</onExit>
+EOF
+
+else
+
+cat <<EOF
+	<onEnter>
+    EAWatched=getEnv("EAWatched");
+    EAWatched_size=getEnv("EAWatched_size");
+    if ( EAWatched_size &gt; 0 ){
+      /* adding the Env array from the sheetmovie to update the local array */
+      ImportEAWatched="on";
+      j=0;
+      while (j &lt; EAWatched_size){
+        MovieID = getStringArrayAt(EAWatched,j);
+        j += 1;
+        Item_Watched = getStringArrayAt(EAWatched,j);
+        j += 1;
+        executeScript("WatchUpdate");
+      }
+      ImportEAWatched="off";
+      setEnv("EAWatched", "");
+      setEnv("EAWatched_size", 0);
+    }
+    redrawDisplay();
+  </onEnter>
+EOF
+fi
+
+cat <<EOF
 	<script>
 	    Config = "/usr/local/etc/srjg.cfg";
 		Config_ok = loadXMLFile(Config);
@@ -361,6 +395,9 @@ cat <<EOF
     /* array to keep update Watchcgi during views */
     AWatched="";
     AWatched_size=0;
+    ImportEAWatched="off";
+    setEnv("EAWatched", "");
+    setEnv("EAWatched_size", 0);
 	</script>
 
 <mediaDisplay name="photoView" rowCount="$row" columnCount="$col" imageFocus="null" showHeader="no" showDefaultInfo="no" drawItemBorder="no" viewAreaXPC="0" viewAreaYPC="0" viewAreaWidthPC="100" viewAreaHeightPC="100" itemGapXPC="0.7" itemGapYPC="1" itemWidthPC="$itemWidth" itemHeightPC="$itemHeight" itemOffsetXPC="$itemXPC" itemOffsetYPC="$itemYPC" itemBorderPC="0" itemBorderColor="7:99:176" itemBackgroundColor="-1:-1:-1" sideTopHeightPC="0" sideBottomHeightPC="0" bottomYPC="100" idleImageXPC="67.81" idleImageYPC="89.17" idleImageWidthPC="4.69" idleImageHeightPC="4.17" backgroundColor="0:0:0">
@@ -429,9 +466,41 @@ cat <<EOF
     SheetPath;
   </script>
 </image>
+
+<!-- Display watched icon -->
+<image type="image/png" redraw="yes" offsetXPC="4" offsetYPC="4" widthPC="10" heightPC="10">
+<script>
+  MovieID=getItemInfo(-1, "IdMovie");
+  AWatched_found="false";
+  AWatched_state="";
+	i=0;
+	while(i &lt; AWatched_size ){
+    if (MovieID == getStringArrayAt(AWatched,i)) {
+      AWatched_found="true";
+      AWatched_state=getStringArrayAt(AWatched,add(i,1));
+      break;
+    }
+		i += 2;
+	}
+  if ( AWatched_found == "true") {
+    if ( AWatched_state == "1" ) "${Jukebox_Path}images/watched.png";
+  } else {
+    if (getItemInfo(-1, "Watched") == "1") "${Jukebox_Path}images/watched.png";
+  }
+</script>
+
+</image>
+<!-- Display 2cd icon -->
+<image type="image/png" redraw="yes" offsetXPC="86" offsetYPC="4" widthPC="10" heightPC="10">
+<script>
+  MovieTitle=getItemInfo(-1, "file");
+  FindCd1=findString(MovieTitle, "cd1");
+  if ( FindCd1 == "cd1" ) "${Jukebox_Path}images/2cd.png";
+</script>
+</image>
 EOF
 
-else
+else  # sheetmovie
 cat <<EOF
 <backgroundDisplay>
   <script>
@@ -459,8 +528,40 @@ cat <<EOF
     SheetPath;
   </script>
 </image>
-EOF
 
+
+<!-- Display watched icon -->
+<image type="image/png" redraw="yes" offsetXPC="4" offsetYPC="4" widthPC="10" heightPC="10">
+<script>
+  MovieID=getItemInfo(-1, "IdMovie");
+  AWatched_found="false";
+  AWatched_state="";
+	i=0;
+	while(i &lt; AWatched_size ){
+    if (MovieID == getStringArrayAt(AWatched,i)) {
+      AWatched_found="true";
+      AWatched_state=getStringArrayAt(AWatched,add(i,1));
+      break;
+    }
+		i += 2;
+	}
+  if ( AWatched_found == "true") {
+    if ( AWatched_state == "1" ) "${Jukebox_Path}images/watched.png";
+  } else {
+    if (getItemInfo(-1, "Watched") == "1") "${Jukebox_Path}images/watched.png";
+  }
+</script>
+</image>
+
+<!-- Display 2cd icon -->
+<image type="image/png" redraw="yes" offsetXPC="86" offsetYPC="4" widthPC="10" heightPC="10">
+<script>
+  MovieTitle=getItemInfo(-1, "file");
+  FindCd1=findString(MovieTitle, "cd1");
+  if ( FindCd1 == "cd1" ) "${Jukebox_Path}images/2cd.png";
+</script>
+</image>
+EOF
 fi
 
 if ([ $mode = "genreSelection" ] || [ $mode = "alphaSelection" ] || [ $mode = "yearSelection" ]); then
@@ -618,7 +719,7 @@ else
 
 cat <<EOF
 <!-- Top Layer folder.jpg -->
-<image type="image/jpeg" offsetXPC="8.2" offsetYPC="5.5" widthPC="84.25" heightPC="89.25">
+<image type="image/jpeg" redraw="yes" offsetXPC="8.2" offsetYPC="5.5" widthPC="84.25" heightPC="89.25">
  <script>
   ItemPath  = getItemInfo(-1, "path");
   ItemFile = getItemInfo(-1, "file");
@@ -636,7 +737,7 @@ cat <<EOF
 </image>
 
 <!-- Display watched icon -->
-<image type="image/png" offsetXPC="3.2" offsetYPC="3.0" widthPC="20" heightPC="15">
+<image type="image/png" redraw="yes" offsetXPC="3.2" offsetYPC="3.0" widthPC="20" heightPC="15">
 <script>
   MovieID=getItemInfo(-1, "IdMovie");
   AWatched_found="false";
@@ -655,6 +756,15 @@ cat <<EOF
   } else {
     if (getItemInfo(-1, "Watched") == "1") "${Jukebox_Path}images/watched.png";
   }
+</script>
+</image>
+
+<!-- Display 2cd icon -->
+<image type="image/png" redraw="yes" offsetXPC="75" offsetYPC="4" widthPC="20" heightPC="15">
+<script>
+  MovieTitle=getItemInfo(-1, "file");
+  FindCd1=findString(MovieTitle, "cd1");
+  if ( FindCd1 == "cd1" ) "${Jukebox_Path}images/2cd.png";
 </script>
 </image>
 EOF
@@ -724,7 +834,7 @@ cat <<EOF
 </Watchcgi>
 
 <WatchUpdate>
-  /* find if also watched, remove it and do nothing */
+  /* find if also watched, remove it and do nothing, else add the modified state into array */
   AWatched_found="false";
 
   i=0;
@@ -738,11 +848,11 @@ cat <<EOF
     }
   	i += 2;
   }
-  if ( AWatched_found != "true") {
-    if (Item_Watched == "1" ) {
-      Watched = 0;
+  if ( AWatched_found != "true" ) {
+    if (ImportEAWatched == "off") {
+      if (Item_Watched == "1") { Watched = 0; } else { Watched = 1; }
     } else {
-      Watched = 1;
+      if (Item_Watched == "1") { Watched = 1; } else { Watched = 0; }
     }
     AWatched=pushBackStringArray(AWatched, MovieID);
     AWatched=pushBackStringArray(AWatched, Watched);
