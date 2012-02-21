@@ -100,6 +100,8 @@ Movie_Filter=`echo $Movie_Filter | sed 's/,/|/ g'`
 find "$Movies_Path" \
   | egrep -i '\.(asf|avi|dat|divx|flv|img|iso|m1v|m2p|m2t|m2ts|m2v|m4v|mkv|mov|mp4|mpg|mts|qt|rm|rmp4|rmvb|tp|trp|ts|vob|wmv)$' \
   | egrep -iv "$Movie_Filter" > $MoviesList
+
+echo '<channel></channel>' # to keep alive RSS
 }
 
 GenerateInsDelFiles()
@@ -113,6 +115,7 @@ else
   cat $MoviesList | sed -e 's/\&lsqb;/\[/g' -e 's/\&rsqb;/\]/g' > $InsertList
 fi
 mv $MoviesList "${PreviousMovieList}"
+echo '<channel></channel>' # to keep alive RSS
 }
 
 DBMovieDelete()
@@ -122,6 +125,7 @@ echo "Removing movies from the Database ...."
 while read LINE
 do
   ${Sqlite} "${Database}"  "DELETE from t1 WHERE file='<file>${LINE}</file>'";
+  echo '<channel></channel>' # to keep alive RSS
 done < $DeleteList
 ${Sqlite} "${Database}"  "VACUUM";
 }
@@ -156,7 +160,7 @@ dbext=`echo "<ext>$MOVIEEXT</ext>" | sed "s/'/''/g"`
 dbYear=$MovieYear
 
 ${Sqlite} "${Database}" "insert into t1 (genre,title,year,path,file,ext) values('$dbgenre','$dbtitle','$dbYear','$dbpath','$dbfile','$dbext');"; 2>> "${UpdateLog}"
-echo '<channel> </channel>' # to maintain the signal
+echo '<channel></channel>' # to keep alive RSS
 done < $InsertList
 }
 
@@ -165,10 +169,12 @@ Update()
 {
 
 Header;
-echo -e '<onEnter>
+cat <<EOF
+<onEnter>
 showIdle();
 postMessage("return");
-</onEnter>'
+</onEnter>
+EOF
 
 GenerateMovieList;
 
@@ -186,7 +192,7 @@ Footer;
 WatchedToggle()
 # Toggle the state of the watched field in the Database.
 {
-echo -e '
+cat <<EOF
 <?xml version="1.0" ?>
 <rss version="2.0" xmlns:dc="http://purl.org/dc/elements/1.1/">
 <onEnter>
@@ -194,7 +200,7 @@ showIdle();
 postMessage("return");
 </onEnter>
 <mediaDisplay name="nullView"/>
-'
+EOF
 
 watch="`${Sqlite} -separator ''  "${Database}"  "SELECT Watched FROM t1 WHERE Movie_ID like '$CategoryTitle'";`"
 
@@ -205,27 +211,26 @@ else
 fi
 
 ${Sqlite} "${Database}" "UPDATE t1 set Watched=$watch WHERE Movie_ID like '$CategoryTitle'";
-
-echo -e '<channel></channel></rss>'
-
+echo '<channel></channel></rss>' # to close the RSS
 exit 0
 }
 
 Header()
 #Insert RSS Header
 {
-echo -e '
+cat <<EOF
 <?xml version="1.0" ?>
-<rss version="2.0" xmlns:dc="http://purl.org/dc/elements/1.1/">'
+<rss version="2.0" xmlns:dc="http://purl.org/dc/elements/1.1/">
+EOF
 }
-
 
 Footer()
 #Insert RSS Footer
 {
-echo -e '
+cat <<EOF
 </channel>
-</rss>'
+</rss>
+EOF
 }
 
 UpdateMenu()
@@ -313,21 +318,15 @@ DisplayRss()
 {
 if [ $Jukebox_Size = "2x6" ]; then
    row="2"; col="6"; itemWidth="14.06"; itemHeight="35.42"; itemXPC="5.5"; itemYPC="12.75";
-   NewView="sheetwall";
-   
 elif [ $Jukebox_Size = "sheetwall" ]; then
    row="1"; col="8"; itemWidth="10.3"; itemHeight="20"; itemXPC="5.5"; itemYPC="80";
-   NewView="sheetmovie";
-   
- elif [ $Jukebox_Size = "sheetmovie" ]; then
+elif [ $Jukebox_Size = "sheetmovie" ]; then
    row="1"; col="8"; itemWidth="10.3"; itemHeight="20"; itemXPC="5.5"; itemYPC="20";
-   NewView="3x8";
 else
    row="3"; col="8"; itemWidth="10.3"; itemHeight="23.42"; itemXPC="5.5"; itemYPC="12.75";
-   NewView="2x6";
 fi
    
-echo -e '
+cat <<EOF
 	<onEnter>redrawDisplay();</onEnter>
 
 	<script>
@@ -343,15 +342,14 @@ echo -e '
 		}
 		
 		DefaultView = getXMLText("Config", "Jukebox_Size");
-            Category_Title = "'$CategoryTitle'";
-	    Category_Background = "'${Jukebox_Path}'images/background.jpg";
-            setFocusItemIndex('$Item_Pos');
+            Category_Title = "$CategoryTitle";
+	    Category_Background = "${Jukebox_Path}images/background.jpg";
+            setFocusItemIndex($Item_Pos);
             Current_Item_index=0;
-            NewView = "'$NewView'";
             Genre_Title = Category_Title;
-	    Jukebox_Size ="'$Jukebox_Size'";
-	    mode = "'$mode'";
-	    nextmode = "'$nextmode'";
+	    Jukebox_Size ="$Jukebox_Size";
+	    mode = "$mode";
+	    nextmode = "$nextmode";
 		
 		langpath = Jukebox_Path + "lang/" + Language;
 		langfile = loadXMLFile(langpath);
@@ -365,7 +363,7 @@ echo -e '
     AWatched_size=0;
 	</script>
 
-<mediaDisplay name="photoView" rowCount="'$row'" columnCount="'$col'" imageFocus="null" showHeader="no" showDefaultInfo="no" drawItemBorder="no" viewAreaXPC="0" viewAreaYPC="0" viewAreaWidthPC="100" viewAreaHeightPC="100" itemGapXPC="0.7" itemGapYPC="1" itemWidthPC="'$itemWidth'" itemHeightPC="'$itemHeight'" itemOffsetXPC="'$itemXPC'" itemOffsetYPC="'$itemYPC'" itemBorderPC="0" itemBorderColor="7:99:176" itemBackgroundColor="-1:-1:-1" sideTopHeightPC="0" sideBottomHeightPC="0" bottomYPC="100" idleImageXPC="67.81" idleImageYPC="89.17" idleImageWidthPC="4.69" idleImageHeightPC="4.17" backgroundColor="0:0:0">
+<mediaDisplay name="photoView" rowCount="$row" columnCount="$col" imageFocus="null" showHeader="no" showDefaultInfo="no" drawItemBorder="no" viewAreaXPC="0" viewAreaYPC="0" viewAreaWidthPC="100" viewAreaHeightPC="100" itemGapXPC="0.7" itemGapYPC="1" itemWidthPC="$itemWidth" itemHeightPC="$itemHeight" itemOffsetXPC="$itemXPC" itemOffsetYPC="$itemYPC" itemBorderPC="0" itemBorderColor="7:99:176" itemBackgroundColor="-1:-1:-1" sideTopHeightPC="0" sideBottomHeightPC="0" bottomYPC="100" idleImageXPC="67.81" idleImageYPC="89.17" idleImageWidthPC="4.69" idleImageHeightPC="4.17" backgroundColor="0:0:0">
 
 		<idleImage> image/POPUP_LOADING_01.png </idleImage>
 		<idleImage> image/POPUP_LOADING_02.png </idleImage>
@@ -374,8 +372,8 @@ echo -e '
 		<idleImage> image/POPUP_LOADING_05.png </idleImage>
 		<idleImage> image/POPUP_LOADING_06.png </idleImage>
 		<idleImage> image/POPUP_LOADING_07.png </idleImage>
-		<idleImage> image/POPUP_LOADING_08.png </idleImage>'
-
+		<idleImage> image/POPUP_LOADING_08.png </idleImage>
+EOF
 
 if ([ $Jukebox_Size = "2x6" ] || [ $Jukebox_Size = "3x8" ]); then		
 cat <<EOF
@@ -404,7 +402,7 @@ cat <<EOF
 EOF
 
 elif [ $Jukebox_Size = "sheetwall" ]; then
-echo -e '
+cat <<EOF
 		<backgroundDisplay>
     <script>
       Jukebox_itemSize = getPageInfo("itemCount"); 
@@ -424,17 +422,17 @@ echo -e '
         SheetPath = ItemPath +"/0001.jpg";
         Etat = readStringFromFile(SheetPath);
         if (Etat==null){
-          SheetPath = "'${Jukebox_Path}'images/NoMovieinfo.jpg";
+          SheetPath = "${Jukebox_Path}images/NoMovieinfo.jpg";
         }
       }
     }
     SheetPath;
   </script>
 </image>
-'
+EOF
 
 else
-echo -e '
+cat <<EOF
 <backgroundDisplay>
   <script>
     Jukebox_itemSize = getPageInfo("itemCount"); 
@@ -454,14 +452,14 @@ echo -e '
         SheetPath = ItemPath +"/0001.jpg";
         Etat = readStringFromFile(SheetPath);
         if (Etat==null){
-          SheetPath = "'${Jukebox_Path}'images/NoMovieinfo.jpg";
+          SheetPath = "${Jukebox_Path}images/NoMovieinfo.jpg";
         }
       }
     }
     SheetPath;
   </script>
 </image>
-'
+EOF
 
 fi
 
@@ -516,20 +514,18 @@ EOF
 	if ([ $mode = "genreSelection" ] || [ $mode = "alphaSelection" ] || [ $mode = "yearSelection" ]); then
 cat <<EOF	
 				else if (userInput == "one") {
-                    Genre_Title=urlEncode(Genre_Title); 
+          Genre_Title=urlEncode(Genre_Title); 
 					executeScript("SwitchView");
 					"false";
 					redrawDisplay();
-				} 
-
+				}
 EOF
 fi
 
 if ([ $mode = "genre" ] || [ $mode = "year" ] || [ $mode = "alpha" ] || [ $mode = "recent" ] || [ $mode = "notwatched" ]); then
-cat <<EOF     
-
-          else if (userInput == "two") {
-                                        MovieID=getItemInfo(-1, "IdMovie"); 
+cat <<EOF
+        else if (userInput == "two") {
+          MovieID=getItemInfo(-1, "IdMovie"); 
           Item_Watched=getItemInfo(-1, "Watched"); /* get item info before exiting rss */
 					jumpToLink("Watchcgi"); /* update database */
           executeScript("WatchUpdate"); /* update array AWatched */
@@ -538,18 +534,17 @@ cat <<EOF
 EOF
 	fi
 
-cat << EOF
-				  else if (userInput == "video_play") {
-  Current_Movie_File=getItemInfo(-1, "path") +"/"+ getItemInfo(-1, "file") +"."+ getItemInfo(-1, "ext");
-                                        playItemURL(Current_Movie_File, 10);
+cat <<EOF
+        else if (userInput == "video_play") {
+          Current_Movie_File=getItemInfo(-1, "path") +"/"+ getItemInfo(-1, "file") +"."+ getItemInfo(-1, "ext");
+          playItemURL(Current_Movie_File, 10);
 					"false";
-					}
+        }
 		</onUserInput>
 EOF
 
-
 if ([ $Jukebox_Size = "2x6" ] ||  [ $Jukebox_Size = "3x8" ]); then
-cat << EOF 
+cat <<EOF 
 <!-- Show Folder Name -->
 <text offsetXPC="7" offsetYPC="88.8" widthPC="60" heightPC="5" fontSize="14" useBackgroundSurface="yes" foregroundColor="195:196:195" redraw="yes" lines="1">
  <script>
@@ -558,7 +553,6 @@ cat << EOF
  </script>
 </text>
 
-
 <!-- Show Page Info -->
 <text offsetXPC="85" offsetYPC="88.8" widthPC="8" heightPC="5" fontSize="14" foregroundColor="195:196:195" useBackgroundSurface="yes" redraw="yes" lines="1">
  <script>
@@ -566,49 +560,50 @@ cat << EOF
   pageInfo;
  </script>
 </text>
-
 <itemDisplay>
 EOF
 
 else
-cat << EOF 
+cat <<EOF 
 <itemDisplay>
 EOF
 
 fi
 
-cat << EOF 
+cat <<EOF 
 <!-- Bottom Layer focus/unfocus -->
 <image type="image/jpeg" offsetXPC="0" offsetYPC="0" widthPC="100" heightPC="100">
 EOF
-echo -e '
+
+cat <<EOF
  <script>
   if (getDrawingItemState() == "focus")
   { if (getItemInfo(-1, "Watched") == "1") {
-      "'${Jukebox_Path}'images/focus_watched.jpg";
+      "${Jukebox_Path}images/focus_watched.jpg";
       }
     else {
-      "'${Jukebox_Path}'images/focus.jpg";
+      "${Jukebox_Path}images/focus.jpg";
       }
   }
   else
   { if (getItemInfo(-1, "Watched") == "1") {
-      "'${Jukebox_Path}'images/unfocus_watched.jpg";
+      "${Jukebox_Path}images/unfocus_watched.jpg";
       }
     else {
-      "'${Jukebox_Path}'images/unfocus.jpg";
+      "${Jukebox_Path}images/unfocus.jpg";
       }
   }
  </script>
-</image>'
+</image>
+EOF
 
 
 if [ "$mode" = "yearSelection" ]; then
-echo -e '
+cat <<EOF
 <!-- Top Layer folder.jpg -->
 <image type="image/jpeg" offsetXPC="8.2" offsetYPC="5.5" widthPC="84.25" heightPC="89.25">
  <script>
-  thumbnailPath = "'${Jukebox_Path}'images/yearfolder.jpg";
+  thumbnailPath = "${Jukebox_Path}images/yearfolder.jpg";
   thumbnailPath;
  </script>
 </image>
@@ -616,12 +611,12 @@ echo -e '
 <script>
 	getItemInfo(-1, "title");
 </script>
-</text>'
+</text>
+EOF
 
 else
 
-echo -e '
-
+cat <<EOF
 <!-- Top Layer folder.jpg -->
 <image type="image/jpeg" offsetXPC="8.2" offsetYPC="5.5" widthPC="84.25" heightPC="89.25">
  <script>
@@ -633,7 +628,7 @@ echo -e '
     thumbnailPath = ItemPath +"/folder.jpg";
     Etat = readStringFromFile(thumbnailPath);
     if (Etat==null){
-      thumbnailPath = "'${Jukebox_Path}'images/nofolder.jpg";
+      thumbnailPath = "${Jukebox_Path}images/nofolder.jpg";
     }
   }
   thumbnailPath;
@@ -656,25 +651,27 @@ echo -e '
 		i += 2;
 	}
   if ( AWatched_found == "true") {
-    if ( AWatched_state == "1" ) "'${Jukebox_Path}'images/watched.png";
+    if ( AWatched_state == "1" ) "${Jukebox_Path}images/watched.png";
   } else {
-    if (getItemInfo(-1, "Watched") == "1") "'${Jukebox_Path}'images/watched.png";
+    if (getItemInfo(-1, "Watched") == "1") "${Jukebox_Path}images/watched.png";
   }
 </script>
-</image>'
+</image>
+EOF
 
 if [ "$mode" = "genreSelection" ]; then
-echo -e '
+cat <<EOF
 <text offsetXPC="1" offsetYPC="75" widthPC="98" heightPC="13" fontSize="13" align="center" foregroundColor="255:255:255">
 <script>
 	getItemInfo(-1, "title");
 </script>
-</text>'
+</text>
+EOF
 
   fi # if "$mode" = "genreSelection"
 fi
 
-cat << EOF
+cat <<EOF
 </itemDisplay>
 </mediaDisplay>
 
@@ -696,8 +693,7 @@ cat << EOF
 EOF
 
 if [ $mode = "genre" ] || [ $mode = "year" ] || [ $mode = "alpha" ] || [ $mode = "recent" ] || [ $mode = "notwatched" ] || [ $mode = "moviesearch" ]; then
-cat <<EOF	
-
+cat <<EOF
 <ViewSheet>
     <link>
        <script>
@@ -709,8 +705,7 @@ EOF
 fi
 
 if ([ $mode = "genreSelection" ] || [ $mode = "alphaSelection" ] || [ $mode = "yearSelection" ]); then
-cat <<EOF	
-
+cat <<EOF
 <SwitchView>
   if( Jukebox_Size == "2x6" ) Jukebox_Size="3x8";
 	else if( Jukebox_Size == "3x8") Jukebox_Size="sheetwall";
@@ -719,7 +714,7 @@ cat <<EOF
 EOF
 fi
 
-cat << EOF
+cat <<EOF
 <Watchcgi>
     <link>
        <script>
@@ -817,14 +812,15 @@ if [ "$mode" = "genreSelection" ]; then
   while read LINE
   do
     # translate to find genre thumbnails 
-    Img_genre=`sed "/|$LINE>/!d;s:.*>\(.*\)|:\1:" "${Jukebox_Path}lang/${Language}_genre"`
+    Img_genre=`sed "/|${LINE}>/!d;s:.*>\(.*\)|:\1:" "${Jukebox_Path}lang/${Language}_genre"`
     if [ -z "$Img_genre" ] ; then Img_genre="Unknown"; fi
-    echo -e '
+cat <<EOF
     <item>
-    <title>'$LINE'</title>
-    <path>'${Jukebox_Path}'images/genre</path>
-    <file>'$Img_genre'</file>
-    </item>'
+    <title>${LINE}</title>
+    <path>${Jukebox_Path}images/genre</path>
+    <file>$Img_genre</file>
+    </item>
+EOF
   done < /tmp/srjg_genre.list
 fi
 
@@ -1399,10 +1395,7 @@ else
   sed -i "s:<$Cfg_Tag>.*</$Cfg_Tag>:<$Cfg_Tag>$Cfg_Par</$Cfg_Tag>:" /usr/local/etc/srjg.cfg
 fi
 
-cat <<EOF
-<channel></channel></rss>
-EOF
-
+echo '<channel></channel></rss>' # to close the RSS
 exit 0
 }
 
@@ -1429,10 +1422,7 @@ echo $prevdir"/" > /tmp/srjg_Browser_dir.list
 cd "$folder"
 echo */ " " | sed "s/\/ /\n/g"  >> /tmp/srjg_Browser_dir.list
 
-cat <<EOF
-<channel></channel></rss>
-EOF
-
+echo '<channel></channel></rss>' # to close the RSS
 exit 0
 }
 
@@ -1520,10 +1510,7 @@ cat <<EOF
 EOF
 done
 
-cat <<EOF
-</channel>
-</rss>
-EOF
+echo '</channel></rss>' # to close the RSS
 }
 
 ImdbSheetDspl()
@@ -2095,4 +2082,3 @@ case $mode in
 esac
 
 exit 0
-
