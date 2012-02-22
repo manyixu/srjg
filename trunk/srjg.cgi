@@ -333,6 +333,7 @@ cat <<EOF
 <onExit>
   setEnv("EAWatched", AWatched);
   setEnv("EAWatched_size", AWatched_size);
+  playItemURL(-1, 1);                              /* Stop the video on exit */
 </onExit>
 EOF
 
@@ -359,6 +360,10 @@ cat <<EOF
     }
     redrawDisplay();
   </onEnter>
+
+<onExit>
+  playItemURL(-1, 1);                              /* Stop the video on exit */
+</onExit>
 EOF
 fi
 
@@ -577,6 +582,7 @@ fi
 cat <<EOF
 	<onUserInput>
 				userInput = currentUserInput();
+print ("-------------"+userInput);
 				Current_Item_index=getFocusItemIndex();
 				Max_index = (-1 + Jukebox_itemSize);
 				Prev_index = (-1 + Current_Item_index);
@@ -598,8 +604,11 @@ cat <<EOF
 					"false";                                 
         } else if (userInput == "enter") {
           if ( "$Jukebox_Size" == "sheetmovie" ) {
-             Current_Movie_File=getItemInfo(-1, "path") +"/"+ getItemInfo(-1, "file") +"."+ getItemInfo(-1, "ext");
-             playItemURL(Current_Movie_File, 10);
+            MTitle=getItemInfo(-1, "file");
+            MPath=getItemInfo(-1, "path");
+            MExt=getItemInfo(-1, "ext");
+            Current_Movie_File=MPath +"/"+ MTitle +"."+ MExt;
+            playItemURL(Current_Movie_File, 10);
 					} else if (nextmode == "moviesheet") {
              Item_Pos=getFocusItemIndex();
 					   Genre_Title=urlEncode("$CategoryTitle");
@@ -637,10 +646,25 @@ EOF
 
 cat <<EOF
         else if (userInput == "video_play") {
-          Current_Movie_File=getItemInfo(-1, "path") +"/"+ getItemInfo(-1, "file") +"."+ getItemInfo(-1, "ext");
+          MTitle=getItemInfo(-1, "file");
+          MPath=getItemInfo(-1, "path");
+          MExt=getItemInfo(-1, "ext");
+          Current_Movie_File=MPath +"/"+ MTitle +"."+ MExt;
           playItemURL(Current_Movie_File, 10);
 					"false";
+        } else if (userInput == "video_completed" || userInput == "video_stop" ) {
+          FindCd1=findString(MTitle, "cd1");
+          if ( FindCd1 == "cd1" ) {
+            MTitle=urlEncode(MTitle); 
+            jumpToLink("ReplaceCd1byCd2"); /* replace cd1 by cd2 */
+            MTitle=getEnv( "MovieCd2" );
+            Current_Movie_File=MPath +"/"+ MTitle +"."+ MExt;
+            playItemURL(-1, 1);              /* reset play */
+            playItemURL(Current_Movie_File, 10); /* play cd2 */
+          }
+					"false";
         }
+
 		</onUserInput>
 EOF
 
@@ -825,6 +849,14 @@ EOF
 fi
 
 cat <<EOF
+<ReplaceCd1byCd2>
+    <link>
+       <script>
+           print("http://127.0.0.1:$Port/cgi-bin/srjg.cgi?ReplaceCd1byCd2@"+MTitle+"@");
+       </script>
+    </link>
+</ReplaceCd1byCd2>
+
 <Watchcgi>
     <link>
        <script>
@@ -1509,6 +1541,24 @@ echo '<channel></channel></rss>' # to close the RSS
 exit 0
 }
 
+ReplaceCd1byCd2()
+# replace string
+{
+Cd2=`echo "$CategoryTitle" | sed 's:\(.*\)cd1:\1cd2:'`
+cat <<EOF
+<?xml version="1.0" ?>
+<rss version="2.0" xmlns:dc="http://purl.org/dc/elements/1.1/">
+<onEnter>
+setEnv("MovieCd2","$Cd2");
+showIdle();
+postMessage("return");
+</onEnter>
+<mediaDisplay name="nullView"/>
+<channel></channel></rss>
+EOF
+exit 0
+}
+
 DirList()
 # List HDD or Usb devices
 {
@@ -2184,6 +2234,7 @@ case $mode in
   "MenuCfg") MenuCfg;;
 	"ImdbSheetDspl") ImdbSheetDspl;;
   "ImdbCfgEdit") ImdbCfgEdit;;
+  "ReplaceCd1byCd2") ReplaceCd1byCd2;;
   *)
     SetVar
     Header
