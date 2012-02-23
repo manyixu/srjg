@@ -357,7 +357,6 @@ cat <<EOF
         j += 1;
         executeScript("WatchUpdate");
       }
-      ToggleEAWatched="on";
       setEnv("EAWatched", "");
       setEnv("EAWatched_size", 0);
     }
@@ -407,6 +406,7 @@ cat <<EOF
     setEnv("EAWatched", "");
     setEnv("EAWatched_size", 0);
     Cd2 = "false";
+    EndPlay="false"
 	</script>
 
 <mediaDisplay name="photoView" rowCount="$row" columnCount="$col" imageFocus="null" showHeader="no" showDefaultInfo="no" drawItemBorder="no" viewAreaXPC="0" viewAreaYPC="0" viewAreaWidthPC="100" viewAreaHeightPC="100" itemGapXPC="0.7" itemGapYPC="1" itemWidthPC="$itemWidth" itemHeightPC="$itemHeight" itemOffsetXPC="$itemXPC" itemOffsetYPC="$itemYPC" itemBorderPC="0" itemBorderColor="7:99:176" itemBackgroundColor="-1:-1:-1" sideTopHeightPC="0" sideBottomHeightPC="0" bottomYPC="100" idleImageXPC="67.81" idleImageYPC="89.17" idleImageWidthPC="4.69" idleImageHeightPC="4.17" backgroundColor="0:0:0">
@@ -658,7 +658,7 @@ cat <<EOF
           Cd2 = "false";
           playItemURL(Current_Movie_File, 10);
 					"false";
-        } else if (userInput == "video_completed" || userInput == "video_stop" ) {
+        } else if (userInput == "video_completed") {
           FindCd1=findString(M_Title, "cd1");
           if ( FindCd1 == "cd1" ) {
             M_Title=urlEncode(M_Title); 
@@ -669,17 +669,14 @@ cat <<EOF
             Cd2 = "true";
             playItemURL(Current_Movie_File, 10); /* play cd2 */
           }
-					if (userInput == "video_completed" ){ /* tag the movie as watched */
-            if ( Cd2 == "false" ) {
-              Item_Watched="1"; /* mark item as watched */
-              EndPlay="true";
-			  		  ToggleEAWatched = "off"; /* don't toggle watched */
-              MovieID=M_ID;
-              executeScript("WatchUpdate"); /* update array AWatched */
-				  	  ToggleEAWatched = "on";
-				  	  jumpToLink("Watchcgi"); /* update watched state in database */
-            } else Cd2 = "false";
-					}
+          if ( Cd2 == "false" ) {
+            Item_Watched="1"; /* mark item as watched */
+            EndPlay="true";
+			  		ToggleEAWatched = "off"; /* don't toggle watched */
+            MovieID=M_ID;
+            executeScript("WatchUpdate"); /* update array AWatched */
+				   jumpToLink("Watchcgi"); /* update watched state in database */
+          } else Cd2 = "false";
 					"false";
         }
 		</onUserInput>
@@ -885,12 +882,14 @@ cat <<EOF
 <WatchUpdate>
   /* find if also watched, remove it and do nothing, else add the modified state into array */
   AWatched_found="false";
-  i=0;
   TmpTst = "false";
+  i=0;
   while(i &lt; AWatched_size ){
     TmpID=getStringArrayAt(AWatched,i);
     TmpW=getStringArrayAt(AWatched,add(i,1));
-    if (TmpW == "1" &amp;&amp; EndPlay == "true" ) TmpTst = "true"; else TmpTst = "false";
+    if (TmpW == "1" &amp;&amp; EndPlay == "true" ) {
+      TmpTst = "true";
+    } else TmpTst = "false";
     if (MovieID == TmpID) {
       if ( TmpTst == "false" ){
         AWatched=deleteStringArrayAt(AWatched, i);
@@ -912,6 +911,8 @@ cat <<EOF
     AWatched=pushBackStringArray(AWatched, Watched);
     AWatched_size +=2;
   } else if (Item_Watched == "1") { Watched = 1; } else { Watched = 0; } /* reset toggle watch */
+	ToggleEAWatched = "on";
+  EndPlay="false";
 </WatchUpdate>
 
 <channel>
