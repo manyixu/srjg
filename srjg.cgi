@@ -55,7 +55,7 @@ CreateMovieDB()
 # DB as an automatic datestamp but unfortunately it relies on the player having the
 # correct date which can be trivial with some players.
 {
-${Sqlite} "${Database}" "create table t1 (Movie_ID INTEGER PRIMARY KEY AUTOINCREMENT,genre TEXT,title TEXT,year TEXT,path TEXT,file TEXT,ext TEXT,watched INTEGER,dateStamp DATE DEFAULT CURRENT_DATE)";
+${Sqlite} "${Database}" "create table t1 (Movie_ID INTEGER PRIMARY KEY AUTOINCREMENT,genre TEXT,title TEXT,year TEXT,path TEXT,file TEXT,ext TEXT,watched INTEGER,dateStamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP)";
 ${Sqlite} "${Database}" "create table t2 (header TEXT, footer TEXT, IdMovhead TEXT, IdMovFoot TEXT,WatchedHead TEXT, WatchedFoot TEXT)";
 ${Sqlite} "${Database}" "insert into t2 values ('<item>','</item>','<IdMovie>','</IdMovie>','<Watched>','</Watched>')";
 }
@@ -136,31 +136,39 @@ DBMovieInsert()
 rm "${UpdateLog}" 2>/dev/null
 while read LINE
 do
-   MOVIEPATH="${LINE%/*}"  # Shell builtins instead of dirname
-   MOVIEFILE="${LINE##*/}" # Shell builtins instead of basename
-   MOVIENAME="${MOVIEFILE%.*}"  # Strip off .ext
-   MOVIEEXT="${MOVIEFILE##*.}"  # only ext
+  MOVIEPATH="${LINE%/*}"  # Shell builtins instead of dirname
+  MOVIEFILE="${LINE##*/}" # Shell builtins instead of basename
+  MOVIENAME="${MOVIEFILE%.*}"  # Strip off .ext
+  MOVIEEXT="${MOVIEFILE##*.}"  # only ext
 
-   # Initialize defaults, replace later
-   MOVIETITLE="$MOVIENAME</title>"
-   MOVIESHEET=NoMovieinfo.jpg
-   GENRE="<name>Unknown</name>"
-   MovieYear=""
-		
-   [ -e "$MOVIEPATH/$MOVIENAME.nfo" ] && INFONAME=$MOVIENAME.nfo
-   [ -e "$MOVIEPATH/MovieInfo.nfo" ] && INFONAME=MovieInfo.nfo
-        
-   [ -e "$MOVIEPATH/$INFONAME" ] && Infoparsing
+  # Initialize defaults, replace later
+  MOVIETITLE="$MOVIENAME</title>"
+  MOVIESHEET=NoMovieinfo.jpg
+  GENRE="<name>Unknown</name>"
+  MovieYear=""
 
-if [ -z "$GENRE" ]; then dbgenre="<name>Unknown</name>"; else dbgenre="$GENRE"; fi
-dbtitle=`echo "<title>$MOVIETITLE" | sed "s/'/''/g"`
-dbpath=`echo "<path>$MOVIEPATH</path>" | sed "s/'/''/g"`
-dbfile=`echo "<file>$MOVIENAME</file>" | sed "s/'/''/g"`
-dbext=`echo "<ext>$MOVIEEXT</ext>" | sed "s/'/''/g"`
-dbYear=$MovieYear
+  [ -e "$MOVIEPATH/$MOVIENAME.nfo" ] && INFONAME=$MOVIENAME.nfo
+  [ -e "$MOVIEPATH/MovieInfo.nfo" ] && INFONAME=MovieInfo.nfo
 
-${Sqlite} "${Database}" "insert into t1 (genre,title,year,path,file,ext) values('$dbgenre','$dbtitle','$dbYear','$dbpath','$dbfile','$dbext');"; 2>> "${UpdateLog}"
-echo '<channel></channel>' # to keep alive RSS
+  [ -e "$MOVIEPATH/$INFONAME" ] && Infoparsing
+
+  if [ -z "$GENRE" ]; then dbgenre="<name>Unknown</name>"; else dbgenre="$GENRE"; fi
+  dbtitle=`echo "<title>$MOVIETITLE" | sed "s/'/''/g"`
+  dbpath=`echo "<path>$MOVIEPATH</path>" | sed "s/'/''/g"`
+  dbfile=`echo "<file>$MOVIENAME</file>" | sed "s/'/''/g"`
+  dbext=`echo "<ext>$MOVIEEXT</ext>" | sed "s/'/''/g"`
+  dbYear=$MovieYear
+
+  if [ "$Force_DB_Update" = "y" ]; then
+    dbdateStamp=`date -r "$MOVIEPATH/$MOVIENAME.$MOVIEEXT" '+%Y-%m-%d %H:%M:%S'`
+    ${Sqlite} "${Database}" \
+      "insert into t1 (genre,title,year,path,file,ext,dateStamp) \
+      values ('$dbgenre','$dbtitle','$dbYear','$dbpath','$dbfile','$dbext','$dbdateStamp');";
+  else
+    ${Sqlite} "${Database}" \
+      "insert into t1 (genre,title,year,path,file,ext) \
+      values ('$dbgenre','$dbtitle','$dbYear','$dbpath','$dbfile','$dbext');";
+  fi
 done < $InsertList
 }
 
