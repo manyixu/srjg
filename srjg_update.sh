@@ -1,7 +1,6 @@
 #!/bin/sh
 # Simple RSS Jukebox Generator
 
-
 # Reading/parsing xml configuration file and assign variables.
 
 CfgFile=/usr/local/etc/srjg.cfg
@@ -89,7 +88,10 @@ if [ ! -d "${Movies_Path}" ]; then			# ctrl directory cfg file
   exit 1
 fi
 
-([ -d "${Movies_Path}" ] && [ "${SingleDb}" = "no" ]) && mkdir -p "${Movies_Path}SRJG/"
+[ "${SingleDb}" = "no" ] && mkdir -p "${Movies_Path}SRJG/"
+
+mkdir -p "${Movies_Path}SRJG/ImgNfo/"
+FSrjg_Path="${Movies_Path}SRJG/ImgNfo" # Possible storage for images and Nfo files to let clean the Movies_Path folder
 
 CreateMovieDB()
 # Create the Movie Database
@@ -139,11 +141,11 @@ do
   if [ "${#SHORT}" = "${#LINE}" ]; then continue ; fi
   MOVIETITLE="$SHORT"
   break   # Found <title>, quit looking
-done <"$MOVIEPATH/$INFONAME"
+done <"$NFOPATH/$INFONAME"
 
 # if genre not exist <genre />
-GENRE=`sed -e '/<genre>/,/\/genre>/!d;/genre>/d' -f "${Jukebox_Path}lang/${Lang}_genreGrp" "$MOVIEPATH/$INFONAME"`
-MovieYear=`sed '/<year>/!d;s:.*>\(.*\)</.*:\1:' "$MOVIEPATH/$INFONAME"`            
+GENRE=`sed -e '/<genre>/,/\/genre>/!d;/genre>/d' -f "${Jukebox_Path}lang/${Lang}_genreGrp" "$NFOPATH/$INFONAME"`
+MovieYear=`sed '/<year>/!d;s:.*>\(.*\)</.*:\1:' "$NFOPATH/$INFONAME"`            
 }
 
 
@@ -173,16 +175,17 @@ do
   MOVIENAME="${MOVIEFILE%.*}"  # Strip off .ext
   MOVIEEXT="${MOVIEFILE##*.}"  # only ext
 
+  if [ "${Nfo_Path}" = "MoviesPath" ]; then NFOPATH="${MOVIEPATH}"; else NFOPATH="${FSrjg_Path}"; fi
+
   # Initialize defaults, replace later
   MOVIETITLE="$MOVIENAME</title>"
-  MOVIESHEET=NoMovieinfo.jpg
   GENRE="<name>Unknown</name>"
   MovieYear=""
 
-  [ -e "$MOVIEPATH/$MOVIENAME.nfo" ] && INFONAME=$MOVIENAME.nfo
-  [ -e "$MOVIEPATH/MovieInfo.nfo" ] && INFONAME=MovieInfo.nfo
+  [ -e "$NFOPATH/$MOVIENAME.nfo" ] && INFONAME=$MOVIENAME.nfo
+  [ -e "$NFOPATH/MovieInfo.nfo" ] && INFONAME=MovieInfo.nfo
 
-  [ -e "$MOVIEPATH/$INFONAME" ] && Infoparsing
+  [ -e "$NFOPATH/$INFONAME" ] && Infoparsing
 
   if [ -z "$GENRE" ]; then dbgenre="<name>Unknown</name>"; else dbgenre="$GENRE"; fi
   dbtitle=`echo "<title>$MOVIETITLE" | sed "s/'/''/g"`

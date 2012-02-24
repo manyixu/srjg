@@ -21,16 +21,24 @@
   <Lang>Language</Lang>
   <Jukebox_Size>View</Jukebox_Size>
   <Movies_Path>Movie path</Movies_Path>
+	<Nfo_Path>Location Nfo</Nfo_Path>
+	<Poster_Path>Location Poster</Poster_Path>
+	<Sheet_Path>Location Sheet</Sheet_Path>
   <Movie_Filter>Filter</Movie_Filter>
   <SingleDb>Single Database</SingleDb>
   <Recent_Max>Max recent movie</Recent_Max>
   <Imdb>Use Imdb</Imdb>
+	<Dspl>Display</Dspl>
   <Jukebox_Path>Jukebox path:</Jukebox_Path>
   <Port>Port:</Port>
   <Version>Version:</Version>
   <yes>Yes</yes>
   <no>No</no>
 </cfg>
+<Dspl>
+  <Dspl_Genre_txt>Genre text:</Dspl_Genre_txt>
+	<Dspl_HelpBar>Help bar:</Dspl_HelpBar>
+</Dspl>
 <FBrowser>
   <FBrowser_Title>Movies Path:</FBrowser_Title>
   <FBrowser_Valid>to validate</FBrowser_Valid>
