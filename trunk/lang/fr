@@ -11,7 +11,7 @@
   <config>Config</config>
 </main>
 <jukebox>
-	<top>1 = Change vue | 2 = Marquer comme vu | Enter = Select | Rtn = Ecran précédent | Play = Joue la vidéo</top>
+	<help>1 = Change vue | 2 = Marquer comme vu | Enter = Select | Rtn = Ecran précédent | Play = Joue la vidéo</help>
 </jukebox>
 <update>
   <fast>Rapide</fast>
@@ -21,16 +21,28 @@
   <Lang>Langue</Lang>
   <Jukebox_Size>Vue</Jukebox_Size>
   <Movies_Path>Chemin des Films</Movies_Path>
+	<Nfo_Path>Emplacement Nfo</Nfo_Path>
+	<Poster_Path>Emplacement Jaquettes</Poster_Path>
+	<Sheet_Path>Emplacement Sheet</Sheet_Path>
   <Movie_Filter>Filtre</Movie_Filter>
   <SingleDb>Base unique</SingleDb>
   <Recent_Max>Max films récents</Recent_Max>
   <Imdb>Utiliser Imdb</Imdb>
+	<Dspl>Affichage</Dspl>
   <Jukebox_Path>Chemin du Jukebox:</Jukebox_Path>
   <Port>Port:</Port>
   <Version>Version:</Version>
   <yes>Oui</yes>
   <no>Non</no>
+	<top>Haut</top>
+	<bottom>Bas</bottom>
+	<white>Blanc</white>
+	<black>Noir</black>
 </cfg>
+<Dspl>
+  <Dspl_Genre_txt>Texte du Genre:</Dspl_Genre_txt>
+	<Dspl_HelpBar>Barre d'aide:</Dspl_HelpBar>
+</Dspl>
 <FBrowser>
   <FBrowser_Title>Chemin des films:</FBrowser_Title>
   <FBrowser_Valid>pour valider</FBrowser_Valid>

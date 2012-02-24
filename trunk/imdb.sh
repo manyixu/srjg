@@ -21,8 +21,10 @@ fi
 sed '1d;$d;s:<\(.*\)>\(.*\)</.*>:\1=\2:' ${CfgFile} >/tmp/srjg.cfg
 . /tmp/srjg.cfg
 
+FSrjg_Path="${Movies_Path}SRJG/ImgNfo" # Possible storage for images and Nfo files to let clean the Movies_Path folder
+
 PAR_LINK="http://playon.unixstorm.org/IMDB/movie.php?name="			# Link to IMDB API [DO NOT CHANGE, unless you are requested to do so]
-PAR_INFO="&mode=info"													# Parameters for generating info file
+PAR_INFO="&mode=info&lang=$Imdb_Lang"													# Parameters for generating info file
 
 PAR_SHEET="&mode=sheet&lang=$Imdb_Lang&font=$Imdb_Font"		# Parameters for generating moviesheet
 if [ $Imdb_Backdrop != "no" ]; then PAR_SHEET="$PAR_SHEET&backdrop=y"; fi
@@ -88,29 +90,33 @@ MkDlList()
       MOVIENAMETEMP="$MOVIEFILE"				# Use file as moviename
     fi
 
+    if [ "${Nfo_Path}" = "MoviesPath" ]; then NFOPATH="${MOVIEPATH}"; else NFOPATH="${FSrjg_Path}"; fi
+    if [ "${Poster_Path}" = "MoviesPath" ]; then POSTERPATH="${MOVIEPATH}"; else POSTERPATH="${FSrjg_Path}"; fi
+    if [ "${Sheet_Path}" = "MoviesPath" ]; then SHEETPATH="${MOVIEPATH}"; else SHEETPATH="${FSrjg_Path}"; fi
+
     # Remove CD parts and replace special characters with plus sign
     MOVIENAME=`echo $MOVIENAMETEMP | sed "s/[cC][dD]*[1-9]//g;s/[ &']/+/g"`
 	
     # Download poster
-    if ( [ $Imdb_Poster = "yes" ] && [ ! -e "$MOVIEPATH/folder.jpg" ] && [ ! -e "$MOVIEPATH/${MOVIEFILE}.jpg" ] )
+    if ( [ $Imdb_Poster = "yes" ] && [ ! -e "$POSTERPATH/${MOVIEFILE}.jpg" ] )
     then
-      NAME="$MOVIEPATH/${MOVIEFILE}.jpg"
+      NAME="$POSTERPATH/${MOVIEFILE}.jpg"
       let INDX+=1
       echo "$INDX $PAR_LINK$MOVIENAME$PAR_POSTER@$NAME@Movie" >>${IMDB_DL_List}
     fi
 
     # Download moviesheet
-    if ( [ $Imdb_Sheet = "yes" ] && [ ! -e "$MOVIEPATH/about.jpg" ] && [ ! -e "$MOVIEPATH/0001.jpg" ] && [ ! -e "$MOVIEPATH/${MOVIEFILE}_sheet.jpg" ] )
+    if ( [ $Imdb_Sheet = "yes" ] && [ ! -e "$SHEETPATH/${MOVIEFILE}_sheet.jpg" ] )
     then
-      NAME="$MOVIEPATH/${MOVIEFILE}_sheet.jpg"
+      NAME="$SHEETPATH/${MOVIEFILE}_sheet.jpg"
       let INDX+=1
       echo "$INDX $PAR_LINK$MOVIENAME$PAR_SHEET@$NAME@Movie" >>${IMDB_DL_List}
     fi
 	
     # Download NFO file
-    if ( [ $Imdb_Info = "yes" ] && [ ! -e "$MOVIEPATH/$MOVIEFILE.nfo" ] && [ ! -e "$MOVIEPATH/MovieInfo.nfo" ] )
+    if ( [ $Imdb_Info = "yes" ] && [ ! -e "$NFOPATH/$MOVIEFILE.nfo" ] && [ ! -e "$NFOPATH/MovieInfo.nfo" ] )
     then
-      NAME="$MOVIEPATH/${MOVIEFILE}.nfo"
+      NAME="$NFOPATH/${MOVIEFILE}.nfo"
       let INDX+=1
       echo "$INDX $PAR_LINK$MOVIENAME$PAR_INFO@$NAME@title">>${IMDB_DL_List}
     fi

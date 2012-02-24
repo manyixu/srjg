@@ -30,6 +30,9 @@ else
   PreviousMovieList="${Movies_Path}SRJG/prevmovies.list"
 fi
 
+[ -d "${Movies_Path}" ] && mkdir -p "${Movies_Path}SRJG/ImgNfo/"
+FSrjg_Path="${Movies_Path}SRJG/ImgNfo" # Possible storage for images and Nfo files to let clean the Movies_Path folder
+
 Sqlite=${Jukebox_Path}"sqlite3"
 MoviesList="/tmp/srjg_movies.list"
 InsertList="/tmp/srjg_insert.list"
@@ -83,11 +86,11 @@ do
   if [ "${#SHORT}" = "${#LINE}" ]; then continue ; fi
   MOVIETITLE="$SHORT"
   break   # Found <title>, quit looking
-done <"$MOVIEPATH/$INFONAME"
+done <"$NFOPATH/$INFONAME"
 
 # if genre not exist <genre />
-GENRE=`sed -e '/<genre>/,/\/genre>/!d;/genre>/d' -f "${Jukebox_Path}lang/${Language}_genreGrp" "$MOVIEPATH/$INFONAME"`
-MovieYear=`sed '/<year>/!d;s:.*>\(.*\)</.*:\1:' "$MOVIEPATH/$INFONAME"`            
+GENRE=`sed -e '/<genre>/,/\/genre>/!d;/genre>/d' -f "${Jukebox_Path}lang/${Language}_genreGrp" "$NFOPATH/$INFONAME"`
+MovieYear=`sed '/<year>/!d;s:.*>\(.*\)</.*:\1:' "$NFOPATH/$INFONAME"`            
 }
 
 GenerateMovieList()
@@ -141,16 +144,17 @@ do
   MOVIENAME="${MOVIEFILE%.*}"  # Strip off .ext
   MOVIEEXT="${MOVIEFILE##*.}"  # only ext
 
+  if [ "${Nfo_Path}" = "MoviesPath" ]; then NFOPATH="${MOVIEPATH}"; else NFOPATH="${FSrjg_Path}"; fi
+
   # Initialize defaults, replace later
   MOVIETITLE="$MOVIENAME</title>"
-  MOVIESHEET=NoMovieinfo.jpg
   GENRE="<name>Unknown</name>"
   MovieYear=""
 
-  [ -e "$MOVIEPATH/$MOVIENAME.nfo" ] && INFONAME=$MOVIENAME.nfo
-  [ -e "$MOVIEPATH/MovieInfo.nfo" ] && INFONAME=MovieInfo.nfo
+  [ -e "$NFOPATH/$MOVIENAME.nfo" ] && INFONAME=$MOVIENAME.nfo
+  [ -e "$NFOPATH/MovieInfo.nfo" ] && INFONAME=MovieInfo.nfo
 
-  [ -e "$MOVIEPATH/$INFONAME" ] && Infoparsing
+  [ -e "$NFOPATH/$INFONAME" ] && Infoparsing
 
   if [ -z "$GENRE" ]; then dbgenre="<name>Unknown</name>"; else dbgenre="$GENRE"; fi
   dbtitle=`echo "<title>$MOVIETITLE" | sed "s/'/''/g"`
@@ -396,7 +400,7 @@ cat <<EOF
 		langfile = loadXMLFile(langpath);
 		if (langfile != null)
 		{
-			jukebox_top = getXMLText("jukebox", "top");
+			jukebox_top = getXMLText("jukebox", "help");
 		}
 
     /* array to keep update Watchcgi during views */
@@ -433,13 +437,25 @@ cat <<EOF
 				</script>
 		  	</image>      
 		</backgroundDisplay>   
+EOF
 
-        <text redraw="no" align="center" offsetXPC="2" offsetYPC="1" widthPC="96" heightPC="3" fontSize="12" backgroundColor="-1:-1:-1" foregroundColor="130:130:130">
+if [ "$Dspl_HelpBar" != "no" ]; then
+cat <<EOF
+        <text redraw="no" align="center" offsetXPC="2" widthPC="96" heightPC="3" fontSize="12" backgroundColor="-1:-1:-1" foregroundColor="130:130:130">
+			<offsetYPC>
+			  <script>
+			    if ( "$Dspl_HelpBar" == "top" ) 1;
+				  else 85;
+			  </script>
+			</offsetYPC>
 			<script>
 				print(jukebox_top);
 			</script>
 		</text>
-   
+EOF
+fi # Dspl_HelpBar != "no"
+
+cat <<EOF
 		<text redraw="no" align="center" offsetXPC="2.5" offsetYPC="3" widthPC="90" heightPC="10" fontSize="20" backgroundColor="-1:-1:-1" foregroundColor="192:192:192">
 			<script>
 			    print(Category_Title);
@@ -457,21 +473,12 @@ cat <<EOF
 		
 		<image type="image/jpeg" redraw="yes" offsetXPC="0" offsetYPC="0" widthPC="100" heightPC="80">
   <script>
-    ItemPath  = getItemInfo(-1, "path");
+    if ( "${Sheet_Path}" == "MoviesPath" ) ItemPath = getItemInfo(-1, "path");
+    else ItemPath = "${FSrjg_Path}";
     ItemFile = getItemInfo(-1, "file");
     SheetPath = ItemPath +"/"+ ItemFile +"_sheet.jpg";
     Etat = readStringFromFile(SheetPath);
-    if (Etat==null){
-      SheetPath = ItemPath +"/about.jpg";
-      Etat = readStringFromFile(SheetPath);
-      if (Etat==null){
-        SheetPath = ItemPath +"/0001.jpg";
-        Etat = readStringFromFile(SheetPath);
-        if (Etat==null){
-          SheetPath = "${Jukebox_Path}images/NoMovieinfo.jpg";
-        }
-      }
-    }
+    if (Etat==null) SheetPath = "${Jukebox_Path}images/NoMovieinfo.jpg";
     SheetPath;
   </script>
 </image>
@@ -519,21 +526,12 @@ cat <<EOF
 		
 <image type="image/jpeg" redraw="yes" offsetXPC="0" offsetYPC="0" widthPC="100" heightPC="100">
   <script>
-    ItemPath  = getItemInfo(-1, "path");
+    if ( "${Sheet_Path}" == "MoviesPath" ) ItemPath = getItemInfo(-1, "path");
+    else ItemPath = "${FSrjg_Path}";
     ItemFile = getItemInfo(-1, "file");
     SheetPath = ItemPath +"/"+ ItemFile +"_sheet.jpg";
     Etat = readStringFromFile(SheetPath);
-    if (Etat==null){
-      SheetPath = ItemPath +"/about.jpg";
-      Etat = readStringFromFile(SheetPath);
-      if (Etat==null){
-        SheetPath = ItemPath +"/0001.jpg";
-        Etat = readStringFromFile(SheetPath);
-        if (Etat==null){
-          SheetPath = "${Jukebox_Path}images/NoMovieinfo.jpg";
-        }
-      }
-    }
+    if (Etat==null) SheetPath = "${Jukebox_Path}images/NoMovieinfo.jpg";
     SheetPath;
   </script>
 </image>
@@ -759,17 +757,12 @@ cat <<EOF
 <!-- Top Layer folder.jpg -->
 <image type="image/jpeg" redraw="yes" offsetXPC="8.2" offsetYPC="5.5" widthPC="84.25" heightPC="89.25">
  <script>
-  ItemPath  = getItemInfo(-1, "path");
+  if ( "${Poster_Path}" == "MoviesPath" || "$mode" == "genreSelection") ItemPath = getItemInfo(-1, "path");
+  else ItemPath = "${FSrjg_Path}";
   ItemFile = getItemInfo(-1, "file");
   thumbnailPath = ItemPath +"/"+ ItemFile +".jpg";
   Etat = readStringFromFile(thumbnailPath);
-  if (Etat==null){
-    thumbnailPath = ItemPath +"/folder.jpg";
-    Etat = readStringFromFile(thumbnailPath);
-    if (Etat==null){
-      thumbnailPath = "${Jukebox_Path}images/nofolder.jpg";
-    }
-  }
+  if (Etat==null) thumbnailPath = "${Jukebox_Path}images/nofolder.jpg";
   thumbnailPath;
  </script>
 </image>
@@ -807,9 +800,15 @@ cat <<EOF
 </image>
 EOF
 
-if [ "$mode" = "genreSelection" ]; then
+if ([ "$mode" = "genreSelection" ] && [ "$Dspl_Genre_txt" != "no" ]); then
 cat <<EOF
-<text offsetXPC="1" offsetYPC="75" widthPC="98" heightPC="13" fontSize="13" align="center" foregroundColor="255:255:255">
+<text offsetXPC="1" offsetYPC="75" widthPC="98" heightPC="13" fontSize="13" align="center">
+<foregroundColor>
+  <script>
+	  if ( "$Dspl_Genre_txt" == "white") "255:255:255";
+		else "0:0:0";
+  </script>
+</foregroundColor>
 <script>
 	getItemInfo(-1, "title");
 </script>
@@ -1017,34 +1016,24 @@ done < /tmp/srjg_alpha.list
 fi
 }
 
-MenuCfg()
-# RSS to edit srjg.cfg
+CpCfgTmp()
+# Copy settings srjg.cfg to /tmp to affect the shell
 {
 cat <<EOF
-<?xml version="1.0" encoding="UTF-8" ?>
-<rss version="2.0" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:media="http://purl.org/dc/elements/1.1/">
-
-<onEnter>
-  showIdle();
-	Config = "/usr/local/etc/srjg.cfg";
-  Config_ok = loadXMLFile(Config);
-    
-	if (Config_ok == null) {
-		print("Load Config fail ", Config);
-	}
-    else {
-        Config_itemSize = getXMLElementCount("Config");
-	}
-
   if (Config_itemSize > 0) {
     Language = getXMLText("Config", "Lang");
 		Jukebox_Path = getXMLText("Config", "Jukebox_Path");
 		Jukebox_Size = getXMLText("Config", "Jukebox_Size");
 		Movies_Path = getXMLText("Config", "Movies_Path");
+		Nfo_Path = getXMLText("Config", "Nfo_Path");
+		Poster_Path = getXMLText("Config", "Poster_Path");
+		Sheet_Path = getXMLText("Config", "Sheet_Path");
     SingleDb = getXMLText("Config", "SingleDb");
 		Movie_Filter = getXMLText("Config", "Movie_Filter");
 		Port = getXMLText("Config", "Port");
 		Recent_Max = getXMLText("Config", "Recent_Max");
+		Dspl_Genre_txt = getXMLText("Config", "Dspl_Genre_txt");
+		Dspl_HelpBar = getXMLText("Config", "Dspl_HelpBar");
     Imdb = getXMLText("Config", "Imdb");
 		Imdb_Lang = getXMLText("Config", "Imdb_Lang");
 		Imdb_Poster = getXMLText("Config", "Imdb_Poster");
@@ -1067,10 +1056,15 @@ cat <<EOF
   tmpconfigArray=pushBackStringArray(tmpconfigArray, "Language="+Language);
   tmpconfigArray=pushBackStringArray(tmpconfigArray, "Jukebox_Path="+Jukebox_Path);
   tmpconfigArray=pushBackStringArray(tmpconfigArray, "Movies_Path="+Movies_Path);
+  tmpconfigArray=pushBackStringArray(tmpconfigArray, "Nfo_Path="+Nfo_Path);
+  tmpconfigArray=pushBackStringArray(tmpconfigArray, "Poster_Path="+Poster_Path);
+  tmpconfigArray=pushBackStringArray(tmpconfigArray, "Sheet_Path="+Sheet_Path);
   tmpconfigArray=pushBackStringArray(tmpconfigArray, "Movie_Filter="+Movie_Filter);
   tmpconfigArray=pushBackStringArray(tmpconfigArray, "SingleDb="+SingleDb);
   tmpconfigArray=pushBackStringArray(tmpconfigArray, "Port="+Port);
   tmpconfigArray=pushBackStringArray(tmpconfigArray, "Recent_Max="+Recent_Max);
+	tmpconfigArray=pushBackStringArray(tmpconfigArray, "Dspl_Genre_txt="+Dspl_Genre_txt);
+	tmpconfigArray=pushBackStringArray(tmpconfigArray, "Dspl_HelpBar="+Dspl_HelpBar);
   tmpconfigArray=pushBackStringArray(tmpconfigArray, "Imdb="+Imdb);
   tmpconfigArray=pushBackStringArray(tmpconfigArray, "Imdb_Lang="+Imdb_Lang);
   tmpconfigArray=pushBackStringArray(tmpconfigArray, "Imdb_Poster="+Imdb_Poster);
@@ -1087,29 +1081,50 @@ cat <<EOF
   tmpconfigArray=pushBackStringArray(tmpconfigArray, "Imdb_Info="+Imdb_Info);
   tmpconfigArray=pushBackStringArray(tmpconfigArray, "Imdb_MaxDl="+Imdb_MaxDl);
   writeStringToFile(srjgconf, tmpconfigArray);
-	 
+EOF
+}
+
+DsplCfgEdit()
+# RSS to edit Display
+{
+cat <<EOF
+<?xml version="1.0" encoding="UTF-8" ?>
+<rss version="2.0" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:media="http://purl.org/dc/elements/1.1/">
+
+<onEnter>
+  showIdle();
+	Config = "/usr/local/etc/srjg.cfg";
+  Config_ok = loadXMLFile(Config);
+    
+	if (Config_ok == null) {
+		print("Load Config fail ", Config);
+	}
+    else {
+        Config_itemSize = getXMLElementCount("Config");
+	}
+EOF
+
+CpCfgTmp
+
+cat <<EOF
   langpath = Jukebox_Path + "lang/" + Language;
   langfile = loadXMLFile(langpath);
   if (langfile != null) {
-    cfg_lang = getXMLText("cfg", "Lang");
-    cfg_Jukebox_Path = getXMLText("cfg", "Jukebox_Path");
-    cfg_Jukebox_Size = getXMLText("cfg", "Jukebox_Size");
-    cfg_Movies_Path = getXMLText("cfg", "Movies_Path");
-    cfg_SingleDb = getXMLText("cfg", "SingleDb");
-    cfg_Movie_Filter = getXMLText("cfg", "Movie_Filter");
-    cfg_Imdb = getXMLText("cfg", "Imdb");
-    cfg_Port = getXMLText("cfg", "Port");
-    cfg_Version = getXMLText("cfg", "Version");
-    cfg_Recent_Max = getXMLText("cfg", "Recent_Max");
-    cfg_Yes = getXMLText("cfg", "yes");
-    cfg_No = getXMLText("cfg", "no");
+    Lang_Dspl_Genre_txt = getXMLText("Dspl", "Dspl_Genre_txt");
+		Lang_Dspl_HelpBar = getXMLText("Dspl", "Dspl_HelpBar");
+		Lang_No = getXMLText("cfg", "no");
+		Lang_Yes = getXMLText("cfg", "yes");
+		Lang_White = getXMLText("cfg", "white");
+		Lang_Black = getXMLText("cfg", "black");
+		Lang_Top = getXMLText("cfg", "top");
+		Lang_Bottom = getXMLText("cfg", "bottom");
   }
 
   Version = readStringFromFile(Jukebox_Path + "Version");
   if ( Version == null ) print ("Version File not found");
 </onEnter>
 
-<mediaDisplay name="photoView" rowCount="7" columnCount="1" drawItemText="no" showHeader="no" showDefaultInfo="no" menuBorderColor="255:255:255" sideColorBottom="-1:-1:-1" sideColorTop="-1:-1:-1" itemAlignt="left" itemOffsetXPC="4" itemOffsetYPC="32" itemWidthPC="32" itemHeightPC="7.2" backgroundColor="-1:-1:-1" itemBackgroundColor="-1:-1:-1" sliding="no" itemGap="0" idleImageXPC="90" idleImageYPC="5" idleImageWidthPC="5" idleImageHeightPC="8" imageUnFocus="null" imageParentFocus="null" imageBorderPC="0" forceFocusOnItem="no" cornerRounding="yes" itemBorderColor="-1:-1:-1" focusBorderColor="-1:-1:-1" unFocusBorderColor="-1:-1:-1">
+<mediaDisplay name="photoView" rowCount="2" columnCount="1" drawItemText="no" showHeader="no" showDefaultInfo="no" menuBorderColor="255:255:255" sideColorBottom="-1:-1:-1" sideColorTop="-1:-1:-1" itemAlignt="left" itemOffsetXPC="4" itemOffsetYPC="32" itemWidthPC="32" itemHeightPC="7.2" backgroundColor="-1:-1:-1" itemBackgroundColor="-1:-1:-1" sliding="no" itemGap="0" idleImageXPC="90" idleImageYPC="5" idleImageWidthPC="5" idleImageHeightPC="8" imageUnFocus="null" imageParentFocus="null" imageBorderPC="0" forceFocusOnItem="no" cornerRounding="yes" itemBorderColor="-1:-1:-1" focusBorderColor="-1:-1:-1" unFocusBorderColor="-1:-1:-1">
 <idleImage> image/POPUP_LOADING_01.png </idleImage> 
 <idleImage> image/POPUP_LOADING_02.png </idleImage> 
 <idleImage> image/POPUP_LOADING_03.png </idleImage> 
@@ -1122,82 +1137,17 @@ cat <<EOF
 <!-- comment menu display -->
 <text redraw="no" backgroundColor="-1:-1:-1" foregroundColor="200:200:200" offsetXPC="36" offsetYPC="35" widthPC="57" heightPC="4" fontSize="16" lines="1" align="left">
 	<script>
-		print(Language);
+		if ( Dspl_Genre_txt == "no" ) print( Lang_No );
+    else if ( Dspl_Genre_txt == "white" ) print( Lang_White );
+		else print( Lang_Black );
 	</script>
 </text>
 
 <text redraw="no" backgroundColor="-1:-1:-1" foregroundColor="200:200:200" offsetXPC="36" offsetYPC="43" widthPC="57" heightPC="4" fontSize="16" lines="1" align="left">
 	<script>
-		print(Movies_Path);
-	</script>
-</text>
-
-<text redraw="no" backgroundColor="-1:-1:-1" foregroundColor="200:200:200" offsetXPC="36" offsetYPC="51" widthPC="57" heightPC="4" fontSize="16" lines="1" align="left">
-	<script>
-		if ( SingleDb == "yes" ) print( cfg_Yes );
-    else print( cfg_No );
-	</script>
-</text>
-
-<text redraw="no" backgroundColor="-1:-1:-1" foregroundColor="200:200:200" offsetXPC="36" offsetYPC="59" widthPC="57" heightPC="4" fontSize="16" lines="1" align="left">
-	<script>
-		print(Movie_Filter);
-	</script>
-</text>
-
-<text redraw="no" backgroundColor="-1:-1:-1" foregroundColor="200:200:200" offsetXPC="36" offsetYPC="67" widthPC="57" heightPC="4" fontSize="16" lines="1" align="left">
-	<script>
-		print(Jukebox_Size);
-	</script>
-</text>
-
-<text redraw="no" backgroundColor="-1:-1:-1" foregroundColor="200:200:200" offsetXPC="36" offsetYPC="75" widthPC="57" heightPC="4" fontSize="16" lines="1" align="left">
-	<script>
-		print(Recent_Max);
-	</script>
-</text>
-
-<text redraw="no" backgroundColor="-1:-1:-1" foregroundColor="200:200:200" offsetXPC="36" offsetYPC="83" widthPC="57" heightPC="4" fontSize="16" lines="1" align="left">
-	<script>
-		if ( Imdb == "yes" ) print( cfg_Yes );
-    else print( cfg_No );
-	</script>
-</text>
-
-<!-- info display -->
-<text redraw="no" backgroundColor="-1:-1:-1" foregroundColor="200:200:200" offsetXPC="59" offsetYPC="10" widthPC="37" heightPC="4" fontSize="16" lines="1" align="center">
-	<script>
-		print(cfg_Jukebox_Path);
-	</script>
-</text>
-
-<text redraw="no" backgroundColor="-1:-1:-1" foregroundColor="200:200:200" offsetXPC="59" offsetYPC="14" widthPC="37" heightPC="4" fontSize="13" lines="1" align="center">
-	<script>
-		print(Jukebox_Path);
-	</script>
-</text>
-
-<text redraw="no" backgroundColor="-1:-1:-1" foregroundColor="200:200:200" offsetXPC="65" offsetYPC="18" widthPC="23" heightPC="4" fontSize="16" lines="1" align="left">
-	<script>
-		print(cfg_Port);
-	</script>
-</text>
-
-<text redraw="no" backgroundColor="-1:-1:-1" foregroundColor="200:200:200" offsetXPC="75" offsetYPC="18" widthPC="10" heightPC="4" fontSize="16" lines="1" align="left">
-	<script>
-		print(Port);
-	</script>
-</text>
-
-<text redraw="no" backgroundColor="-1:-1:-1" foregroundColor="200:200:200" offsetXPC="65" offsetYPC="22" widthPC="10" heightPC="4" fontSize="16" lines="1" align="left">
-	<script>
-		print(cfg_Version);
-	</script>
-</text>
-
-<text redraw="no" backgroundColor="-1:-1:-1" foregroundColor="200:200:200" offsetXPC="75" offsetYPC="22" widthPC="10" heightPC="4" fontSize="16" lines="1" align="left">
-	<script>
-		print(Version);
+		if ( Dspl_HelpBar == "no" ) print( Lang_No );
+    else if ( Dspl_HelpBar == "top" ) print( Lang_Top );
+		else print( Lang_Bottom );
 	</script>
 </text>
 
@@ -1268,12 +1218,266 @@ cat <<EOF
 </SelectionEntered>
 
 <channel>
+<title>Display menu</title>
+
+<item>
+<title>
+	<script>
+		print(Lang_Dspl_Genre_txt);
+	</script>
+</title>
+<selection>Dspl_Genre_txt</selection>
+<param>no%20white%20black</param>
+<pos>25</pos>
+</item>
+
+<item>
+<title>
+	<script>
+		print(Lang_Dspl_HelpBar);
+	</script>
+</title>
+<selection>Dspl_HelpBar</selection>
+<param>top%20no%20bottom</param>
+<pos>25</pos>
+</item>
+
+</channel>
+</rss>
+EOF
+}
+
+MenuCfg()
+# RSS to edit srjg.cfg
+{
+cat <<EOF
+<?xml version="1.0" encoding="UTF-8" ?>
+<rss version="2.0" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:media="http://purl.org/dc/elements/1.1/">
+
+<onEnter>
+  showIdle();
+	Config = "/usr/local/etc/srjg.cfg";
+  Config_ok = loadXMLFile(Config);
+    
+	if (Config_ok == null) {
+		print("Load Config fail ", Config);
+	}
+    else {
+        Config_itemSize = getXMLElementCount("Config");
+	}
+EOF
+
+CpCfgTmp
+
+cat <<EOF
+  langpath = Jukebox_Path + "lang/" + Language;
+  langfile = loadXMLFile(langpath);
+  if (langfile != null) {
+    Lang_Lang = getXMLText("cfg", "Lang");
+    Lang_Jukebox_Path = getXMLText("cfg", "Jukebox_Path");
+    Lang_Jukebox_Size = getXMLText("cfg", "Jukebox_Size");
+    Lang_Movies_Path = getXMLText("cfg", "Movies_Path");
+		Lang_Nfo_Path = getXMLText("cfg", "Nfo_Path");
+		Lang_Poster_Path = getXMLText("cfg", "Poster_Path");
+		Lang_Sheet_Path = getXMLText("cfg", "Sheet_Path");
+    Lang_SingleDb = getXMLText("cfg", "SingleDb");
+    Lang_Movie_Filter = getXMLText("cfg", "Movie_Filter");
+    Lang_Imdb = getXMLText("cfg", "Imdb");
+		Lang_Dspl = getXMLText("cfg", "Dspl");
+    Lang_Port = getXMLText("cfg", "Port");
+    Lang_Version = getXMLText("cfg", "Version");
+    Lang_Recent_Max = getXMLText("cfg", "Recent_Max");
+    Lang_Yes = getXMLText("cfg", "yes");
+    Lang_No = getXMLText("cfg", "no");
+  }
+
+  Version = readStringFromFile(Jukebox_Path + "Version");
+  if ( Version == null ) print ("Version File not found");
+</onEnter>
+
+<mediaDisplay name="photoView" rowCount="11" columnCount="1" drawItemText="no" showHeader="no" showDefaultInfo="no" menuBorderColor="255:255:255" sideColorBottom="-1:-1:-1" sideColorTop="-1:-1:-1" itemAlignt="left" itemOffsetXPC="4" itemOffsetYPC="21" itemWidthPC="32" itemHeightPC="5" backgroundColor="-1:-1:-1" itemBackgroundColor="-1:-1:-1" sliding="no" itemGap="0" idleImageXPC="90" idleImageYPC="5" idleImageWidthPC="5" idleImageHeightPC="8" imageUnFocus="null" imageParentFocus="null" imageBorderPC="0" forceFocusOnItem="no" cornerRounding="yes" itemBorderColor="-1:-1:-1" focusBorderColor="-1:-1:-1" unFocusBorderColor="-1:-1:-1">
+<idleImage> image/POPUP_LOADING_01.png </idleImage> 
+<idleImage> image/POPUP_LOADING_02.png </idleImage> 
+<idleImage> image/POPUP_LOADING_03.png </idleImage> 
+<idleImage> image/POPUP_LOADING_04.png </idleImage> 
+<idleImage> image/POPUP_LOADING_05.png </idleImage> 
+<idleImage> image/POPUP_LOADING_06.png </idleImage> 
+<idleImage> image/POPUP_LOADING_07.png </idleImage> 
+<idleImage> image/POPUP_LOADING_08.png </idleImage> 
+
+<!-- comment menu display -->
+<text redraw="no" backgroundColor="-1:-1:-1" foregroundColor="200:200:200" offsetXPC="36" offsetYPC="23" widthPC="57" heightPC="4" fontSize="16" lines="1" align="left">
+	<script>
+		print(Language);
+	</script>
+</text>
+
+<text redraw="no" backgroundColor="-1:-1:-1" foregroundColor="200:200:200" offsetXPC="36" offsetYPC="29" widthPC="57" heightPC="4" fontSize="16" lines="1" align="left">
+	<script>
+		print(Movies_Path);
+	</script>
+</text>
+
+<text redraw="no" backgroundColor="-1:-1:-1" foregroundColor="200:200:200" offsetXPC="36" offsetYPC="35" widthPC="57" heightPC="4" fontSize="16" lines="1" align="left">
+	<script>
+		print(Nfo_Path);
+	</script>
+</text>
+
+<text redraw="no" backgroundColor="-1:-1:-1" foregroundColor="200:200:200" offsetXPC="36" offsetYPC="41" widthPC="57" heightPC="4" fontSize="16" lines="1" align="left">
+	<script>
+		print(Poster_Path);
+	</script>
+</text>
+
+<text redraw="no" backgroundColor="-1:-1:-1" foregroundColor="200:200:200" offsetXPC="36" offsetYPC="47" widthPC="57" heightPC="4" fontSize="16" lines="1" align="left">
+	<script>
+		print(Sheet_Path);
+	</script>
+</text>
+
+<text redraw="no" backgroundColor="-1:-1:-1" foregroundColor="200:200:200" offsetXPC="36" offsetYPC="53" widthPC="57" heightPC="4" fontSize="16" lines="1" align="left">
+	<script>
+		if ( SingleDb == "yes" ) print( Lang_Yes );
+    else print( Lang_No );
+	</script>
+</text>
+
+<text redraw="no" backgroundColor="-1:-1:-1" foregroundColor="200:200:200" offsetXPC="36" offsetYPC="59" widthPC="57" heightPC="4" fontSize="16" lines="1" align="left">
+	<script>
+		print(Movie_Filter);
+	</script>
+</text>
+
+<text redraw="no" backgroundColor="-1:-1:-1" foregroundColor="200:200:200" offsetXPC="36" offsetYPC="65" widthPC="57" heightPC="4" fontSize="16" lines="1" align="left">
+	<script>
+		print(Jukebox_Size);
+	</script>
+</text>
+
+<text redraw="no" backgroundColor="-1:-1:-1" foregroundColor="200:200:200" offsetXPC="36" offsetYPC="71" widthPC="57" heightPC="4" fontSize="16" lines="1" align="left">
+	<script>
+		print(Recent_Max);
+	</script>
+</text>
+
+<text redraw="no" backgroundColor="-1:-1:-1" foregroundColor="200:200:200" offsetXPC="36" offsetYPC="77" widthPC="57" heightPC="4" fontSize="16" lines="1" align="left">
+	<script>
+		if ( Imdb == "yes" ) print( Lang_Yes );
+    else print( Lang_No );
+	</script>
+</text>
+
+<!-- info display -->
+<text redraw="no" backgroundColor="-1:-1:-1" foregroundColor="200:200:200" offsetXPC="59" offsetYPC="10" widthPC="37" heightPC="4" fontSize="16" lines="1" align="center">
+	<script>
+		print(Lang_Jukebox_Path);
+	</script>
+</text>
+
+<text redraw="no" backgroundColor="-1:-1:-1" foregroundColor="200:200:200" offsetXPC="59" offsetYPC="14" widthPC="37" heightPC="4" fontSize="13" lines="1" align="center">
+	<script>
+		print(Jukebox_Path);
+	</script>
+</text>
+
+<text redraw="no" backgroundColor="-1:-1:-1" foregroundColor="200:200:200" offsetXPC="65" offsetYPC="18" widthPC="23" heightPC="4" fontSize="16" lines="1" align="left">
+	<script>
+		print(Lang_Port);
+	</script>
+</text>
+
+<text redraw="no" backgroundColor="-1:-1:-1" foregroundColor="200:200:200" offsetXPC="75" offsetYPC="18" widthPC="10" heightPC="4" fontSize="16" lines="1" align="left">
+	<script>
+		print(Port);
+	</script>
+</text>
+
+<text redraw="no" backgroundColor="-1:-1:-1" foregroundColor="200:200:200" offsetXPC="65" offsetYPC="22" widthPC="10" heightPC="4" fontSize="16" lines="1" align="left">
+	<script>
+		print(Lang_Version);
+	</script>
+</text>
+
+<text redraw="no" backgroundColor="-1:-1:-1" foregroundColor="200:200:200" offsetXPC="75" offsetYPC="22" widthPC="10" heightPC="4" fontSize="16" lines="1" align="left">
+	<script>
+		print(Version);
+	</script>
+</text>
+
+<onUserInput>
+  <script>
+    userInput = currentUserInput();
+	
+    if (userInput == "enter" ) {
+      indx=getFocusItemIndex();
+      mode=getItemInfo(indx, "selection");
+      if ( mode == "Movie_Filter") {
+        inputFilter=getInput("userName","doModal");
+        if (inputFilter != NULL) {
+          mode="UpdateCfg";
+          YPos="Movie_Filter";
+          SelParam=inputFilter;
+					jumpToLink("SelectionEntered");
+        }
+      } else
+        SelParam=getItemInfo(indx, "param");
+        YPos=getItemInfo(indx, "pos");
+        jumpToLink("SelectionEntered");
+			}
+      "false";
+    }
+  </script>
+</onUserInput>
+
+ 
+<itemDisplay>
+
+<image type="image/png" offsetXPC="0" offsetYPC="0" widthPC="100" heightPC="100">
+ <script>
+  if (getDrawingItemState() == "focus")
+  {
+      print(Jukebox_Path + "images/focus_on.png");
+  }
+ else
+  {
+      print(Jukebox_Path + "images/focus_off.png");
+  }
+ </script>
+</image>
+
+<text redraw="no" offsetXPC="0" offsetYPC="0" widthPC="94" heightPC="100" backgroundColor="-1:-1:-1" foregroundColor="200:200:200" fontSize="14" align="center">
+ <script>
+    getItemInfo(-1, "title");
+ </script>
+</text>
+</itemDisplay>  
+
+   <backgroundDisplay>
+        <image type="image/jpeg" redraw="no" offsetXPC="0" offsetYPC="0" widthPC="100" heightPC="100">
+	     <script>
+                 print(Jukebox_Path + "images/srjgMainMenu.jpg");
+             </script>
+        </image>
+    </backgroundDisplay> 
+
+</mediaDisplay>
+
+<SelectionEntered>
+    <link>
+       <script>
+           print("http://127.0.0.1:"+Port+"/cgi-bin/srjg.cgi?"+mode+"@"+SelParam+"@"+YPos);
+       </script>
+    </link>
+</SelectionEntered>
+
+<channel>
 <title>Config menu</title>
 
 <item>
 <title>
 	<script>
-		print(cfg_lang);
+		print(Lang_Lang);
 	</script>
 </title>
 <selection>Lang</selection>
@@ -1284,7 +1488,7 @@ cat <<EOF
 <item>
 <title>
 	<script>
-		print(cfg_Movies_Path);
+		print(Lang_Movies_Path);
 	</script>
 </title>
 <selection>FBrowser</selection>
@@ -1295,7 +1499,40 @@ cat <<EOF
 <item>
 <title>
 	<script>
-		print(cfg_SingleDb);
+		print(Lang_Nfo_Path);
+	</script>
+</title>
+<selection>Nfo_Path</selection>
+<param>MoviesPath%20SRJG</param>
+<pos>27</pos>
+</item>
+
+<item>
+<title>
+	<script>
+		print(Lang_Poster_Path);
+	</script>
+</title>
+<selection>Poster_Path</selection>
+<param>MoviesPath%20SRJG</param>
+<pos>33</pos>
+</item>
+
+<item>
+<title>
+	<script>
+		print(Lang_Sheet_Path);
+	</script>
+</title>
+<selection>Sheet_Path</selection>
+<param>MoviesPath%20SRJG</param>
+<pos>40</pos>
+</item>
+
+<item>
+<title>
+	<script>
+		print(Lang_SingleDb);
 	</script>
 </title>
 <selection>SingleDb</selection>
@@ -1306,7 +1543,7 @@ cat <<EOF
 <item>
 <title>
 	<script>
-		print(cfg_Movie_Filter);
+		print(Lang_Movie_Filter);
 	</script>
 </title>
 <selection>Movie_Filter</selection>
@@ -1317,7 +1554,7 @@ cat <<EOF
 <item>
 <title>
 	<script>
-		print(cfg_Jukebox_Size);
+		print(Lang_Jukebox_Size);
 	</script>
 </title>
 <selection>Jukebox_Size</selection>
@@ -1328,7 +1565,7 @@ cat <<EOF
 <item>
 <title>
 	<script>
-		print(cfg_Recent_Max);
+		print(Lang_Recent_Max);
 	</script>
 </title>
 <selection>Recent_Max</selection>
@@ -1339,10 +1576,21 @@ cat <<EOF
 <item>
 <title>
 	<script>
-		print(cfg_Imdb);
+		print(Lang_Imdb);
 	</script>
 </title>
 <selection>ImdbCfgEdit</selection>
+<param></param>
+<pos></pos>
+</item>
+
+<item>
+<title>
+	<script>
+		print(Lang_Dspl);
+	</script>
+</title>
+<selection>DsplCfgEdit</selection>
 <param></param>
 <pos></pos>
 </item>
@@ -1683,6 +1931,10 @@ do
   case ${Item_lst} in
     "yes") Item_dspl=`sed "/<yes>/!d;s:.*>\(.*\)<.*:\1:" "${Jukebox_Path}lang/${Language}"`;;
     "no")  Item_dspl=`sed "/<no>/!d;s:.*>\(.*\)<.*:\1:" "${Jukebox_Path}lang/${Language}"`;;
+    "top")  Item_dspl=`sed "/<top>/!d;s:.*>\(.*\)<.*:\1:" "${Jukebox_Path}lang/${Language}"`;;
+    "bottom")  Item_dspl=`sed "/<bottom>/!d;s:.*>\(.*\)<.*:\1:" "${Jukebox_Path}lang/${Language}"`;;
+    "white")  Item_dspl=`sed "/<white>/!d;s:.*>\(.*\)<.*:\1:" "${Jukebox_Path}lang/${Language}"`;;
+    "black")  Item_dspl=`sed "/<black>/!d;s:.*>\(.*\)<.*:\1:" "${Jukebox_Path}lang/${Language}"`;;
     *)     Item_dspl=$Item_lst;;
   esac
 cat <<EOF
@@ -1772,81 +2024,33 @@ cat <<EOF
     else {
         Config_itemSize = getXMLElementCount("Config");
 	}
-    
-  if (Config_itemSize > 0) {
-    Language = getXMLText("Config", "Lang");
-		Jukebox_Path = getXMLText("Config", "Jukebox_Path");
-		Jukebox_Size = getXMLText("Config", "Jukebox_Size");
-		Movies_Path = getXMLText("Config", "Movies_Path");
-    SingleDb = getXMLText("Config", "SingleDb");
-		Movie_Filter = getXMLText("Config", "Movie_Filter");
-		Port = getXMLText("Config", "Port");
-		Recent_Max = getXMLText("Config", "Recent_Max");
-    Imdb = getXMLText("Config", "Imdb");
-		Imdb_Lang = getXMLText("Config", "Imdb_Lang");
-		Imdb_Poster = getXMLText("Config", "Imdb_Poster");
-		Imdb_PBox = getXMLText("Config", "Imdb_PBox");
-		Imdb_PPost = getXMLText("Config", "Imdb_PPost");
-		Imdb_Sheet = getXMLText("Config", "Imdb_Sheet");
-		Imdb_SBox = getXMLText("Config", "Imdb_SBox");
-		Imdb_SPost = getXMLText("Config", "Imdb_SPost");
-		Imdb_Backdrop = getXMLText("Config", "Imdb_Backdrop");
-		Imdb_Font = getXMLText("Config", "Imdb_Font");
-		Imdb_Genres = getXMLText("Config", "Imdb_Genres");
-    Imdb_Tagline = getXMLText("Config", "Imdb_Tagline");
-    Imdb_Time = getXMLText("Config", "Imdb_Time");
-    Imdb_Info = getXMLText("Config", "Imdb_Info");
-    Imdb_MaxDl = getXMLText("Config", "Imdb_MaxDl");
-  }
-	 
-  srjgconf="/tmp/srjg.cfg";
-  tmpconfigArray=null;
-  tmpconfigArray=pushBackStringArray(tmpconfigArray, "Language="+Language);
-  tmpconfigArray=pushBackStringArray(tmpconfigArray, "Jukebox_Path="+Jukebox_Path);
-  tmpconfigArray=pushBackStringArray(tmpconfigArray, "Movies_Path="+Movies_Path);
-  tmpconfigArray=pushBackStringArray(tmpconfigArray, "Movie_Filter="+Movie_Filter);
-  tmpconfigArray=pushBackStringArray(tmpconfigArray, "SingleDb="+SingleDb);
-  tmpconfigArray=pushBackStringArray(tmpconfigArray, "Port="+Port);
-  tmpconfigArray=pushBackStringArray(tmpconfigArray, "Recent_Max="+Recent_Max);
-  tmpconfigArray=pushBackStringArray(tmpconfigArray, "Imdb="+Imdb);
-  tmpconfigArray=pushBackStringArray(tmpconfigArray, "Imdb_Lang="+Imdb_Lang);
-  tmpconfigArray=pushBackStringArray(tmpconfigArray, "Imdb_Poster="+Imdb_Poster);
-  tmpconfigArray=pushBackStringArray(tmpconfigArray, "Imdb_PBox="+Imdb_PBox);
-  tmpconfigArray=pushBackStringArray(tmpconfigArray, "Imdb_PPost="+Imdb_PPost);
-  tmpconfigArray=pushBackStringArray(tmpconfigArray, "Imdb_Sheet="+Imdb_Sheet);
-  tmpconfigArray=pushBackStringArray(tmpconfigArray, "Imdb_SBox="+Imdb_SBox);
-  tmpconfigArray=pushBackStringArray(tmpconfigArray, "Imdb_SPost="+Imdb_SPost);
-  tmpconfigArray=pushBackStringArray(tmpconfigArray, "Imdb_Backdrop="+Imdb_Backdrop);
-  tmpconfigArray=pushBackStringArray(tmpconfigArray, "Imdb_Font="+Imdb_Font);
-  tmpconfigArray=pushBackStringArray(tmpconfigArray, "Imdb_Genres="+Imdb_Genres);
-  tmpconfigArray=pushBackStringArray(tmpconfigArray, "Imdb_Tagline="+Imdb_Tagline);
-  tmpconfigArray=pushBackStringArray(tmpconfigArray, "Imdb_Time="+Imdb_Time);
-  tmpconfigArray=pushBackStringArray(tmpconfigArray, "Imdb_Info="+Imdb_Info);
-  tmpconfigArray=pushBackStringArray(tmpconfigArray, "Imdb_MaxDl="+Imdb_MaxDl);
-  writeStringToFile(srjgconf, tmpconfigArray);
-	
+EOF
+
+CpCfgTmp
+
+cat <<EOF
   /* Translated values */ 
   langpath = Jukebox_Path + "lang/" + Language;
   langfile = loadXMLFile(langpath);
   if (langfile != null) {
-    cfg_Imdb = getXMLText("cfg", "Imdb");
-    cfg_Yes = getXMLText("cfg", "yes");
-    cfg_No = getXMLText("cfg", "no");
-    cfgI_Use=getXMLText("Imdb", "Imdb_Use");
-    cfgI_Lang=getXMLText("Imdb", "Imdb_Lang");
-    cfgI_Poster=getXMLText("Imdb", "Imdb_Poster");
-    cfgI_PBox=getXMLText("Imdb", "Imdb_PBox");
-    cfgI_PPost=getXMLText("Imdb", "Imdb_PPost");
-    cfgI_Sheet=getXMLText("Imdb", "Imdb_Sheet");
-    cfgI_SBox=getXMLText("Imdb", "Imdb_SBox");
-    cfgI_SPost=getXMLText("Imdb", "Imdb_SPost");
-    cfgI_Backdrop=getXMLText("Imdb", "Imdb_Backdrop");
-    cfgI_Font=getXMLText("Imdb", "Imdb_Font");
-    cfgI_Genres=getXMLText("Imdb", "Imdb_Genres");
-    cfgI_Tagline=getXMLText("Imdb", "Imdb_Tagline");
-    cfgI_Time=getXMLText("Imdb", "Imdb_Time");
-    cfgI_Info=getXMLText("Imdb", "Imdb_Info");
-    cfgI_MaxDl=getXMLText("Imdb", "Imdb_MaxDl");
+    Lang_Imdb = getXMLText("cfg", "Imdb");
+    Lang_Yes = getXMLText("cfg", "yes");
+    Lang_No = getXMLText("cfg", "no");
+    Lang_Use=getXMLText("Imdb", "Imdb_Use");
+    Lang_Lang=getXMLText("Imdb", "Imdb_Lang");
+    Lang_Poster=getXMLText("Imdb", "Imdb_Poster");
+    Lang_PBox=getXMLText("Imdb", "Imdb_PBox");
+    Lang_PPost=getXMLText("Imdb", "Imdb_PPost");
+    Lang_Sheet=getXMLText("Imdb", "Imdb_Sheet");
+    Lang_SBox=getXMLText("Imdb", "Imdb_SBox");
+    Lang_SPost=getXMLText("Imdb", "Imdb_SPost");
+    Lang_Backdrop=getXMLText("Imdb", "Imdb_Backdrop");
+    Lang_Font=getXMLText("Imdb", "Imdb_Font");
+    Lang_Genres=getXMLText("Imdb", "Imdb_Genres");
+    Lang_Tagline=getXMLText("Imdb", "Imdb_Tagline");
+    Lang_Time=getXMLText("Imdb", "Imdb_Time");
+    Lang_Info=getXMLText("Imdb", "Imdb_Info");
+    Lang_MaxDl=getXMLText("Imdb", "Imdb_MaxDl");
   }
 </onEnter>
 
@@ -1897,8 +2101,8 @@ cat <<EOF
 <!-- comment menu display -->
 <text redraw="no" backgroundColor="-1:-1:-1" foregroundColor="200:200:200" offsetXPC="34" offsetYPC="6" widthPC="57" heightPC="4" fontSize="16" lines="1" align="left">
 	<script>
-		if ( Imdb == "yes" ) print( cfg_Yes );
-    else print( cfg_No );
+		if ( Imdb == "yes" ) print( Lang_Yes );
+    else print( Lang_No );
 	</script>
 </text>
 
@@ -1910,50 +2114,50 @@ cat <<EOF
 
 <text redraw="no" backgroundColor="-1:-1:-1" foregroundColor="200:200:200" offsetXPC="34" offsetYPC="18" widthPC="57" heightPC="4" fontSize="16" lines="1" align="left">
 	<script>
-		if ( Imdb_Poster == "yes" ) print( cfg_Yes );
-    else print( cfg_No );
+		if ( Imdb_Poster == "yes" ) print( Lang_Yes );
+    else print( Lang_No );
 	</script>
 </text>
 
 <text redraw="no" backgroundColor="-1:-1:-1" foregroundColor="200:200:200" offsetXPC="34" offsetYPC="24" widthPC="57" heightPC="4" fontSize="16" lines="1" align="left">
 	<script>
-		if ( Imdb_PBox == "no" ) print( cfg_No );
+		if ( Imdb_PBox == "no" ) print( Lang_No );
     else print( Imdb_PBox );
 	</script>
 </text>
 
 <text redraw="no" backgroundColor="-1:-1:-1" foregroundColor="200:200:200" offsetXPC="34" offsetYPC="30" widthPC="57" heightPC="4" fontSize="16" lines="1" align="left">
 	<script>
-		if ( Imdb_PPost == "yes" ) print( cfg_Yes );
-    else print( cfg_No );
+		if ( Imdb_PPost == "yes" ) print( Lang_Yes );
+    else print( Lang_No );
 	</script>
 </text>
 
 <text redraw="no" backgroundColor="-1:-1:-1" foregroundColor="200:200:200" offsetXPC="34" offsetYPC="36" widthPC="57" heightPC="4" fontSize="16" lines="1" align="left">
 	<script>
-		if ( Imdb_Sheet == "yes" ) print( cfg_Yes );
-    else print( cfg_No );
+		if ( Imdb_Sheet == "yes" ) print( Lang_Yes );
+    else print( Lang_No );
 	</script>
 </text>
 
 <text redraw="no" backgroundColor="-1:-1:-1" foregroundColor="200:200:200" offsetXPC="34" offsetYPC="42" widthPC="57" heightPC="4" fontSize="16" lines="1" align="left">
 	<script>
-		if ( Imdb_SBox == "no" ) print( cfg_No );
+		if ( Imdb_SBox == "no" ) print( Lang_No );
     else print( Imdb_SBox );
 	</script>
 </text>
 
 <text redraw="no" backgroundColor="-1:-1:-1" foregroundColor="200:200:200" offsetXPC="34" offsetYPC="48" widthPC="57" heightPC="4" fontSize="16" lines="1" align="left">
 	<script>
-		if ( Imdb_SPost == "yes" ) print( cfg_Yes );
-    else print( cfg_No );
+		if ( Imdb_SPost == "yes" ) print( Lang_Yes );
+    else print( Lang_No );
 	</script>
 </text>
 
 <text redraw="no" backgroundColor="-1:-1:-1" foregroundColor="200:200:200" offsetXPC="34" offsetYPC="54" widthPC="57" heightPC="4" fontSize="16" lines="1" align="left">
 	<script>
-		if ( Imdb_Backdrop == "yes" ) print( cfg_Yes );
-    else print( cfg_No );
+		if ( Imdb_Backdrop == "yes" ) print( Lang_Yes );
+    else print( Lang_No );
 	</script>
 </text>
 
@@ -1965,29 +2169,29 @@ cat <<EOF
 
 <text redraw="no" backgroundColor="-1:-1:-1" foregroundColor="200:200:200" offsetXPC="34" offsetYPC="66" widthPC="57" heightPC="4" fontSize="16" lines="1" align="left">
 	<script>
-		if ( Imdb_Genres == "yes" ) print( cfg_Yes );
-    else print( cfg_No );
+		if ( Imdb_Genres == "yes" ) print( Lang_Yes );
+    else print( Lang_No );
 	</script>
 </text>
 
 <text redraw="no" backgroundColor="-1:-1:-1" foregroundColor="200:200:200" offsetXPC="34" offsetYPC="72" widthPC="57" heightPC="4" fontSize="16" lines="1" align="left">
 	<script>
-		if ( Imdb_Tagline == "yes" ) print( cfg_Yes );
-    else print( cfg_No );
+		if ( Imdb_Tagline == "yes" ) print( Lang_Yes );
+    else print( Lang_No );
 	</script>
 </text>
 
 <text redraw="no" backgroundColor="-1:-1:-1" foregroundColor="200:200:200" offsetXPC="34" offsetYPC="78" widthPC="57" heightPC="4" fontSize="16" lines="1" align="left">
 	<script>
-		if ( Imdb_Time == "no" ) print( cfg_No );
+		if ( Imdb_Time == "no" ) print( Lang_No );
     else print( Imdb_Time );
 	</script>
 </text>
 
 <text redraw="no" backgroundColor="-1:-1:-1" foregroundColor="200:200:200" offsetXPC="34" offsetYPC="84" widthPC="57" heightPC="4" fontSize="16" lines="1" align="left">
 	<script>
-		if ( Imdb_Info == "yes" ) print( cfg_Yes );
-    else print( cfg_No );
+		if ( Imdb_Info == "yes" ) print( Lang_Yes );
+    else print( Lang_No );
 	</script>
 </text>
 
@@ -2065,7 +2269,7 @@ cat <<EOF
 <item>
 <title>
 	<script>
-		print(cfgI_Use);
+		print(Lang_Use);
 	</script>
 </title>
 <selection>Imdb</selection>
@@ -2076,7 +2280,7 @@ cat <<EOF
 <item>
 <title>
 	<script>
-		print(cfgI_Lang);
+		print(Lang_Lang);
 	</script>
 </title>
 <selection>Imdb_Lang</selection>
@@ -2087,7 +2291,7 @@ cat <<EOF
 <item>
 <title>
 	<script>
-		print(cfgI_Poster);
+		print(Lang_Poster);
 	</script>
 </title>
 <selection>Imdb_Poster</selection>
@@ -2098,7 +2302,7 @@ cat <<EOF
 <item>
 <title>
 	<script>
-		print(cfgI_PBox);
+		print(Lang_PBox);
 	</script>
 </title>
 <selection>Imdb_PBox</selection>
@@ -2109,7 +2313,7 @@ cat <<EOF
 <item>
 <title>
 	<script>
-		print(cfgI_PPost);
+		print(Lang_PPost);
 	</script>
 </title>
 <selection>Imdb_PPost</selection>
@@ -2120,7 +2324,7 @@ cat <<EOF
 <item>
 <title>
 	<script>
-		print(cfgI_Sheet);
+		print(Lang_Sheet);
 	</script>
 </title>
 <selection>Imdb_Sheet</selection>
@@ -2131,7 +2335,7 @@ cat <<EOF
 <item>
 <title>
 	<script>
-		print(cfgI_SBox);
+		print(Lang_SBox);
 	</script>
 </title>
 <selection>Imdb_SBox</selection>
@@ -2142,7 +2346,7 @@ cat <<EOF
 <item>
 <title>
 	<script>
-		print(cfgI_SPost);
+		print(Lang_SPost);
 	</script>
 </title>
 <selection>Imdb_SPost</selection>
@@ -2153,7 +2357,7 @@ cat <<EOF
 <item>
 <title>
 	<script>
-		print(cfgI_Backdrop);
+		print(Lang_Backdrop);
 	</script>
 </title>
 <selection>Imdb_Backdrop</selection>
@@ -2164,7 +2368,7 @@ cat <<EOF
 <item>
 <title>
 	<script>
-		print(cfgI_Font);
+		print(Lang_Font);
 	</script>
 </title>
 <selection>Imdb_Font</selection>
@@ -2175,7 +2379,7 @@ cat <<EOF
 <item>
 <title>
 	<script>
-		print(cfgI_Genres);
+		print(Lang_Genres);
 	</script>
 </title>
 <selection>Imdb_Genres</selection>
@@ -2186,7 +2390,7 @@ cat <<EOF
 <item>
 <title>
 	<script>
-		print(cfgI_Tagline);
+		print(Lang_Tagline);
 	</script>
 </title>
 <selection>Imdb_Tagline</selection>
@@ -2197,7 +2401,7 @@ cat <<EOF
 <item>
 <title>
 	<script>
-		print(cfgI_Time);
+		print(Lang_Time);
 	</script>
 </title>
 <selection>Imdb_Time</selection>
@@ -2208,7 +2412,7 @@ cat <<EOF
 <item>
 <title>
 	<script>
-		print(cfgI_Info);
+		print(Lang_Info);
 	</script>
 </title>
 <selection>Imdb_Info</selection>
@@ -2219,7 +2423,7 @@ cat <<EOF
 <item>
 <title>
 	<script>
-		print(cfgI_MaxDl);
+		print(Lang_MaxDl);
 	</script>
 </title>
 <selection>Imdb_MaxDl</selection>
@@ -2246,7 +2450,9 @@ case $mode in
     else
       UpdateMenu;
     fi;;
-  Lang|Jukebox_Size|SingleDb|Port|Recent_Max|Imdb|Imdb_Lang|\
+  Lang|Jukebox_Size|SingleDb|Port|Recent_Max|Nfo_Path|Poster_Path|Sheet_Path|\
+	Dspl_Genre_txt|Dspl_HelpBar|\
+	Imdb|Imdb_Lang|\
   Imdb_Poster|Imdb_PBox|Imdb_PPost|Imdb_Sheet|\
   Imdb_SBox|Imdb_SPost|Imdb_Backdrop|Imdb_Font|\
   Imdb_Genres|Imdb_Tagline|Imdb_Time|Imdb_Info|\
@@ -2257,6 +2463,7 @@ case $mode in
   "MenuCfg") MenuCfg;;
 	"ImdbSheetDspl") ImdbSheetDspl;;
   "ImdbCfgEdit") ImdbCfgEdit;;
+	"DsplCfgEdit") DsplCfgEdit;;
   "ReplaceCd1byCd2") ReplaceCd1byCd2;;
   *)
     SetVar
