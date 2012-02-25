@@ -177,36 +177,35 @@ do
   MHDD="`sed -n "$IDX"p "$TMPHDD"`"
   MFILE="`sed -n "$IDX"p "$TMPFILE"`"
   MEXT="`sed -n "$IDX"p "$TMPEXT"`"
-  
-  if [ $USESYMLINK = 0 ];
+ 
+
+  if [ -e "$MPATH/$MFILE.jpg" ];
   then
-	if [ -e "$MPATH/$MFILE.jpg" ];
+	if [ $USESYMLINK = 0 ];
 	then
 	  cp "$MPATH/$MFILE.jpg" "$IMGPATH/p$IDX.jpg" 
 	  SHOWPOSTER="images/p$IDX.jpg"
 	else
-      SHOWPOSTER="images/defposter.jpg"
-	fi 
-  
+	  SHOWPOSTER="$MHDD/$MFILE.jpg"
+	fi
   else
-	SHOWPOSTER="$MHDD/$MFILE.jpg"
+	SHOWPOSTER="images/defposter.jpg"
   fi
  
  
-  if ( [ $USESHEET = 1 ] && [ $USESYMLINK = 0 ] );
+ 
+  if [ $USESHEET = 1 ];
   then
-	if [ -e "${MPATH}/${MFILE}_sheet.jpg" ];
+	if ( [ -e "${MPATH}/${MFILE}_sheet.jpg" ] && [ $USESYMLINK = 0 ] );
 	then
 	  cp "${MPATH}/${MFILE}_sheet.jpg" "$IMGPATH/m$IDX.jpg"
 	  SHOWSHEET="images/m$IDX.jpg"
+	elif ( [ -e "${MPATH}/${MFILE}_sheet.jpg" ] && [ $USESYMLINK = 1 ] );
+	then
+	  SHOWSHEET="${MHDD}/${MFILE}_sheet.jpg"  
 	else
       SHOWSHEET="images/defsheet.jpg"
 	fi
-	
-  elif ( [ $USESHEET = 1 ] && [ $USESYMLINK = 1 ] );
-  then
-	SHOWSHEET="${MHDD}/${MFILE}_sheet.jpg"
-	
   else
     SHOWSHEET="#"
   fi
