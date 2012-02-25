@@ -88,10 +88,12 @@ if [ ! -d "${Movies_Path}" ]; then			# ctrl directory cfg file
   exit 1
 fi
 
-[ "${SingleDb}" = "no" ] && mkdir -p "${Movies_Path}SRJG/"
+([ "${SingleDb}" = "no" ] && [ ! -d "${Movies_Path}SRJG/" ]) && mkdir -p "${Movies_Path}SRJG/"
 
-mkdir -p "${Movies_Path}SRJG/ImgNfo/"
-FSrjg_Path="${Movies_Path}SRJG/ImgNfo" # Possible storage for images and Nfo files to let clean the Movies_Path folder
+if ([ "${Nfo_Path}" = "MoviesPath" ] || [ "${Sheet_Path}" = "MoviesPath" ] || [ "${Poster_Path}" = "MoviesPath" ]) ; then
+  [ ! -d "${Movies_Path}SRJG/ImgNfo/" ] && mkdir -p "${Movies_Path}SRJG/ImgNfo/"
+  FSrjg_Path="${Movies_Path}SRJG/ImgNfo" # Possible storage for images and Nfo files to let clean the Movies_Path folder
+fi
 
 CreateMovieDB()
 # Create the Movie Database
