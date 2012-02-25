@@ -26,12 +26,14 @@ if [ "${SingleDb}" = "yes" ]; then
 else
   Database="${Movies_Path}SRJG/movies.db"
   UpdateLog="${Movies_Path}SRJG/update.log"
-  [ -d "${Movies_Path}" ] && mkdir -p "${Movies_Path}SRJG/"
+  ([ -d "${Movies_Path}" ] && [ ! -d "${Movies_Path}SRJG/" ]) && mkdir -p "${Movies_Path}SRJG/"
   PreviousMovieList="${Movies_Path}SRJG/prevmovies.list"
 fi
 
-[ -d "${Movies_Path}" ] && mkdir -p "${Movies_Path}SRJG/ImgNfo/"
-FSrjg_Path="${Movies_Path}SRJG/ImgNfo" # Possible storage for images and Nfo files to let clean the Movies_Path folder
+if ([ "${Nfo_Path}" = "MoviesPath" ] || [ "${Sheet_Path}" = "MoviesPath" ] || [ "${Poster_Path}" = "MoviesPath" ]) ; then
+  ([ -d "${Movies_Path}" ] && [ ! -d "${Movies_Path}SRJG/ImgNfo/" ]) && mkdir -p "${Movies_Path}SRJG/ImgNfo/"
+  FSrjg_Path="${Movies_Path}SRJG/ImgNfo" # Possible storage for images and Nfo files to let clean the Movies_Path folder
+fi
 
 Sqlite=${Jukebox_Path}"sqlite3"
 MoviesList="/tmp/srjg_movies.list"
