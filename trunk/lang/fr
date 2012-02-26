@@ -21,9 +21,9 @@
   <Lang>Langue</Lang>
   <Jukebox_Size>Vue</Jukebox_Size>
   <Movies_Path>Chemin des Films</Movies_Path>
-	<Nfo_Path>Emplacement Nfo</Nfo_Path>
-	<Poster_Path>Emplacement Jaquettes</Poster_Path>
-	<Sheet_Path>Emplacement Sheet</Sheet_Path>
+	<Nfo_Path>Chemin Nfo</Nfo_Path>
+	<Poster_Path>Chemin Jaquettes</Poster_Path>
+	<Sheet_Path>Chemin Sheet</Sheet_Path>
   <Movie_Filter>Filtre</Movie_Filter>
   <SingleDb>Base unique</SingleDb>
   <Recent_Max>Max films récents</Recent_Max>
@@ -38,6 +38,7 @@
 	<bottom>Bas</bottom>
 	<white>Blanc</white>
 	<black>Noir</black>
+	<browse>Parcourir</browse>
 </cfg>
 <Dspl>
   <Dspl_Genre_txt>Texte du Genre:</Dspl_Genre_txt>
@@ -64,4 +65,3 @@
   <Imdb_Info>Générer fichier info</Imdb_Info>
   <Imdb_MaxDl>Téléchargements simultanés</Imdb_MaxDl>
 </Imdb>
-
