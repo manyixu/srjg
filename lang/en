@@ -21,9 +21,9 @@
   <Lang>Language</Lang>
   <Jukebox_Size>View</Jukebox_Size>
   <Movies_Path>Movie path</Movies_Path>
-	<Nfo_Path>Location Nfo</Nfo_Path>
-	<Poster_Path>Location Poster</Poster_Path>
-	<Sheet_Path>Location Sheet</Sheet_Path>
+	<Nfo_Path>Nfo path</Nfo_Path>
+	<Poster_Path>Poster path</Poster_Path>
+	<Sheet_Path>Sheet path</Sheet_Path>
   <Movie_Filter>Filter</Movie_Filter>
   <SingleDb>Single Database</SingleDb>
   <Recent_Max>Max recent movie</Recent_Max>
@@ -34,6 +34,11 @@
   <Version>Version:</Version>
   <yes>Yes</yes>
   <no>No</no>
+	<top>Haut</top>
+	<bottom>Bas</bottom>
+	<white>Blanc</white>
+	<black>Noir</black>
+	<browse>Parcourir</browse>
 </cfg>
 <Dspl>
   <Dspl_Genre_txt>Genre text:</Dspl_Genre_txt>
@@ -55,7 +60,6 @@
   <Imdb_Backdrop>Random Bankground</Imdb_Backdrop>
   <Imdb_Font>Font</Imdb_Font>
   <Imdb_Genres>Genres images</Imdb_Genres>
-  <Imdb_Source>Random Poster</Imdb_Source>
   <Imdb_Tagline>Tagline</Imdb_Tagline>
   <Imdb_Time>Format time</Imdb_Time>
   <Imdb_Info>Create file info</Imdb_Info>
