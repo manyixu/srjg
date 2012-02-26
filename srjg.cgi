@@ -30,7 +30,7 @@ else
   PreviousMovieList="${Movies_Path}SRJG/prevmovies.list"
 fi
 
-if ([ "${Nfo_Path}" = "MoviesPath" ] || [ "${Sheet_Path}" = "MoviesPath" ] || [ "${Poster_Path}" = "MoviesPath" ]) ; then
+if ([ "${Nfo_Path}" = "SRJG" ] || [ "${Sheet_Path}" = "SRJG" ] || [ "${Poster_Path}" = "SRJG" ]) ; then
   ([ -d "${Movies_Path}" ] && [ ! -d "${Movies_Path}SRJG/ImgNfo/" ]) && mkdir -p "${Movies_Path}SRJG/ImgNfo/"
   FSrjg_Path="${Movies_Path}SRJG/ImgNfo" # Possible storage for images and Nfo files to let clean the Movies_Path folder
 fi
@@ -146,7 +146,9 @@ do
   MOVIENAME="${MOVIEFILE%.*}"  # Strip off .ext
   MOVIEEXT="${MOVIEFILE##*.}"  # only ext
 
-  if [ "${Nfo_Path}" = "MoviesPath" ]; then NFOPATH="${MOVIEPATH}"; else NFOPATH="${FSrjg_Path}"; fi
+  if [ "${Nfo_Path}" = "MoviesPath" ]; then NFOPATH="${MOVIEPATH}"; 
+  elif [ "${Nfo_Path}" = "SRJG" ]; then NFOPATH="${FSrjg_Path}"
+  else NFOPATH="${Nfo_Path}"; fi
 
   # Initialize defaults, replace later
   MOVIETITLE="$MOVIENAME</title>"
@@ -476,7 +478,8 @@ cat <<EOF
 		<image type="image/jpeg" redraw="yes" offsetXPC="0" offsetYPC="0" widthPC="100" heightPC="80">
   <script>
     if ( "${Sheet_Path}" == "MoviesPath" ) ItemPath = getItemInfo(-1, "path");
-    else ItemPath = "${FSrjg_Path}";
+    else if ( "${Sheet_Path}" == "SRJG" ) ItemPath = "${FSrjg_Path}";
+    else ItemPath = "${Sheet_Path}";
     ItemFile = getItemInfo(-1, "file");
     SheetPath = ItemPath +"/"+ ItemFile +"_sheet.jpg";
     Etat = readStringFromFile(SheetPath);
@@ -529,7 +532,8 @@ cat <<EOF
 <image type="image/jpeg" redraw="yes" offsetXPC="0" offsetYPC="0" widthPC="100" heightPC="100">
   <script>
     if ( "${Sheet_Path}" == "MoviesPath" ) ItemPath = getItemInfo(-1, "path");
-    else ItemPath = "${FSrjg_Path}";
+    else if ( "${Sheet_Path}" == "SRJG" ) ItemPath = "${FSrjg_Path}";
+    else ItemPath = "${Sheet_Path}";
     ItemFile = getItemInfo(-1, "file");
     SheetPath = ItemPath +"/"+ ItemFile +"_sheet.jpg";
     Etat = readStringFromFile(SheetPath);
@@ -760,7 +764,8 @@ cat <<EOF
 <image type="image/jpeg" redraw="yes" offsetXPC="8.2" offsetYPC="5.5" widthPC="84.25" heightPC="89.25">
  <script>
   if ( "${Poster_Path}" == "MoviesPath" || "$mode" == "genreSelection") ItemPath = getItemInfo(-1, "path");
-  else ItemPath = "${FSrjg_Path}";
+  else if ("${Poster_Path}" == "SRJG") ItemPath = "${FSrjg_Path}";
+  else ItemPath = "${Poster_Path}";
   ItemFile = getItemInfo(-1, "file");
   thumbnailPath = ItemPath +"/"+ ItemFile +".jpg";
   Etat = readStringFromFile(thumbnailPath);
@@ -1494,8 +1499,8 @@ cat <<EOF
 	</script>
 </title>
 <selection>FBrowser</selection>
-<param></param>
-<pos></pos>
+<param>Movies_Path</param>
+<pos>0</pos>
 </item>
 
 <item>
@@ -1505,7 +1510,7 @@ cat <<EOF
 	</script>
 </title>
 <selection>Nfo_Path</selection>
-<param>MoviesPath%20SRJG</param>
+<param>MoviesPath%20SRJG%20browse</param>
 <pos>27</pos>
 </item>
 
@@ -1516,7 +1521,7 @@ cat <<EOF
 	</script>
 </title>
 <selection>Poster_Path</selection>
-<param>MoviesPath%20SRJG</param>
+<param>MoviesPath%20SRJG%20browse</param>
 <pos>33</pos>
 </item>
 
@@ -1527,7 +1532,7 @@ cat <<EOF
 	</script>
 </title>
 <selection>Sheet_Path</selection>
-<param>MoviesPath%20SRJG</param>
+<param>MoviesPath%20SRJG%20browse</param>
 <pos>40</pos>
 </item>
 
@@ -1630,6 +1635,10 @@ cat <<EOF
   RedrawDisplay();
 </onEnter>
 
+<onExit>
+  if ( "$CategoryTitle" != "Movies_Path" ) postMessage("return");
+</onExit>
+
 <mediaDisplay name="onePartView" sideLeftWidthPC="0" sideColorLeft="0:0:0" sideRightWidthPC="0" fontSize="14" focusFontColor="210:16:16" itemAlignt="center" viewAreaXPC=29.7 viewAreaYPC=26 viewAreaWidthPC=40 viewAreaHeightPC=50 headerImageWidthPC="0" itemImageHeightPC="0" itemImageWidthPC="0" itemXPC="10" itemYPC="15" itemWidthPC="80" itemHeightPC="10" itemBackgroundColor="0:0:0" itemPerPage="6" itemGap="0" infoYPC="90" infoXPC="90" backgroundColor="0:0:0" showHeader="no" showDefaultInfo="no">
 <idleImage> image/POPUP_LOADING_01.png </idleImage>
 <idleImage> image/POPUP_LOADING_02.png </idleImage>
@@ -1715,7 +1724,7 @@ cat <<EOF
 		      New_Ch_Base = Ch_Sel;
 		    }
         New_Ch_Base=urlEncode(New_Ch_Base);
-        dlok = loadXMLFile("http://127.0.0.1:80/cgi-bin/srjg.cgi?UpdateCfg@"+New_Ch_Base+"@Movies_Path");
+        dlok = loadXMLFile("http://127.0.0.1:80/cgi-bin/srjg.cgi?UpdateCfg@"+New_Ch_Base+"@$CategoryTitle");
         postMessage("return");
         "true";
 
@@ -1804,7 +1813,11 @@ EOF
 Cfg_Tag=$Jukebox_Size
 Cfg_Par=$CategoryTitle
 
-if [ $Cfg_Tag = "Movies_Path" ]; then
+#&& [ $Cfg_Par != "SRJG" ]
+#   [ $Cfg_Par != "MoviesPath" ] || \
+
+if ([ $Cfg_Tag = "Movies_Path" ] || [ $Cfg_Tag = "Nfo_Path" ] || [ $Cfg_Tag = "Sheet_Path" ] || [ $Cfg_Tag = "Poster_Path" ]) \
+   && ([ $Cfg_Par != "SRJG" ] && [ $Cfg_Par != "MoviesPath" ]) ; then
   sed -i "s:<$Cfg_Tag>.*</$Cfg_Tag>:<$Cfg_Tag>\"$Cfg_Par\"</$Cfg_Tag>:" /usr/local/etc/srjg.cfg
 else
   sed -i "s:<$Cfg_Tag>.*</$Cfg_Tag>:<$Cfg_Tag>$Cfg_Par</$Cfg_Tag>:" /usr/local/etc/srjg.cfg
@@ -1864,7 +1877,7 @@ SubMenucfg()
 {
 
 Item_nb=0
-for Item_lst in $CategoryTitle
+for SelParam in $CategoryTitle
 do
   let Item_nb+=1
 done
@@ -1916,33 +1929,49 @@ cat <<EOF
   if (userInput == "right") {
     "true";
   } else if (userInput == "enter") {
-    postMessage("return");
+    indx=getFocusItemIndex();
+    action=getItemInfo(indx, "action");
+    selparam=getItemInfo(indx, "selparam");
+    param=getItemInfo(indx, "param");
+    jumpToLink("SelectionEntered");
+    if (action != "FBrowser") postMessage("return");
     "false";
   }
 
 </onUserInput>
 </mediaDisplay>
 
+<SelectionEntered>
+    <link>
+       <script>
+           print("http://127.0.0.1:$Port/cgi-bin/srjg.cgi?"+action+"@"+selparam+"@"+param);
+       </script>
+    </link>
+</SelectionEntered>
+
 <channel>
 <title>Updating Cfg</title>
 EOF
 
 Item_nb=0
-for Item_lst in $CategoryTitle
+for SelParam in $CategoryTitle
 do
-  case ${Item_lst} in
-    "yes") Item_dspl=`sed "/<yes>/!d;s:.*>\(.*\)<.*:\1:" "${Jukebox_Path}lang/${Language}"`;;
-    "no")  Item_dspl=`sed "/<no>/!d;s:.*>\(.*\)<.*:\1:" "${Jukebox_Path}lang/${Language}"`;;
-    "top")  Item_dspl=`sed "/<top>/!d;s:.*>\(.*\)<.*:\1:" "${Jukebox_Path}lang/${Language}"`;;
-    "bottom")  Item_dspl=`sed "/<bottom>/!d;s:.*>\(.*\)<.*:\1:" "${Jukebox_Path}lang/${Language}"`;;
-    "white")  Item_dspl=`sed "/<white>/!d;s:.*>\(.*\)<.*:\1:" "${Jukebox_Path}lang/${Language}"`;;
-    "black")  Item_dspl=`sed "/<black>/!d;s:.*>\(.*\)<.*:\1:" "${Jukebox_Path}lang/${Language}"`;;
-    *)     Item_dspl=$Item_lst;;
+  case ${SelParam} in
+    "yes") Item_dspl=`sed "/<yes>/!d;s:.*>\(.*\)<.*:\1:" "${Jukebox_Path}lang/${Language}"`; Action=UpdateCfg; Param=$mode;;
+    "no")  Item_dspl=`sed "/<no>/!d;s:.*>\(.*\)<.*:\1:" "${Jukebox_Path}lang/${Language}"`; Action=UpdateCfg; Param=$mode;;
+    "top")  Item_dspl=`sed "/<top>/!d;s:.*>\(.*\)<.*:\1:" "${Jukebox_Path}lang/${Language}"`; Action=UpdateCfg; Param=$mode;;
+    "bottom")  Item_dspl=`sed "/<bottom>/!d;s:.*>\(.*\)<.*:\1:" "${Jukebox_Path}lang/${Language}"`; Action=UpdateCfg; Param=$mode;;
+    "white")  Item_dspl=`sed "/<white>/!d;s:.*>\(.*\)<.*:\1:" "${Jukebox_Path}lang/${Language}"`; Action=UpdateCfg; Param=$mode;;
+    "black")  Item_dspl=`sed "/<black>/!d;s:.*>\(.*\)<.*:\1:" "${Jukebox_Path}lang/${Language}"`; Action=UpdateCfg; Param=$mode;;
+    "browse") Item_dspl=`sed "/<browse>/!d;s:.*>\(.*\)<.*:\1:" "${Jukebox_Path}lang/${Language}"`; Action=FBrowser; SelParam=$mode;;
+    *)     Item_dspl=$SelParam; Action=UpdateCfg; Param=$mode;;
   esac
 cat <<EOF
 <item>
 <title>$Item_dspl</title>
-<link>http://127.0.0.1:$Port/cgi-bin/srjg.cgi?UpdateCfg@$Item_lst@$mode</link>
+<action>$Action</action>
+<selparam>$SelParam</selparam>
+<param>$Param</param>
 </item>
 EOF
 done
