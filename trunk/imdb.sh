@@ -90,9 +90,17 @@ MkDlList()
       MOVIENAMETEMP="$MOVIEFILE"				# Use file as moviename
     fi
 
-    if [ "${Nfo_Path}" = "MoviesPath" ]; then NFOPATH="${MOVIEPATH}"; else NFOPATH="${FSrjg_Path}"; fi
-    if [ "${Poster_Path}" = "MoviesPath" ]; then POSTERPATH="${MOVIEPATH}"; else POSTERPATH="${FSrjg_Path}"; fi
-    if [ "${Sheet_Path}" = "MoviesPath" ]; then SHEETPATH="${MOVIEPATH}"; else SHEETPATH="${FSrjg_Path}"; fi
+    if [ "${Nfo_Path}" = "MoviesPath" ]; then NFOPATH="${MOVIEPATH}"; 
+    elif [ "${Nfo_Path}" = "SRJG" ]; then NFOPATH="${FSrjg_Path}"
+    else NFOPATH="${Nfo_Path}"; fi
+
+    if [ "${Poster_Path}" = "MoviesPath" ]; then POSTERPATH="${MOVIEPATH}"; 
+    elif [ "${Poster_Path}" = "SRJG" ]; then POSTERPATH="${FSrjg_Path}"
+    else POSTERPATH="${Poster_Path}"; fi
+
+    if [ "${Sheet_Path}" = "MoviesPath" ]; then SHEETPATH="${MOVIEPATH}"; 
+    elif [ "${Sheet_Path}" = "SRJG" ]; then SHEETPATH="${FSrjg_Path}"
+    else SHEETPATH="${Sheet_Path}"; fi
 
     # Remove CD parts and replace special characters with plus sign
     MOVIENAME=`echo $MOVIENAMETEMP | sed "s/[cC][dD]*[1-9]//g;s/[ &']/+/g"`

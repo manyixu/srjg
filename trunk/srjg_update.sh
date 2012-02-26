@@ -90,7 +90,7 @@ fi
 
 ([ "${SingleDb}" = "no" ] && [ ! -d "${Movies_Path}SRJG/" ]) && mkdir -p "${Movies_Path}SRJG/"
 
-if ([ "${Nfo_Path}" = "MoviesPath" ] || [ "${Sheet_Path}" = "MoviesPath" ] || [ "${Poster_Path}" = "MoviesPath" ]) ; then
+if ([ "${Nfo_Path}" = "SRJG" ] || [ "${Sheet_Path}" = "SRJG" ] || [ "${Poster_Path}" = "SRJG" ]) ; then
   [ ! -d "${Movies_Path}SRJG/ImgNfo/" ] && mkdir -p "${Movies_Path}SRJG/ImgNfo/"
   FSrjg_Path="${Movies_Path}SRJG/ImgNfo" # Possible storage for images and Nfo files to let clean the Movies_Path folder
 fi
@@ -177,7 +177,9 @@ do
   MOVIENAME="${MOVIEFILE%.*}"  # Strip off .ext
   MOVIEEXT="${MOVIEFILE##*.}"  # only ext
 
-  if [ "${Nfo_Path}" = "MoviesPath" ]; then NFOPATH="${MOVIEPATH}"; else NFOPATH="${FSrjg_Path}"; fi
+  if [ "${Nfo_Path}" = "MoviesPath" ]; then NFOPATH="${MOVIEPATH}"; 
+  elif [ "${Nfo_Path}" = "SRJG" ]; then NFOPATH="${FSrjg_Path}"
+  else NFOPATH="${Nfo_Path}"; fi
 
   # Initialize defaults, replace later
   MOVIETITLE="$MOVIENAME</title>"
