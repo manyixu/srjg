@@ -11,8 +11,6 @@ SRJGPATH="`sed '/<Jukebox_Path/!d;s:.*>\(.*\)</.*:\1:' /usr/local/etc/srjg.cfg |
 MOVPATH="`sed '/<Movies_Path/!d;s:.*>\(.*\)</.*:\1:' /usr/local/etc/srjg.cfg | grep "[!-~]"`"
 SINGLEDB="`sed '/<SingleDb/!d;s:.*>\(.*\)</.*:\1:' /usr/local/etc/srjg.cfg | grep "[!-~]"`"
 
-DEFPOSTER="nofolder.jpg"
-DEFSHEET="NoMovieinfo.jpg"
 TMPPATH="/tmp/db2html_path"
 TMPHDD="/tmp/db2html_hdd"
 TMPTITLE="/tmp/db2html_title"
@@ -89,7 +87,6 @@ HTMLPATH="$MAINPATH/SRJG"
 IMGPATH="$MAINPATH/SRJG/images"
 echo "Starting jukebox generation in $MAINPATH.."
 
-
 # If image path doesn't exist, create folder for HTML jukebox
 if [ ! -d "$IMGPATH" ];
 then
@@ -114,7 +111,7 @@ echo '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html><head>
 <title>SRJG Jukebox</title>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-<link rel="StyleSheet" type="text/css" href="s.css">
+<link rel="StyleSheet" type="text/css" href="db2html.css">
 </head>
 
 <body>
@@ -166,8 +163,8 @@ echo "Movies found: `sed -n '$=' "$TMPTITLE"`"
 
 # Copy basic files
 echo "Copying basic files.."
-cp "$DB2HTML/b.jpg" "$DB2HTML/defposter.jpg" "$DB2HTML/defsheet.jpg" "$IMGPATH"
-cp "$DB2HTML/s.css" "$HTMLPATH"
+cp "$DB2HTML/db2html.jpg" "$SRJGPATH/images/nofolder.jpg" "$SRJGPATH/images/NoMovieinfo.jpg" "$IMGPATH"
+cp "$DB2HTML/db2html.css" "$HTMLPATH"
 
 # Main loop
 while read MOVIE
@@ -189,7 +186,7 @@ do
 	  SHOWPOSTER="$MHDD/$MFILE.jpg"
 	fi
   else
-	SHOWPOSTER="images/defposter.jpg"
+	SHOWPOSTER="images/nofolder.jpg"
   fi
  
  
@@ -204,7 +201,7 @@ do
 	then
 	  SHOWSHEET="${MHDD}/${MFILE}_sheet.jpg"  
 	else
-      SHOWSHEET="images/defsheet.jpg"
+      SHOWSHEET="images/NoMovieinfo.jpg"
 	fi
   else
     SHOWSHEET="#"
