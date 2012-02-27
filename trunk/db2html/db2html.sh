@@ -10,6 +10,8 @@
 SRJGPATH="`sed '/<Jukebox_Path/!d;s:.*>\(.*\)</.*:\1:' /usr/local/etc/srjg.cfg | grep "[!-~]"`"
 MOVPATH="`sed '/<Movies_Path/!d;s:.*>\(.*\)</.*:\1:' /usr/local/etc/srjg.cfg | grep "[!-~]"`"
 SINGLEDB="`sed '/<SingleDb/!d;s:.*>\(.*\)</.*:\1:' /usr/local/etc/srjg.cfg | grep "[!-~]"`"
+POSTERPATH="`sed '/<Poster_Path/!d;s:.*>\(.*\)</.*:\1:' /usr/local/etc/srjg.cfg | grep "[!-~]"`"
+SHEETSPATH="`sed '/<Sheet_Path/!d;s:.*>\(.*\)</.*:\1:' /usr/local/etc/srjg.cfg | grep "[!-~]"`"
 
 TMPPATH="/tmp/db2html_path"
 TMPHDD="/tmp/db2html_hdd"
@@ -78,6 +80,11 @@ fi
 MOVPATH=$(echo ${MOVPATH%\/})
 MAINPATH=$(echo ${MAINPATH%\/})
 SRJGPATH=$(echo ${SRJGPATH%\/})
+POSTERPATH=$(echo ${POSTERPATH%\/})
+SHEETSPATH=$(echo ${SHEETSPATH%\/})
+
+echo "Setting is set to $POSTERPATH"
+
 
 # Initialize title and paths
 DB2HTML="$SRJGPATH/db2html";		# Main path to db2html
@@ -94,17 +101,55 @@ then
   mkdir -p "$IMGPATH"
 fi
 
-# Create symlink to HTML jukebox
-echo "Creating basic symlinks.."
+# Create symlink to HTML jukebox   (TO DO: remove all the same time - unique names)
+echo "Creating symlinks.."
 mount -o remount,rw /
 rm -f /tmp/www/srjg
 rm -f /tmp_orig/www/srjg
 rm -f /tmp/www/hdd
 rm -f /tmp_orig/www/hdd
+
+rm -f /tmp/www/poster
+rm -f /tmp_orig/www/poster
+rm -f /tmp/www/sheet
+rm -f /tmp_orig/www/sheet
+
 ln -sf "$HTMLPATH" /tmp/www/srjg
 ln -sf "$HTMLPATH" /tmp_orig/www/srjg
 ln -sf "$MOVPATH" /tmp/www/hdd
 ln -sf "$MOVPATH" /tmp_orig/www/hdd
+
+if [ "$POSTERPATH" = "MoviesPath" ];
+then
+  REALPOSTER="different"
+elif [ "$POSTERPATH" = "SRJG" ];
+then
+  ln -sf "$MOVPATH/SRJG/ImgNfo" /tmp/www/poster
+  ln -sf "$MOVPATH/SRJG/ImgNfo" /tmp_orig/www/poster
+  REALPOSTER="$MOVPATH/SRJG/ImgNfo"
+else
+  ln -sf "$POSTERPATH" /tmp/www/poster
+  ln -sf "$POSTERPATH" /tmp_orig/www/poster
+  REALPOSTER="$POSTERPATH"
+fi
+
+echo "Poster path is: $REALPOSTER"
+
+if [ "$SHEETSPATH" = "MoviesPath" ];
+then
+  REALSHEET="different"
+elif [ "$SHEETSPATH" = "SRJG" ];
+then
+  ln -sf "$MOVPATH/SRJG/ImgNfo" /tmp/www/sheet
+  ln -sf "$MOVPATH/SRJG/ImgNfo" /tmp_orig/www/sheet
+  REALSHEET="$MOVPATH/SRJG/ImgNfo"
+else
+  ln -sf "$SHEETSPATH" /tmp/www/sheet
+  ln -sf "$SHEETSPATH" /tmp_orig/www/sheet
+  REALSHEET="$SHEETSPATH"
+fi
+
+echo "Sheet path is: $REALSHEET"
   
 # Default template header
 echo '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
@@ -170,36 +215,53 @@ cp "$DB2HTML/db2html.css" "$HTMLPATH"
 while read MOVIE
 do
   echo "Processing $IDX: $MOVIE.."
-  MPATH="`sed -n "$IDX"p "$TMPPATH"`"
+  
   MHDD="`sed -n "$IDX"p "$TMPHDD"`"
   MFILE="`sed -n "$IDX"p "$TMPFILE"`"
   MEXT="`sed -n "$IDX"p "$TMPEXT"`"
- 
+  
+  if [ "$REALPOSTER" = "different" ];
+  then
+	PPATH="`sed -n "$IDX"p "$TMPPATH"`"
+	PSYM="$MHDD"
+  else
+	PPATH="$REALPOSTER"
+	PSYM="/poster"
+  fi
 
-  if [ -e "$MPATH/$MFILE.jpg" ];
+  if [ -e "$PPATH/$MFILE.jpg" ];
   then
 	if [ $USESYMLINK = 0 ];
 	then
-	  cp "$MPATH/$MFILE.jpg" "$IMGPATH/p$IDX.jpg" 
+	  cp "$PPATH/$MFILE.jpg" "$IMGPATH/p$IDX.jpg" 
 	  SHOWPOSTER="images/p$IDX.jpg"
 	else
-	  SHOWPOSTER="$MHDD/$MFILE.jpg"
+	  SHOWPOSTER="$PSYM/$MFILE.jpg"
 	fi
   else
 	SHOWPOSTER="images/nofolder.jpg"
   fi
  
  
- 
   if [ $USESHEET = 1 ];
   then
-	if ( [ -e "${MPATH}/${MFILE}_sheet.jpg" ] && [ $USESYMLINK = 0 ] );
+	
+	if [ "$REALSHEET" = "different" ];
 	then
-	  cp "${MPATH}/${MFILE}_sheet.jpg" "$IMGPATH/m$IDX.jpg"
+	  SPATH="`sed -n "$IDX"p "$TMPPATH"`"
+	  SSYM="$MHDD"
+	else
+	  SPATH="$REALSHEET"
+	  SSYM="/sheet"
+	fi
+	
+	if ( [ -e "${SPATH}/${MFILE}_sheet.jpg" ] && [ $USESYMLINK = 0 ] );
+	then
+	  cp "${SPATH}/${MFILE}_sheet.jpg" "$IMGPATH/m$IDX.jpg"
 	  SHOWSHEET="images/m$IDX.jpg"
-	elif ( [ -e "${MPATH}/${MFILE}_sheet.jpg" ] && [ $USESYMLINK = 1 ] );
+	elif ( [ -e "${SPATH}/${MFILE}_sheet.jpg" ] && [ $USESYMLINK = 1 ] );
 	then
-	  SHOWSHEET="${MHDD}/${MFILE}_sheet.jpg"  
+	  SHOWSHEET="${SSYM}/${MFILE}_sheet.jpg"  
 	else
       SHOWSHEET="images/NoMovieinfo.jpg"
 	fi
