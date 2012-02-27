@@ -8,7 +8,7 @@
 	<notwatched>Do zobaczenia</notwatched>
 	<year>Rok</year>
 	<search>Szukaj</search>
-  <config>Config</config>
+  <config>Konfiguracja</config>
 </main>
 <jukebox>
 	<top>1 = Zmiana widoku | 2 = Zaznacz jako oglądane | Enter = Wybierz | Rtn = Poprzednie menu/widok | Play = Odtwórz film</top>
@@ -20,48 +20,49 @@
 <cfg>
   <Lang>Język</Lang>
   <Jukebox_Size>Zobacz</Jukebox_Size>
-  <Movies_Path>Ścieżka film</Movies_Path>
-	<Nfo_Path>Nfo path</Nfo_Path>
-	<Poster_Path>Poster path</Poster_Path>
-	<Sheet_Path>Sheet path</Sheet_Path>
-  <Movie_Filter>Filter</Movie_Filter>
-  <SingleDb>Single Database</SingleDb>
-  <Recent_Max>Max niedawno film</Recent_Max>
-  <Imdb>Use Imdb</Imdb>
-	<Dspl>Display</Dspl>
-  <Jukebox_Path>Jukebox path:</Jukebox_Path>
+  <Movies_Path>Ścieżka do filmów</Movies_Path>
+	<Nfo_Path>Ścieżka do Nfo</Nfo_Path>
+	<Poster_Path>Ścieżka do plakatów</Poster_Path>
+	<Sheet_Path>Ścieżka do okładek</Sheet_Path>
+  <Movie_Filter>Filtr</Movie_Filter>
+  <SingleDb>Jedna baza danych</SingleDb>
+  <Recent_Max>Max ostatnich filmów</Recent_Max>
+  <Imdb>Użyj Imdb</Imdb>
+	<Dspl>Wyświetl</Dspl>
+  <Jukebox_Path>Ścieżka do Jukebox:</Jukebox_Path>
   <Port>Port:</Port>
-  <Version>Version:</Version>
+  <Version>Wersja:</Version>
   <yes>Tak</yes>
   <no>Nie</no>
-	<top>Haut</top>
-	<bottom>Bas</bottom>
-	<white>Blanc</white>
-	<black>Noir</black>
-	<browse>Parcourir</browse>
+	<top>Góra</top>
+	<bottom>Dół</bottom>
+	<white>Białe</white>
+	<black>Czarne</black>
+	<browse>Przeglądaj</browse>
 </cfg>
 <Dspl>
-  <Dspl_Genre_txt>Genre text:</Dspl_Genre_txt>
-	<Dspl_HelpBar>Help bar:</Dspl_HelpBar>
+  <Dspl_Genre_txt>Tekst gatunku:</Dspl_Genre_txt>
+	<Dspl_HelpBar>Pasek pomocy:</Dspl_HelpBar>
 </Dspl>
 <FBrowser>
-  <FBrowser_Title>Filmy Ścieżka:</FBrowser_Title>
+  <FBrowser_Title>Ścieżka do filmów:</FBrowser_Title>
   <FBrowser_Valid>do sprawdzenia</FBrowser_Valid>
 </FBrowser>
 <Imdb>
-  <Imdb_Use>Activate Imdb</Imdb_Use>
-  <Imdb_Lang>Synopsis</Imdb_Lang>
-  <Imdb_Poster>Download Poster</Imdb_Poster>
-  <Imdb_PBox>Poster Box</Imdb_PBox>
-  <Imdb_PPost>Random Poster</Imdb_PPost>
-  <Imdb_Sheet>Download Sheet</Imdb_Sheet>
-  <Imdb_SBox>Poster Box in Sheet</Imdb_SBox>
-  <Imdb_SPost>Random Poster in Sheet</Imdb_SPost>
-  <Imdb_Backdrop>Random Bankground</Imdb_Backdrop>
-  <Imdb_Font>Font</Imdb_Font>
-  <Imdb_Genres>Genres images</Imdb_Genres>
-  <Imdb_Tagline>Tagline</Imdb_Tagline>
-  <Imdb_Time>Format time</Imdb_Time>
-  <Imdb_Info>Create file info</Imdb_Info>
-  <Imdb_MaxDl>Simultaneus downloads</Imdb_MaxDl>
+  <Imdb_Use>Aktywacja Imdb</Imdb_Use>
+  <Imdb_Lang>Język</Imdb_Lang>
+  <Imdb_Poster>Pobierz plakaty</Imdb_Poster>
+  <Imdb_PBox>Ramka plakatu</Imdb_PBox>
+  <Imdb_PPost>Losowy plakat</Imdb_PPost>
+  <Imdb_Sheet>Pobierz okładki</Imdb_Sheet>
+  <Imdb_SBox>Ramka plakatu w okładce</Imdb_SBox>
+  <Imdb_SPost>Losowy plakat w okładce</Imdb_SPost>
+  <Imdb_Backdrop>Losowa okładka</Imdb_Backdrop>
+  <Imdb_Font>Czcionka</Imdb_Font>
+  <Imdb_Genres>Obrazki gatunku</Imdb_Genres>
+  <Imdb_Source>Losowy plakat</Imdb_Source>
+  <Imdb_Tagline>Motto</Imdb_Tagline>
+  <Imdb_Time>Format czasu</Imdb_Time>
+  <Imdb_Info>Utwórz pliki info</Imdb_Info>
+  <Imdb_MaxDl>Równoczesne pobieranie</Imdb_MaxDl>
 </Imdb>
