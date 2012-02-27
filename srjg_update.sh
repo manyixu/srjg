@@ -1,6 +1,9 @@
 #!/bin/sh
 # Simple RSS Jukebox Generator
 
+# To kill all childs process when need to stop the script
+trap "kill 0" SIGINT EXIT
+
 # Reading/parsing xml configuration file and assign variables.
 
 CfgFile=/usr/local/etc/srjg.cfg
@@ -93,6 +96,22 @@ fi
 if ([ "${Nfo_Path}" = "SRJG" ] || [ "${Sheet_Path}" = "SRJG" ] || [ "${Poster_Path}" = "SRJG" ]) ; then
   [ ! -d "${Movies_Path}SRJG/ImgNfo/" ] && mkdir -p "${Movies_Path}SRJG/ImgNfo/"
   FSrjg_Path="${Movies_Path}SRJG/ImgNfo" # Possible storage for images and Nfo files to let clean the Movies_Path folder
+  if [ ! -d "${FSrjg_Path}" ]; then echo "The specified directory doesn't exist: ${FSrjg_Path}"; exit 1 ; fi
+fi
+
+if [ "${Nfo_Path}" != "MoviesPath" ] && [ "${Nfo_Path}" != "SRJG" ] &&[ ! -d "${Nfo_Path}" ]; then
+  echo "The specified directory doesn't exist: ${Nfo_Path}"
+  exit 1
+fi
+
+if [ "${Sheet_Path}" != "MoviesPath" ] && [ "${Sheet_Path}" != "SRJG" ] &&[ ! -d "${Sheet_Path}" ]; then
+  echo "The specified directory doesn't exist: ${Sheet_Path}"
+  exit 1
+fi
+
+if [ "${Poster_Path}" != "MoviesPath" ] && [ "${Poster_Path}" != "SRJG" ] &&[ ! -d "${Poster_Path}" ]; then
+  echo "The specified directory doesn't exist: ${Poster_Path}"
+  exit 1
 fi
 
 CreateMovieDB()
