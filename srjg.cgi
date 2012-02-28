@@ -769,7 +769,7 @@ cat <<EOF
 <!-- Top Layer folder.jpg -->
 <image type="image/jpeg" redraw="yes" offsetXPC="8.2" offsetYPC="5.5" widthPC="84.25" heightPC="89.25">
  <script>
-  if ( "${Poster_Path}" == "MoviesPath" || "$mode" == "genreSelection") ItemPath = getItemInfo(-1, "path");
+  if ( "${Poster_Path}" == "MoviesPath" || "$mode" == "genreSelection" || "$mode" == "alphaSelection" ) ItemPath = getItemInfo(-1, "path");
   else if ("${Poster_Path}" == "SRJG") ItemPath = "${FSrjg_Path}";
   else ItemPath = "${Poster_Path}";
   ItemFile = getItemInfo(-1, "file");
