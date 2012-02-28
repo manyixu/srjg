@@ -50,7 +50,8 @@
 </FBrowser>
 <Imdb>
   <Imdb_Use>Activer Imdb</Imdb_Use>
-  <Imdb_Lang>Synopsis</Imdb_Lang>
+  <Imdb_Lang>Langage</Imdb_Lang>
+  <Imdb_Source>Source</Imdb_Source>
   <Imdb_Poster>Télécharger Pochette</Imdb_Poster>
   <Imdb_PBox>Cadre de la pochette</Imdb_PBox>
   <Imdb_PPost>Pochette aléatoire</Imdb_PPost>

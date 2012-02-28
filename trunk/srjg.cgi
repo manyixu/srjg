@@ -1,5 +1,8 @@
 #!/bin/sh
 
+# To kill all childs process when need to stop the script
+trap "kill 0" SIGINT EXIT
+
 # Parsing query string provided by the server/client
 QUERY=$QUERY_STRING
 SAVEIFS=$IFS
@@ -105,8 +108,6 @@ Movie_Filter=`echo $Movie_Filter | sed 's/,/|/ g'`
 find "$Movies_Path" \
   | egrep -i '\.(asf|avi|dat|divx|flv|img|iso|m1v|m2p|m2t|m2ts|m2v|m4v|mkv|mov|mp4|mpg|mts|qt|rm|rmp4|rmvb|tp|trp|ts|vob|wmv)$' \
   | egrep -iv "$Movie_Filter" > $MoviesList
-
-echo '<channel></channel>' # to keep alive RSS
 }
 
 GenerateInsDelFiles()
@@ -120,7 +121,6 @@ else
   cat $MoviesList | sed -e 's/\&lsqb;/\[/g' -e 's/\&rsqb;/\]/g' > $InsertList
 fi
 mv $MoviesList "${PreviousMovieList}"
-echo '<channel></channel>' # to keep alive RSS
 }
 
 DBMovieDelete()
@@ -130,7 +130,6 @@ echo "Removing movies from the Database ...."
 while read LINE
 do
   ${Sqlite} "${Database}"  "DELETE from t1 WHERE file='<file>${LINE}</file>'";
-  echo '<channel></channel>' # to keep alive RSS
 done < $DeleteList
 ${Sqlite} "${Database}"  "VACUUM";
 }
@@ -192,6 +191,10 @@ postMessage("return");
 </onEnter>
 EOF
 
+# to keep alive the RSS
+while true; do echo '<k></k>'; sleep 5; done &
+TaskChild=$!
+
 GenerateMovieList;
 
 [ "$Imdb" = "yes" ] &&  ${Jukebox_Path}imdb.sh RSS_mode
@@ -200,6 +203,9 @@ GenerateMovieList;
 GenerateInsDelFiles;
 [[ -s $DeleteList ]] && DBMovieDelete
 [[ -s $InsertList ]] && DBMovieInsert
+
+# End the RSS keep alive
+kill $TaskChild >/dev/null 2>&1
 
 echo '<channel>'
 Footer;
@@ -1043,6 +1049,7 @@ cat <<EOF
 		Dspl_HelpBar = getXMLText("Config", "Dspl_HelpBar");
     Imdb = getXMLText("Config", "Imdb");
 		Imdb_Lang = getXMLText("Config", "Imdb_Lang");
+		Imdb_Source = getXMLText("Config", "Imdb_Source");
 		Imdb_Poster = getXMLText("Config", "Imdb_Poster");
 		Imdb_PBox = getXMLText("Config", "Imdb_PBox");
 		Imdb_PPost = getXMLText("Config", "Imdb_PPost");
@@ -1074,6 +1081,7 @@ cat <<EOF
 	tmpconfigArray=pushBackStringArray(tmpconfigArray, "Dspl_HelpBar="+Dspl_HelpBar);
   tmpconfigArray=pushBackStringArray(tmpconfigArray, "Imdb="+Imdb);
   tmpconfigArray=pushBackStringArray(tmpconfigArray, "Imdb_Lang="+Imdb_Lang);
+	tmpconfigArray=pushBackStringArray(tmpconfigArray, "Imdb_Source="+Imdb_Source);
   tmpconfigArray=pushBackStringArray(tmpconfigArray, "Imdb_Poster="+Imdb_Poster);
   tmpconfigArray=pushBackStringArray(tmpconfigArray, "Imdb_PBox="+Imdb_PBox);
   tmpconfigArray=pushBackStringArray(tmpconfigArray, "Imdb_PPost="+Imdb_PPost);
@@ -2008,16 +2016,16 @@ cat <<EOF
 </text>
 
 <script>
-	LnParam="name=avatar&amp;box=$Imdb_SBox&amp;mode=sheet&amp;font=$Imdb_Font&amp;lang=$Imdb_Lang";
+	LnParam="name=avatar&amp;mode=sheet&amp;font=$Imdb_Font&amp;lang=$Imdb_Lang&amp;source=$Imdb_Source";
   if ( "$Imdb_Backdrop" != "no" ) LnParam=LnParam+"&amp;backdrop=y";
   if ( "$Imdb_SPost" != "no" ) LnParam=LnParam+"&amp;post=y";
   if ( "$Imdb_SBox" != "no" ) LnParam=LnParam+"&amp;box=$Imdb_SBox";
 	if ( "$Imdb_Tagline" != "no" ) LnParam=LnParam+"&amp;tagline=y";
 	if ( "$Imdb_Time" != "no" ) LnParam=LnParam+"&amp;time=$Imdb_Time";
   if ( "$Imdb_Genres" != "no" ) LnParam=LnParam+"&amp;genres=$Imdb_Genres";
-  ImdbLink = "http://playon.unixstorm.org/IMDB/movie.php?" + LnParam;
+  ImdbLink = "http://playon.unixstorm.org/IMDB/movie_beta.php?" + LnParam;
 </script>
-	
+
 <image offsetXPC=5 offsetYPC=5 widthPC=90 heightPC=90><script> print(ImdbLink); </script></image>
 
 </backgroundDisplay>
@@ -2069,6 +2077,7 @@ cat <<EOF
     Lang_No = getXMLText("cfg", "no");
     Lang_Use=getXMLText("Imdb", "Imdb_Use");
     Lang_Lang=getXMLText("Imdb", "Imdb_Lang");
+    Lang_Source=getXMLText("Imdb", "Imdb_Source");
     Lang_Poster=getXMLText("Imdb", "Imdb_Poster");
     Lang_PBox=getXMLText("Imdb", "Imdb_PBox");
     Lang_PPost=getXMLText("Imdb", "Imdb_PPost");
@@ -2085,7 +2094,7 @@ cat <<EOF
   }
 </onEnter>
 
-<mediaDisplay name="photoView" rowCount="15" columnCount="1" drawItemText="no" showHeader="no" showDefaultInfo="no" menuBorderColor="255:255:255" sideColorBottom="-1:-1:-1" sideColorTop="-1:-1:-1" itemAlignt="left" itemOffsetXPC="4" itemOffsetYPC="4" itemWidthPC="30" itemHeightPC="5" backgroundColor="-1:-1:-1" itemBackgroundColor="-1:-1:-1" sliding="no" itemGap="0" idleImageXPC="90" idleImageYPC="5" idleImageWidthPC="5" idleImageHeightPC="8" imageUnFocus="null" imageParentFocus="null" imageBorderPC="0" forceFocusOnItem="no" cornerRounding="yes" itemBorderColor="-1:-1:-1" focusBorderColor="-1:-1:-1" unFocusBorderColor="-1:-1:-1">
+<mediaDisplay name="photoView" rowCount="16" columnCount="1" drawItemText="no" showHeader="no" showDefaultInfo="no" menuBorderColor="255:255:255" sideColorBottom="-1:-1:-1" sideColorTop="-1:-1:-1" itemAlignt="left" itemOffsetXPC="4" itemOffsetYPC="4" itemWidthPC="30" itemHeightPC="4" backgroundColor="-1:-1:-1" itemBackgroundColor="-1:-1:-1" sliding="no" itemGap="0" idleImageXPC="90" idleImageYPC="5" idleImageWidthPC="5" idleImageHeightPC="8" imageUnFocus="null" imageParentFocus="null" imageBorderPC="0" forceFocusOnItem="no" cornerRounding="yes" itemBorderColor="-1:-1:-1" focusBorderColor="-1:-1:-1" unFocusBorderColor="-1:-1:-1">
 <idleImage> image/POPUP_LOADING_01.png </idleImage> 
 <idleImage> image/POPUP_LOADING_02.png </idleImage> 
 <idleImage> image/POPUP_LOADING_03.png </idleImage> 
@@ -2100,10 +2109,10 @@ cat <<EOF
   <script>
     if ( Imdb == "no" || Imdb_Poster == "no" ) "${Jukebox_Path}images/nofolder.jpg";
     else {
-	    LnParam="name=avatar&amp;mode=poster";
+	    LnParam="name=avatar&amp;mode=poster&amp;source="+Imdb_Source;
       if ( Imdb_PBox != "no" ) LnParam=LnParam+"&amp;box="+Imdb_PBox;
 	    if ( Imdb_PPost != "no" ) LnParam=LnParam+"&amp;post=y";
-      "http://playon.unixstorm.org/IMDB/movie.php?" + LnParam;
+      "http://playon.unixstorm.org/IMDB/movie_beta.php?" + LnParam;
     }
   </script>
 </image>
@@ -2116,117 +2125,123 @@ cat <<EOF
   <script>
     if ( Imdb == "no" || Imdb_Sheet == "no" ) "${Jukebox_Path}images/NoMovieinfo.jpg";
     else {
-	    LnParam="name=avatar&amp;box="+Imdb_SBox+"&amp;mode=sheet&amp;font="+Imdb_Font+"&amp;lang="+Imdb_Lang;
+	    LnParam="name=avatar&amp;mode=sheet&amp;font="+Imdb_Font+"&amp;lang="+Imdb_Lang+"&amp;source="+Imdb_Source;
       if ( Imdb_Backdrop != "no" ) LnParam=LnParam+"&amp;backdrop=y";
       if ( Imdb_SPost != "no" ) LnParam=LnParam+"&amp;post=y";
       if ( Imdb_SBox != "no" ) LnParam=LnParam+"&amp;box="+Imdb_SBox;
 	    if ( Imdb_Tagline != "no" ) LnParam=LnParam+"&amp;tagline=y";
 	    if ( Imdb_Time != "no" ) LnParam=LnParam+"&amp;time="+Imdb_Time;
       if ( Imdb_Genres != "no" ) LnParam=LnParam+"&amp;genres="+Imdb_Genres;
-      "http://playon.unixstorm.org/IMDB/movie.php?" + LnParam;
+      "http://playon.unixstorm.org/IMDB/movie_beta.php?" + LnParam;
     }
   </script>
 </image>
 
 
 <!-- comment menu display -->
-<text redraw="no" backgroundColor="-1:-1:-1" foregroundColor="200:200:200" offsetXPC="34" offsetYPC="6" widthPC="57" heightPC="4" fontSize="16" lines="1" align="left">
+<text redraw="no" backgroundColor="-1:-1:-1" foregroundColor="200:200:200" offsetXPC="34" offsetYPC="5.2" widthPC="57" heightPC="4" fontSize="14" lines="1" align="left">
 	<script>
 		if ( Imdb == "yes" ) print( Lang_Yes );
     else print( Lang_No );
 	</script>
 </text>
 
-<text redraw="no" backgroundColor="-1:-1:-1" foregroundColor="200:200:200" offsetXPC="34" offsetYPC="12" widthPC="57" heightPC="4" fontSize="16" lines="1" align="left">
+<text redraw="no" backgroundColor="-1:-1:-1" foregroundColor="200:200:200" offsetXPC="34" offsetYPC="10.2" widthPC="57" heightPC="4" fontSize="14" lines="1" align="left">
 	<script>
 		print(Imdb_Lang);
 	</script>
 </text>
 
-<text redraw="no" backgroundColor="-1:-1:-1" foregroundColor="200:200:200" offsetXPC="34" offsetYPC="18" widthPC="57" heightPC="4" fontSize="16" lines="1" align="left">
+<text redraw="no" backgroundColor="-1:-1:-1" foregroundColor="200:200:200" offsetXPC="34" offsetYPC="15.2" widthPC="57" heightPC="4" fontSize="14" lines="1" align="left">
+	<script>
+		print(Imdb_Source);
+	</script>
+</text>
+
+<text redraw="no" backgroundColor="-1:-1:-1" foregroundColor="200:200:200" offsetXPC="34" offsetYPC="20.2" widthPC="57" heightPC="4" fontSize="14" lines="1" align="left">
 	<script>
 		if ( Imdb_Poster == "yes" ) print( Lang_Yes );
     else print( Lang_No );
 	</script>
 </text>
 
-<text redraw="no" backgroundColor="-1:-1:-1" foregroundColor="200:200:200" offsetXPC="34" offsetYPC="24" widthPC="57" heightPC="4" fontSize="16" lines="1" align="left">
+<text redraw="no" backgroundColor="-1:-1:-1" foregroundColor="200:200:200" offsetXPC="34" offsetYPC="25.2" widthPC="57" heightPC="4" fontSize="14" lines="1" align="left">
 	<script>
 		if ( Imdb_PBox == "no" ) print( Lang_No );
     else print( Imdb_PBox );
 	</script>
 </text>
 
-<text redraw="no" backgroundColor="-1:-1:-1" foregroundColor="200:200:200" offsetXPC="34" offsetYPC="30" widthPC="57" heightPC="4" fontSize="16" lines="1" align="left">
+<text redraw="no" backgroundColor="-1:-1:-1" foregroundColor="200:200:200" offsetXPC="34" offsetYPC="30.2" widthPC="57" heightPC="4" fontSize="14" lines="1" align="left">
 	<script>
 		if ( Imdb_PPost == "yes" ) print( Lang_Yes );
     else print( Lang_No );
 	</script>
 </text>
 
-<text redraw="no" backgroundColor="-1:-1:-1" foregroundColor="200:200:200" offsetXPC="34" offsetYPC="36" widthPC="57" heightPC="4" fontSize="16" lines="1" align="left">
+<text redraw="no" backgroundColor="-1:-1:-1" foregroundColor="200:200:200" offsetXPC="34" offsetYPC="35.2" widthPC="57" heightPC="4" fontSize="14" lines="1" align="left">
 	<script>
 		if ( Imdb_Sheet == "yes" ) print( Lang_Yes );
     else print( Lang_No );
 	</script>
 </text>
 
-<text redraw="no" backgroundColor="-1:-1:-1" foregroundColor="200:200:200" offsetXPC="34" offsetYPC="42" widthPC="57" heightPC="4" fontSize="16" lines="1" align="left">
+<text redraw="no" backgroundColor="-1:-1:-1" foregroundColor="200:200:200" offsetXPC="34" offsetYPC="40.2" widthPC="57" heightPC="4" fontSize="14" lines="1" align="left">
 	<script>
 		if ( Imdb_SBox == "no" ) print( Lang_No );
     else print( Imdb_SBox );
 	</script>
 </text>
 
-<text redraw="no" backgroundColor="-1:-1:-1" foregroundColor="200:200:200" offsetXPC="34" offsetYPC="48" widthPC="57" heightPC="4" fontSize="16" lines="1" align="left">
+<text redraw="no" backgroundColor="-1:-1:-1" foregroundColor="200:200:200" offsetXPC="34" offsetYPC="45.2" widthPC="57" heightPC="4" fontSize="14" lines="1" align="left">
 	<script>
 		if ( Imdb_SPost == "yes" ) print( Lang_Yes );
     else print( Lang_No );
 	</script>
 </text>
 
-<text redraw="no" backgroundColor="-1:-1:-1" foregroundColor="200:200:200" offsetXPC="34" offsetYPC="54" widthPC="57" heightPC="4" fontSize="16" lines="1" align="left">
+<text redraw="no" backgroundColor="-1:-1:-1" foregroundColor="200:200:200" offsetXPC="34" offsetYPC="50.2" widthPC="57" heightPC="4" fontSize="14" lines="1" align="left">
 	<script>
 		if ( Imdb_Backdrop == "yes" ) print( Lang_Yes );
     else print( Lang_No );
 	</script>
 </text>
 
-<text redraw="no" backgroundColor="-1:-1:-1" foregroundColor="200:200:200" offsetXPC="34" offsetYPC="60" widthPC="57" heightPC="4" fontSize="16" lines="1" align="left">
+<text redraw="no" backgroundColor="-1:-1:-1" foregroundColor="200:200:200" offsetXPC="34" offsetYPC="55.2" widthPC="57" heightPC="4" fontSize="14" lines="1" align="left">
 	<script>
 		print(Imdb_Font);
 	</script>
 </text>
 
-<text redraw="no" backgroundColor="-1:-1:-1" foregroundColor="200:200:200" offsetXPC="34" offsetYPC="66" widthPC="57" heightPC="4" fontSize="16" lines="1" align="left">
+<text redraw="no" backgroundColor="-1:-1:-1" foregroundColor="200:200:200" offsetXPC="34" offsetYPC="60.2" widthPC="57" heightPC="4" fontSize="14" lines="1" align="left">
 	<script>
 		if ( Imdb_Genres == "yes" ) print( Lang_Yes );
     else print( Lang_No );
 	</script>
 </text>
 
-<text redraw="no" backgroundColor="-1:-1:-1" foregroundColor="200:200:200" offsetXPC="34" offsetYPC="72" widthPC="57" heightPC="4" fontSize="16" lines="1" align="left">
+<text redraw="no" backgroundColor="-1:-1:-1" foregroundColor="200:200:200" offsetXPC="34" offsetYPC="65.2" widthPC="57" heightPC="4" fontSize="14" lines="1" align="left">
 	<script>
 		if ( Imdb_Tagline == "yes" ) print( Lang_Yes );
     else print( Lang_No );
 	</script>
 </text>
 
-<text redraw="no" backgroundColor="-1:-1:-1" foregroundColor="200:200:200" offsetXPC="34" offsetYPC="78" widthPC="57" heightPC="4" fontSize="16" lines="1" align="left">
+<text redraw="no" backgroundColor="-1:-1:-1" foregroundColor="200:200:200" offsetXPC="34" offsetYPC="70.2" widthPC="57" heightPC="4" fontSize="14" lines="1" align="left">
 	<script>
 		if ( Imdb_Time == "no" ) print( Lang_No );
     else print( Imdb_Time );
 	</script>
 </text>
 
-<text redraw="no" backgroundColor="-1:-1:-1" foregroundColor="200:200:200" offsetXPC="34" offsetYPC="84" widthPC="57" heightPC="4" fontSize="16" lines="1" align="left">
+<text redraw="no" backgroundColor="-1:-1:-1" foregroundColor="200:200:200" offsetXPC="34" offsetYPC="75.2" widthPC="57" heightPC="4" fontSize="14" lines="1" align="left">
 	<script>
 		if ( Imdb_Info == "yes" ) print( Lang_Yes );
     else print( Lang_No );
 	</script>
 </text>
 
-<text redraw="no" backgroundColor="-1:-1:-1" foregroundColor="200:200:200" offsetXPC="34" offsetYPC="90" widthPC="57" heightPC="4" fontSize="16" lines="1" align="left">
+<text redraw="no" backgroundColor="-1:-1:-1" foregroundColor="200:200:200" offsetXPC="34" offsetYPC="80.2" widthPC="57" heightPC="4" fontSize="14" lines="1" align="left">
 	<script>
 		print( Imdb_MaxDl );
 	</script>
@@ -2316,6 +2331,17 @@ cat <<EOF
 </title>
 <selection>Imdb_Lang</selection>
 <param>en%20fr</param>
+<pos>8</pos>
+</item>
+
+<item>
+<title>
+	<script>
+		print(Lang_Source);
+	</script>
+</title>
+<selection>Imdb_Source</selection>
+<param>imdb%20tmdb%20allocine</param>
 <pos>8</pos>
 </item>
 
@@ -2483,7 +2509,7 @@ case $mode in
     fi;;
   Lang|Jukebox_Size|SingleDb|Port|Recent_Max|Nfo_Path|Poster_Path|Sheet_Path|\
 	Dspl_Genre_txt|Dspl_HelpBar|\
-	Imdb|Imdb_Lang|\
+	Imdb|Imdb_Lang|Imdb_Source|\
   Imdb_Poster|Imdb_PBox|Imdb_PPost|Imdb_Sheet|\
   Imdb_SBox|Imdb_SPost|Imdb_Backdrop|Imdb_Font|\
   Imdb_Genres|Imdb_Tagline|Imdb_Time|Imdb_Info|\

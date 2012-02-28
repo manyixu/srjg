@@ -23,10 +23,10 @@ sed '1d;$d;s:<\(.*\)>\(.*\)</.*>:\1=\2:' ${CfgFile} >/tmp/srjg.cfg
 
 FSrjg_Path="${Movies_Path}SRJG/ImgNfo" # Possible storage for images and Nfo files to let clean the Movies_Path folder
 
-PAR_LINK="http://playon.unixstorm.org/IMDB/movie.php?name="			# Link to IMDB API [DO NOT CHANGE, unless you are requested to do so]
-PAR_INFO="&mode=info&lang=$Imdb_Lang"													# Parameters for generating info file
+PAR_LINK="http://playon.unixstorm.org/IMDB/movie_beta.php?name="			# Link to IMDB API [DO NOT CHANGE, unless you are requested to do so]
+PAR_INFO="&mode=info&source=$Imdb_Source"													# Parameters for generating info file
 
-PAR_SHEET="&mode=sheet&lang=$Imdb_Lang&font=$Imdb_Font"		# Parameters for generating moviesheet
+PAR_SHEET="&mode=sheet&lang=$Imdb_Lang&font=$Imdb_Font&source=$Imdb_Source"		# Parameters for generating moviesheet
 if [ $Imdb_Backdrop != "no" ]; then PAR_SHEET="$PAR_SHEET&backdrop=y"; fi
 if [ $Imdb_SBox != "no" ]; then PAR_SHEET="$PAR_SHEET&box=$Imdb_SBox"; fi
 if [ $Imdb_SPost != "no" ]; then PAR_SHEET="$PAR_SHEET&post=y"; fi
@@ -34,7 +34,7 @@ if [ $Imdb_Tagline != "no" ]; then PAR_SHEET="$PAR_SHEET&tagline=y"; fi
 if [ $Imdb_Time != "no" ]; then PAR_SHEET="$PAR_SHEET&time=$Imdb_Time"; fi
 if [ $Imdb_Genres != "no" ]; then PAR_SHEET="$PAR_SHEET&genres=$Imdb_Genres"; fi
 
-PAR_POSTER="&mode=poster"												# Parameters for generating poster
+PAR_POSTER="&mode=poster&source=$Imdb_Source"								# Parameters for generating poster
 if [ $Imdb_PBox != "no" ]; then PAR_POSTER="$PAR_POSTER&box=$Imdb_PBox"; fi
 if [ $Imdb_PPost != "no" ]; then PAR_POSTER="$PAR_POSTER&post=y"; fi
 
@@ -54,22 +54,19 @@ download()
   FNAME="${FNAME##*@}" # Name of the file downloaded
   FCHCK="${DLINE##*@}" # type of check to test the download
 
-  if [ "$PAR_RSS" = "RSS_mode" ]; then
-    echo '<channel> </channel>'
-  else
-    echo "downloading ${FNAME##*/}"
-  fi
+  [ "$PAR_RSS" != "RSS_mode" ] && echo "downloading ${FNAME##*/}"
 
   # download poster, moviesheet or nfo file
   wget -q "${DLINK}" -O "${FNAME}"
 
   # Check generated file
-  PATT=`grep ${FCHCK} "${FNAME}"`
+  if [ ${FCHCK} = "Movie" ]; then TCHCK="found"; else TCHCK="title"; fi
+  PATT=`grep ${TCHCK} "${FNAME}"`
 
   # Remove file if download is bad
-  if ( [ ${FCHCK} = "movie" ] && [ -e "${FNAME}" ] && [ -n "$PATT" ] \
-    || [ ${FCHCK} = "title" ] && [ -e "${FNAME}" ] && [ -z "$PATT" ] \
-    || [ ! -s "${FNAME}" ] ); then rm -f "${FNAME}"; fi
+  if ([ ${FCHCK} = "Movie" -a -e "${FNAME}" -a -n "$PATT" ] \
+    || [ ${FCHCK} = "title" -a -e "${FNAME}" -a -z "$PATT" ] \
+    || [ ! -s "${FNAME}" ]); then rm -f "${FNAME}"; fi
 }
 						
 MkDlList()

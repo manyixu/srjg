@@ -51,6 +51,7 @@
 <Imdb>
   <Imdb_Use>Aktywacja Imdb</Imdb_Use>
   <Imdb_Lang>Język</Imdb_Lang>
+  <Imdb_Source>Losowy plakat</Imdb_Source>
   <Imdb_Poster>Pobierz plakaty</Imdb_Poster>
   <Imdb_PBox>Ramka plakatu</Imdb_PBox>
   <Imdb_PPost>Losowy plakat</Imdb_PPost>
@@ -60,7 +61,6 @@
   <Imdb_Backdrop>Losowa okładka</Imdb_Backdrop>
   <Imdb_Font>Czcionka</Imdb_Font>
   <Imdb_Genres>Obrazki gatunku</Imdb_Genres>
-  <Imdb_Source>Losowy plakat</Imdb_Source>
   <Imdb_Tagline>Motto</Imdb_Tagline>
   <Imdb_Time>Format czasu</Imdb_Time>
   <Imdb_Info>Utwórz pliki info</Imdb_Info>
