@@ -211,7 +211,7 @@ do
   [ -e "$NFOPATH/$INFONAME" ] && Infoparsing
 
   if [ -z "$GENRE" ]; then dbgenre="<name>Unknown</name>"; else dbgenre="$GENRE"; fi
-  dbtitle="`echo "<title>$MOVIETITLE" | sed "s/'/''/g"`"
+  dbtitle=`echo "<title>$MOVIETITLE" | sed "s/'/''/g"`
   dbpath=`echo "<path>$MOVIEPATH</path>" | sed "s/'/''/g"`
   dbfile=`echo "<file>$MOVIENAME</file>" | sed "s/'/''/g"`
   dbext=`echo "<ext>$MOVIEEXT</ext>" | sed "s/'/''/g"`
