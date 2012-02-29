@@ -596,7 +596,7 @@ fi
 cat <<EOF
 	<onUserInput>
 				userInput = currentUserInput();
-print("-------------"+userInput);
+
 				Current_Item_index=getFocusItemIndex();
 				Max_index = (-1 + Jukebox_itemSize);
 				Prev_index = (-1 + Current_Item_index);
