@@ -189,10 +189,10 @@ DBMovieInsert()
 {
 echo "Adding movies to the Database ...."
  
-while read LINE
+while read LINE_I
 do
-  MOVIEPATH="${LINE%/*}"  # Shell builtins instead of dirname
-  MOVIEFILE="${LINE##*/}" # Shell builtins instead of basename
+  MOVIEPATH="${LINE_I%/*}"  # Shell builtins instead of dirname
+  MOVIEFILE="${LINE_I##*/}" # Shell builtins instead of basename
   MOVIENAME="${MOVIEFILE%.*}"  # Strip off .ext
   MOVIEEXT="${MOVIEFILE##*.}"  # only ext
 
@@ -205,13 +205,13 @@ do
   GENRE="<name>Unknown</name>"
   MovieYear=""
 
-  [ -e "$NFOPATH/$MOVIENAME.nfo" ] && INFONAME=$MOVIENAME.nfo
-  [ -e "$NFOPATH/MovieInfo.nfo" ] && INFONAME=MovieInfo.nfo
+  if [ -e "$NFOPATH/MovieInfo.nfo" ]; then INFONAME=MovieInfo.nfo;
+  else INFONAME=$MOVIENAME.nfo; fi
 
   [ -e "$NFOPATH/$INFONAME" ] && Infoparsing
 
   if [ -z "$GENRE" ]; then dbgenre="<name>Unknown</name>"; else dbgenre="$GENRE"; fi
-  dbtitle=`echo "<title>$MOVIETITLE" | sed "s/'/''/g"`
+  dbtitle="`echo "<title>$MOVIETITLE" | sed "s/'/''/g"`"
   dbpath=`echo "<path>$MOVIEPATH</path>" | sed "s/'/''/g"`
   dbfile=`echo "<file>$MOVIENAME</file>" | sed "s/'/''/g"`
   dbext=`echo "<ext>$MOVIEEXT</ext>" | sed "s/'/''/g"`

@@ -154,8 +154,8 @@ do
   GENRE="<name>Unknown</name>"
   MovieYear=""
 
-  [ -e "$NFOPATH/$MOVIENAME.nfo" ] && INFONAME=$MOVIENAME.nfo
-  [ -e "$NFOPATH/MovieInfo.nfo" ] && INFONAME=MovieInfo.nfo
+  if [ -e "$NFOPATH/MovieInfo.nfo" ]; then INFONAME=MovieInfo.nfo;
+  else INFONAME=$MOVIENAME.nfo; fi
 
   [ -e "$NFOPATH/$INFONAME" ] && Infoparsing
 
@@ -596,7 +596,7 @@ fi
 cat <<EOF
 	<onUserInput>
 				userInput = currentUserInput();
-
+print("-------------"+userInput);
 				Current_Item_index=getFocusItemIndex();
 				Max_index = (-1 + Jukebox_itemSize);
 				Prev_index = (-1 + Current_Item_index);
@@ -618,10 +618,12 @@ cat <<EOF
 					"false";                                 
         } else if (userInput == "enter") {
           if ( "$Jukebox_Size" == "sheetmovie" ) {
+            M_ID=getItemInfo(-1, "IdMovie");
             MTitle=getItemInfo(-1, "file");
             MPath=getItemInfo(-1, "path");
             MExt=getItemInfo(-1, "ext");
             Current_Movie_File=MPath +"/"+ MTitle +"."+ MExt;
+            Cd2 = "false";
             playItemURL(Current_Movie_File, 10);
 					} else if (nextmode == "moviesheet") {
              Item_Pos=getFocusItemIndex();
