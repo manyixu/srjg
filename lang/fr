@@ -29,6 +29,7 @@
   <Recent_Max>Max films récents</Recent_Max>
   <Imdb>Utiliser Imdb</Imdb>
 	<Dspl>Affichage</Dspl>
+	<UnlockRM>Autoriser Suppression</UnlockRM>
   <Jukebox_Path>Chemin du Jukebox:</Jukebox_Path>
   <Port>Port:</Port>
   <Version>Version:</Version>
@@ -66,3 +67,14 @@
   <Imdb_Info>Générer fichier info</Imdb_Info>
   <Imdb_MaxDl>Téléchargements simultanés</Imdb_MaxDl>
 </Imdb>
+<MEdit>
+  <EditMenu>Menu d'édition</EditMenu>
+  <rmPoster>Supprimer la Pochette</rmPoster>
+  <rmSheet>Supprimer le Sheet</rmSheet>
+  <rmNfo>Supprimer le Nfo</rmNfo>
+  <rmMovie>Supprimer le Film</rmMovie>
+  <ValPoster>Voulez-vous suprimer uniquement le Poster ?</ValPoster>
+  <ValSheet>Voulez-vous suprimer uniquement le Sheet ?</ValSheet>
+  <ValNfo>Voulez-vous suprimer uniquement le Nfo ?</ValNfo>
+  <ValMovie>Voulez-vous suprimer le Film et tous ses fichiers ?</ValMovie>
+</MEdit>
