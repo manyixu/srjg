@@ -619,10 +619,10 @@ cat <<EOF
         } else if (userInput == "enter") {
           if ( "$Jukebox_Size" == "sheetmovie" ) {
             M_ID=getItemInfo(-1, "IdMovie");
-            MTitle=getItemInfo(-1, "file");
+            MFile=getItemInfo(-1, "file");
             MPath=getItemInfo(-1, "path");
             MExt=getItemInfo(-1, "ext");
-            Current_Movie_File=MPath +"/"+ MTitle +"."+ MExt;
+            Current_Movie_File=MPath +"/"+ MFile +"."+ MExt;
             Cd2 = "false";
             playItemURL(Current_Movie_File, 10);
 					} else if (nextmode == "moviesheet") {
@@ -657,26 +657,39 @@ cat <<EOF
 					jumpToLink("Watchcgi"); /* update watched state in database */
 					"false";
 				}
+        else if (userInput == "edit") {
+          MovieID=getItemInfo(-1, "IdMovie");
+          MTitle=getItemInfo(-1, "title");
+          setEnv("MTitle", MTitle);
+					if ( "$UnlockRM" == "yes" ) jumpToLink("MenuEdit"); /* Display MenuEdit  */
+					"true";
+				}
 EOF
-	fi
+else
+cat <<EOF
+        else if (userInput == "edit") {
+					"true";
+				}
+EOF
+fi
 
 cat <<EOF
         else if (userInput == "video_play") {
           M_ID=getItemInfo(-1, "IdMovie");
-          M_Title=getItemInfo(-1, "file");
+          M_File=getItemInfo(-1, "file");
           M_Path=getItemInfo(-1, "path");
           M_Ext=getItemInfo(-1, "ext");
-          Current_Movie_File=M_Path +"/"+ M_Title +"."+ M_Ext;
+          Current_Movie_File=M_Path +"/"+ M_File +"."+ M_Ext;
           Cd2 = "false";
           playItemURL(Current_Movie_File, 10);
 					"false";
         } else if (userInput == "video_completed") {
-          FindCd1=findString(M_Title, "cd1");
+          FindCd1=findString(M_File, "cd1");
           if ( FindCd1 == "cd1" ) {
-            M_Title=urlEncode(M_Title); 
-            jumpToLink("ReplaceCd1byCd2"); /* replace cd1 by cd2 into M_Title */
-            M_Title=getEnv( "MovieCd2" );
-            Current_Movie_File=M_Path +"/"+ M_Title +"."+ M_Ext;
+            M_File=urlEncode(M_File); 
+            jumpToLink("ReplaceCd1byCd2"); /* replace cd1 by cd2 into M_File */
+            M_File=getEnv( "MovieCd2" );
+            Current_Movie_File=M_Path +"/"+ M_File +"."+ M_Ext;
             playItemURL(-1, 1);              /* reset play */
             Cd2 = "true";
             playItemURL(Current_Movie_File, 10); /* play cd2 */
@@ -880,7 +893,7 @@ cat <<EOF
 <ReplaceCd1byCd2>
     <link>
        <script>
-           print("http://127.0.0.1:$Port/cgi-bin/srjg.cgi?ReplaceCd1byCd2@"+M_Title+"@");
+           print("http://127.0.0.1:$Port/cgi-bin/srjg.cgi?ReplaceCd1byCd2@"+M_File+"@");
        </script>
     </link>
 </ReplaceCd1byCd2>
@@ -892,6 +905,14 @@ cat <<EOF
        </script>
     </link>
 </Watchcgi>
+
+<MenuEdit>
+    <link>
+       <script>
+           print("http://127.0.0.1:$Port/cgi-bin/srjg.cgi?MenuEdit@"+MovieID+"@");
+       </script>
+    </link>
+</MenuEdit>
 
 <WatchUpdate>
   /* find if also watched, remove it and do nothing, else add the modified state into array */
@@ -1043,6 +1064,7 @@ cat <<EOF
 		Nfo_Path = getXMLText("Config", "Nfo_Path");
 		Poster_Path = getXMLText("Config", "Poster_Path");
 		Sheet_Path = getXMLText("Config", "Sheet_Path");
+    UnlockRM = getXMLText("Config", "UnlockRM");
     SingleDb = getXMLText("Config", "SingleDb");
 		Movie_Filter = getXMLText("Config", "Movie_Filter");
 		Port = getXMLText("Config", "Port");
@@ -1075,8 +1097,9 @@ cat <<EOF
   tmpconfigArray=pushBackStringArray(tmpconfigArray, "Nfo_Path="+Nfo_Path);
   tmpconfigArray=pushBackStringArray(tmpconfigArray, "Poster_Path="+Poster_Path);
   tmpconfigArray=pushBackStringArray(tmpconfigArray, "Sheet_Path="+Sheet_Path);
-  tmpconfigArray=pushBackStringArray(tmpconfigArray, "Movie_Filter="+Movie_Filter);
   tmpconfigArray=pushBackStringArray(tmpconfigArray, "SingleDb="+SingleDb);
+  tmpconfigArray=pushBackStringArray(tmpconfigArray, "UnlockRM="+UnlockRM);
+  tmpconfigArray=pushBackStringArray(tmpconfigArray, "Movie_Filter="+Movie_Filter);
   tmpconfigArray=pushBackStringArray(tmpconfigArray, "Port="+Port);
   tmpconfigArray=pushBackStringArray(tmpconfigArray, "Recent_Max="+Recent_Max);
 	tmpconfigArray=pushBackStringArray(tmpconfigArray, "Dspl_Genre_txt="+Dspl_Genre_txt);
@@ -1297,6 +1320,7 @@ cat <<EOF
 		Lang_Nfo_Path = getXMLText("cfg", "Nfo_Path");
 		Lang_Poster_Path = getXMLText("cfg", "Poster_Path");
 		Lang_Sheet_Path = getXMLText("cfg", "Sheet_Path");
+    Lang_UnlockRM = getXMLText("cfg", "UnlockRM");
     Lang_SingleDb = getXMLText("cfg", "SingleDb");
     Lang_Movie_Filter = getXMLText("cfg", "Movie_Filter");
     Lang_Imdb = getXMLText("cfg", "Imdb");
@@ -1312,7 +1336,7 @@ cat <<EOF
   if ( Version == null ) print ("Version File not found");
 </onEnter>
 
-<mediaDisplay name="photoView" rowCount="11" columnCount="1" drawItemText="no" showHeader="no" showDefaultInfo="no" menuBorderColor="255:255:255" sideColorBottom="-1:-1:-1" sideColorTop="-1:-1:-1" itemAlignt="left" itemOffsetXPC="4" itemOffsetYPC="21" itemWidthPC="32" itemHeightPC="5" backgroundColor="-1:-1:-1" itemBackgroundColor="-1:-1:-1" sliding="no" itemGap="0" idleImageXPC="90" idleImageYPC="5" idleImageWidthPC="5" idleImageHeightPC="8" imageUnFocus="null" imageParentFocus="null" imageBorderPC="0" forceFocusOnItem="no" cornerRounding="yes" itemBorderColor="-1:-1:-1" focusBorderColor="-1:-1:-1" unFocusBorderColor="-1:-1:-1">
+<mediaDisplay name="photoView" rowCount="12" columnCount="1" drawItemText="no" showHeader="no" showDefaultInfo="no" menuBorderColor="255:255:255" sideColorBottom="-1:-1:-1" sideColorTop="-1:-1:-1" itemAlignt="left" itemOffsetXPC="4" itemOffsetYPC="21" itemWidthPC="32" itemHeightPC="5" backgroundColor="-1:-1:-1" itemBackgroundColor="-1:-1:-1" sliding="no" itemGap="0" idleImageXPC="90" idleImageYPC="5" idleImageWidthPC="5" idleImageHeightPC="8" imageUnFocus="null" imageParentFocus="null" imageBorderPC="0" forceFocusOnItem="no" cornerRounding="yes" itemBorderColor="-1:-1:-1" focusBorderColor="-1:-1:-1" unFocusBorderColor="-1:-1:-1">
 <idleImage> image/POPUP_LOADING_01.png </idleImage> 
 <idleImage> image/POPUP_LOADING_02.png </idleImage> 
 <idleImage> image/POPUP_LOADING_03.png </idleImage> 
@@ -1381,6 +1405,13 @@ cat <<EOF
 <text redraw="no" backgroundColor="-1:-1:-1" foregroundColor="200:200:200" offsetXPC="36" offsetYPC="77" widthPC="57" heightPC="4" fontSize="16" lines="1" align="left">
 	<script>
 		if ( Imdb == "yes" ) print( Lang_Yes );
+    else print( Lang_No );
+	</script>
+</text>
+
+<text redraw="no" backgroundColor="-1:-1:-1" foregroundColor="200:200:200" offsetXPC="36" offsetYPC="89" widthPC="57" heightPC="4" fontSize="16" lines="1" align="left">
+	<script>
+		if ( UnlockRM == "yes" ) print( Lang_Yes );
     else print( Lang_No );
 	</script>
 </text>
@@ -1612,6 +1643,17 @@ cat <<EOF
 <pos></pos>
 </item>
 
+<item>
+<title>
+	<script>
+		print(Lang_UnlockRM);
+	</script>
+</title>
+<selection>UnlockRM</selection>
+<param>no%20yes</param>
+<pos>75</pos>
+</item>
+
 </channel>
 </rss>
 EOF
@@ -1660,7 +1702,7 @@ cat <<EOF
 <idleImage> image/POPUP_LOADING_08.png </idleImage>
 
 <backgroundDisplay>
-  <image type="image/png" offsetXPC=0 offsetYPC=0 widthPC=100 heightPC=100>
+  <image type="image/jpg" offsetXPC=0 offsetYPC=0 widthPC=100 heightPC=100>
     <script>print(Jukebox_Path + "images/FBrowser_Bg.jpg");</script>
   </image>
 </backgroundDisplay>
@@ -2495,6 +2537,326 @@ cat <<EOF
 EOF
 }
 
+SubMenuEdit()
+# auto choice menu to confirm Edit
+{
+
+Item_nb=0
+for SelParam in $CategoryTitle
+do
+  let Item_nb+=1
+done
+
+YPos=$Jukebox_Size
+
+cat <<EOF
+<?xml version="1.0" encoding="UTF-8" ?>
+<rss version="2.0" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:media="http://purl.org/dc/elements/1.1/">
+
+<onEnter>
+</onEnter>
+
+<onExit>
+  postMessage("return");
+</onExit>
+
+<script>
+  langpath = "${Jukebox_Path}lang/${Language}";
+  langfile = loadXMLFile(langpath);
+  if (langfile != null) {
+    lang_ValPoster = getXMLText("MEdit", "ValPoster");
+    Lang_ValSheet = getXMLText("MEdit", "ValSheet");
+    Lang_ValNfo = getXMLText("MEdit", "ValNfo");
+		Lang_ValMovie = getXMLText("MEdit", "ValMovie");
+  }
+</script>
+
+<mediaDisplay name="photoView" rowCount="$Item_nb" columnCount="1" drawItemText="no" showHeader="no" showDefaultInfo="no" menuBorderColor="255:255:255" sideColorBottom="-1:-1:-1" sideColorTop="-1:-1:-1" itemAlignt="left" itemOffsetXPC="38" itemOffsetYPC="$YPos" itemWidthPC="20" itemHeightPC="7.2" backgroundColor="-1:-1:-1" itemBackgroundColor="-1:-1:-1" sliding="no" itemGap="0" idleImageXPC="90" idleImageYPC="5" idleImageWidthPC="5" idleImageHeightPC="8" imageUnFocus="null" imageParentFocus="null" imageBorderPC="0" forceFocusOnItem="no" cornerRounding="yes" itemBorderColor="-1:-1:-1" focusBorderColor="-1:-1:-1" unFocusBorderColor="-1:-1:-1">
+<idleImage> image/POPUP_LOADING_01.png </idleImage>
+<idleImage> image/POPUP_LOADING_02.png </idleImage>
+<idleImage> image/POPUP_LOADING_03.png </idleImage>
+<idleImage> image/POPUP_LOADING_04.png </idleImage>
+<idleImage> image/POPUP_LOADING_05.png </idleImage>
+<idleImage> image/POPUP_LOADING_06.png </idleImage>
+<idleImage> image/POPUP_LOADING_07.png </idleImage>
+<idleImage> image/POPUP_LOADING_08.png </idleImage>
+
+<text redraw="no" lines=4 offsetXPC="31" offsetYPC="31" widthPC="37" heightPC="23" backgroundColor="0:0:0" foregroundColor="200:200:200" fontSize="16" align="center" >
+ <script>
+    if ( "$mode" == "EM_Poster" ) print(lang_ValPoster);
+    else if ( "$mode" == "EM_Sheet" ) print(Lang_ValSheet);
+    else if ( "$mode" == "EM_Nfo" ) print(Lang_ValNfo);
+    else print(Lang_ValMovie);
+ </script>
+</text>
+
+<itemDisplay>
+<image offsetXPC="0" offsetYPC="0" widthPC="100" heightPC="100">
+ <script>
+  if (getDrawingItemState() == "focus")
+  {
+      print("${Jukebox_Path}images/focus_on.png");
+  }
+ else
+  {
+      print("${Jukebox_Path}images/focus_off.png");
+  }
+ </script>
+</image>
+
+<text redraw="no" offsetXPC="0" offsetYPC="0" widthPC="94" heightPC="100" backgroundColor="-1:-1:-1" foregroundColor="200:200:200" fontSize="16" align="center">
+ <script>
+    getItemInfo(-1, "title");
+ </script>
+</text>
+</itemDisplay>  
+
+<onUserInput>
+
+  userInput = currentUserInput();
+
+  if (userInput == "right") {
+    "true";
+  } else if (userInput == "enter") {
+    indx=getFocusItemIndex();
+    action=getItemInfo(indx, "action");
+    if ( action != "Nothing" ) jumpToLink("SelectionEntered");
+    postMessage("return");
+    "false";
+  }
+
+</onUserInput>
+</mediaDisplay>
+
+<SelectionEntered>
+    <link>
+       <script>
+           print("http://127.0.0.1:$Port/cgi-bin/srjg.cgi?"+action+"@$Item_Pos@$mode");
+       </script>
+    </link>
+</SelectionEntered>
+
+<channel>
+<title>Updating Cfg</title>
+EOF
+
+Item_nb=0
+for SelParam in $CategoryTitle
+do
+  case ${SelParam} in
+    "yes") Item_dspl=`sed "/<yes>/!d;s:.*>\(.*\)<.*:\1:" "${Jukebox_Path}lang/${Language}"`; Action=DelMedia;;
+    "no")  Item_dspl=`sed "/<no>/!d;s:.*>\(.*\)<.*:\1:" "${Jukebox_Path}lang/${Language}"`; Action=Nothing;;
+    *)     Item_dspl=$SelParam; Action=DelMedia;;
+  esac
+cat <<EOF
+<item>
+<title>$Item_dspl</title>
+<action>$Action</action>
+</item>
+EOF
+done
+
+echo '</channel></rss>' # to close the RSS
+}
+
+DelMedia()
+# Remove Nfo, Poster, Sheet or/and Movie
+{
+cat <<EOF
+<?xml version="1.0" encoding="UTF-8" ?>
+<rss version="2.0" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:media="http://purl.org/dc/elements/1.1/">
+<onEnter>
+  showIdle();
+  postMessage("return");
+</onEnter>
+<mediaDisplay name="nullView"/>
+EOF
+
+# extract info 
+MInfo="`${Sqlite} -separator ''  ${Database}  "SELECT path,file,ext FROM t1 WHERE Movie_ID like '$Search'" | grep "[!-~]";`"
+
+MPath=`echo $MInfo |sed '/<path>/!d;s:.*>\(.*\)</path.*:\1:'`
+MFile=`echo $MInfo |sed '/<file>/!d;s:.*>\(.*\)</file.*:\1:'`
+MExt=`echo $MInfo |sed '/<ext>/!d;s:.*>\(.*\)</ext.*:\1:'`
+
+if [ "${Poster_Path}" = "MoviesPath" ]; then PPath="${Movies_Path}";
+elif [ "${Poster_Path}" = "SRJG" ]; then PPath="${Movies_Path}SRJG/ImgNfo";
+else PPath="${Poster_Path}"; fi
+
+if [ "${Sheet_Path}" = "MoviesPath" ]; then SPath="${Movies_Path}";
+elif [ "${Sheet_Path}" = "SRJG" ]; then SPath="${Movies_Path}SRJG/ImgNfo";
+else SPath="${Sheet_Path}"; fi
+
+if [ "${Nfo_Path}" = "MoviesPath" ]; then NPath="${Movies_Path}";
+elif [ "${Nfo_Path}" = "SRJG" ]; then NPath="${Movies_Path}SRJG/ImgNfo";
+else NPath="${Nfo_Path}"; fi
+
+# remove the Poster
+[ "${Jukebox_Size}" = "EM_Poster" -o "${Jukebox_Size}" = "EM_Movie" ] && rm "${PPath}/${MFile}.jpg" 2>/dev/null
+
+# remove the Sheet
+[ "${Jukebox_Size}" = "EM_Sheet" -o "${Jukebox_Size}" = "EM_Movie" ] && rm "${SPath}/${MFile}_sheet.jpg" 2>/dev/null
+
+# remove the Nfo
+[ "${Jukebox_Size}" = "EM_Nfo" -o "${Jukebox_Size}" = "EM_Movie" ] && rm "${NPath}/${MFile}.nfo" 2>/dev/null
+
+if [ "${Jukebox_Size}" = "EM_Movie" ]; then
+  # remove the movie
+  rm "${MPath}/${MFile}.${MExt}" 2>/dev/null
+	
+  # remove the movie from the database
+  ${Sqlite} "${Database}"  "DELETE from t1 WHERE Movie_ID like '$Search'";
+fi
+
+echo '<channel></channel></rss>' # to close the RSS
+exit 0
+}
+
+MenuEdit()
+# Menu to remove Poster, Sheet, Nfo or/and Movie File
+{
+cat <<EOF
+<?xml version="1.0" encoding="UTF-8" ?>
+<rss version="2.0" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:media="http://purl.org/dc/elements/1.1/">
+<onEnter>
+  showIdle();
+  RedrawDisplay();
+</onEnter>
+
+<script>
+  langpath = "${Jukebox_Path}lang/${Language}";
+  langfile = loadXMLFile(langpath);
+  if (langfile != null) {
+    lang_EditMenu = getXMLText("MEdit", "EditMenu");
+    Lang_rmPoster = getXMLText("MEdit", "rmPoster");
+    Lang_rmSheet = getXMLText("MEdit", "rmSheet");
+    Lang_rmNfo = getXMLText("MEdit", "rmNfo");
+		Lang_rmMovie = getXMLText("MEdit", "rmMovie");
+  }
+</script>
+
+<mediaDisplay name="onePartView" rowCount="4" columnCount="1" sideLeftWidthPC="0" sideColorLeft="0:0:0" sideRightWidthPC="0" fontSize="14" focusFontColor="210:16:16" itemAlignt="center" viewAreaXPC=29.7 viewAreaYPC=26 viewAreaWidthPC=40 viewAreaHeightPC=50 headerImageWidthPC="0" itemImageHeightPC="0" itemImageWidthPC="0" itemXPC="10" itemYPC="15" itemWidthPC="80" itemHeightPC="10" itemBackgroundColor="0:0:0" itemGap="0" infoYPC="90" infoXPC="90" backgroundColor="0:0:0" showHeader="no" showDefaultInfo="no">
+<idleImage> image/POPUP_LOADING_01.png </idleImage>
+<idleImage> image/POPUP_LOADING_02.png </idleImage>
+<idleImage> image/POPUP_LOADING_03.png </idleImage>
+<idleImage> image/POPUP_LOADING_04.png </idleImage>
+<idleImage> image/POPUP_LOADING_05.png </idleImage>
+<idleImage> image/POPUP_LOADING_06.png </idleImage>
+<idleImage> image/POPUP_LOADING_07.png </idleImage>
+<idleImage> image/POPUP_LOADING_08.png </idleImage>
+
+<backgroundDisplay>
+  <image type="image/jpg" offsetXPC=0 offsetYPC=0 widthPC=100 heightPC=100>
+    <script>print("${Jukebox_Path}images/FBrowser_Bg.jpg");</script>
+  </image>
+</backgroundDisplay>
+
+<text align="center" offsetXPC=2 offsetYPC=0 widthPC=96 heightPC=10 fontSize=14 backgroundColor=-1:-1:-1    foregroundColor=70:140:210>
+  <script>print(lang_EditMenu);</script>
+</text>
+
+<text align="left" offsetXPC=2 offsetYPC=89 widthPC=96 heightPC=10 fontSize=12 backgroundColor=-1:-1:-1    foregroundColor=200:200:200>
+<script>MTitle=getEnv("MTitle");print(MTitle);</script>
+</text>
+
+<onUserInput>
+  <script>
+    userInput = currentUserInput();
+	
+    if (userInput == "enter" ) {
+      indx=getFocusItemIndex();
+      mode=getItemInfo(indx, "selection");
+      SelParam=getItemInfo(indx, "param");
+      YPos=getItemInfo(indx, "pos");
+      jumpToLink("SelectionEntered");
+      "false";
+    }
+  </script>
+</onUserInput>
+
+<itemDisplay>
+  <image type="image/png" redraw="yes" offsetXPC="0" offsetYPC="0" widthPC="100" heightPC="100">
+    <script>
+  if (getDrawingItemState() == "focus")
+  {
+      print("${Jukebox_Path}images/focus_on.png");
+  }
+ else
+  {
+      print("${Jukebox_Path}images/FBrowser_unfocus.png");
+  }
+    </script>
+  </image>
+	
+<text redraw="yes" offsetXPC="0" offsetYPC="0" widthPC="94" heightPC="100" backgroundColor="-1:-1:-1" foregroundColor="200:200:200" fontSize="13" align="center">
+ <script>
+    getItemInfo(-1, "title");
+ </script>
+</text>
+</itemDisplay>
+
+</mediaDisplay>
+
+<SelectionEntered>
+    <link>
+       <script>
+           print("http://127.0.0.1:"+Port+"/cgi-bin/srjg.cgi?"+mode+"@"+SelParam+"@"+YPos+"@$CategoryTitle");
+       </script>
+    </link>
+</SelectionEntered>
+
+<channel>
+<title>Edit Menu</title>
+
+<item>
+<title>
+	<script>
+    print ( Lang_rmPoster );
+	</script>
+</title>
+<selection>EM_Poster</selection>
+<param>no%20yes</param>
+<pos>53</pos>
+</item>
+
+<item>
+<title>
+	<script>
+    print ( Lang_rmSheet );
+	</script>
+</title>
+<selection>EM_Sheet</selection>
+<param>no%20yes</param>
+<pos>53</pos>
+</item>
+
+<item>
+<title>
+	<script>
+    print ( Lang_rmNfo );
+	</script>
+</title>
+<selection>EM_Nfo</selection>
+<param>no%20yes</param>
+<pos>53</pos>
+</item>
+
+<item>
+<title>
+	<script>
+    print ( Lang_rmMovie );
+	</script>
+</title>
+<selection>EM_Movie</selection>
+<param>no%20yes</param>
+<pos>53</pos>
+</item>
+
+</channel>
+</rss>
+EOF
+}
+
 #***********************Main Program*********************************
 
 case $mode in
@@ -2509,21 +2871,24 @@ case $mode in
     else
       UpdateMenu;
     fi;;
-  Lang|Jukebox_Size|SingleDb|Port|Recent_Max|Nfo_Path|Poster_Path|Sheet_Path|\
+  Lang|Jukebox_Size|SingleDb|Port|Recent_Max|Nfo_Path|Poster_Path|Sheet_Path|UnlockRM|\
 	Dspl_Genre_txt|Dspl_HelpBar|\
 	Imdb|Imdb_Lang|Imdb_Source|\
   Imdb_Poster|Imdb_PBox|Imdb_PPost|Imdb_Sheet|\
   Imdb_SBox|Imdb_SPost|Imdb_Backdrop|Imdb_Font|\
   Imdb_Genres|Imdb_Tagline|Imdb_Time|Imdb_Info|\
-  Imdb_MaxDl ) SubMenucfg;;   # display submenu to chose settings
-  "UpdateCfg") UpdateCfg;;    # update the cfg file
-  "DirList") DirList;;        # FBrowser list directorys
-  "FBrowser") FBrowser;;
-  "MenuCfg") MenuCfg;;
-	"ImdbSheetDspl") ImdbSheetDspl;;
-  "ImdbCfgEdit") ImdbCfgEdit;;
-	"DsplCfgEdit") DsplCfgEdit;;
-  "ReplaceCd1byCd2") ReplaceCd1byCd2;;
+  Imdb_MaxDl) SubMenucfg;;   # display submenu to chose settings
+  UpdateCfg) UpdateCfg;;    # update the cfg file
+  DirList) DirList;;        # FBrowser list directorys
+  FBrowser) FBrowser;;
+  MenuCfg) MenuCfg;;
+	ImdbSheetDspl) ImdbSheetDspl;;
+  ImdbCfgEdit) ImdbCfgEdit;;
+	DsplCfgEdit) DsplCfgEdit;;
+  ReplaceCd1byCd2) ReplaceCd1byCd2;;
+	MenuEdit) MenuEdit;;
+	EM_Poster|EM_Sheet|EM_Nfo|EM_Movie) SubMenuEdit;;
+  DelMedia) DelMedia;;
   *)
     SetVar
     Header

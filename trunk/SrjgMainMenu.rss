@@ -21,6 +21,7 @@
 		Nfo_Path = getXMLText("Config", "Nfo_Path");
 		Poster_Path = getXMLText("Config", "Poster_Path");
 		Sheet_Path = getXMLText("Config", "Sheet_Path");
+    UnlockRM = getXMLText("Config", "UnlockRM");
     SingleDb = getXMLText("Config", "SingleDb");
 		Movie_Filter = getXMLText("Config", "Movie_Filter");
 		Port = getXMLText("Config", "Port");
@@ -29,6 +30,7 @@
 		Dspl_HelpBar = getXMLText("Config", "Dspl_HelpBar");
     Imdb = getXMLText("Config", "Imdb");
 		Imdb_Lang = getXMLText("Config", "Imdb_Lang");
+		Imdb_Source = getXMLText("Config", "Imdb_Source");
 		Imdb_Poster = getXMLText("Config", "Imdb_Poster");
 		Imdb_PBox = getXMLText("Config", "Imdb_PBox");
 		Imdb_PPost = getXMLText("Config", "Imdb_PPost");
@@ -52,14 +54,16 @@
   tmpconfigArray=pushBackStringArray(tmpconfigArray, "Nfo_Path="+Nfo_Path);
   tmpconfigArray=pushBackStringArray(tmpconfigArray, "Poster_Path="+Poster_Path);
   tmpconfigArray=pushBackStringArray(tmpconfigArray, "Sheet_Path="+Sheet_Path);
-  tmpconfigArray=pushBackStringArray(tmpconfigArray, "Movie_Filter="+Movie_Filter);
   tmpconfigArray=pushBackStringArray(tmpconfigArray, "SingleDb="+SingleDb);
+  tmpconfigArray=pushBackStringArray(tmpconfigArray, "UnlockRM="+UnlockRM);
+  tmpconfigArray=pushBackStringArray(tmpconfigArray, "Movie_Filter="+Movie_Filter);
   tmpconfigArray=pushBackStringArray(tmpconfigArray, "Port="+Port);
   tmpconfigArray=pushBackStringArray(tmpconfigArray, "Recent_Max="+Recent_Max);
 	tmpconfigArray=pushBackStringArray(tmpconfigArray, "Dspl_Genre_txt="+Dspl_Genre_txt);
 	tmpconfigArray=pushBackStringArray(tmpconfigArray, "Dspl_HelpBar="+Dspl_HelpBar);
   tmpconfigArray=pushBackStringArray(tmpconfigArray, "Imdb="+Imdb);
   tmpconfigArray=pushBackStringArray(tmpconfigArray, "Imdb_Lang="+Imdb_Lang);
+	tmpconfigArray=pushBackStringArray(tmpconfigArray, "Imdb_Source="+Imdb_Source);
   tmpconfigArray=pushBackStringArray(tmpconfigArray, "Imdb_Poster="+Imdb_Poster);
   tmpconfigArray=pushBackStringArray(tmpconfigArray, "Imdb_PBox="+Imdb_PBox);
   tmpconfigArray=pushBackStringArray(tmpconfigArray, "Imdb_PPost="+Imdb_PPost);
@@ -125,7 +129,9 @@
       mode=urlEncode(mode);
       jumpToLink("SelectionEntered");
       "false";
-    }
+    } else if (userInput == "edit") {
+			"true";
+		}
   </script>
 </onUserInput>
 

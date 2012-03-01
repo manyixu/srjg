@@ -29,6 +29,7 @@
   <Recent_Max>Max ostatnich filmów</Recent_Max>
   <Imdb>Użyj Imdb</Imdb>
 	<Dspl>Wyświetl</Dspl>
+	<UnlockRM>Pozwól Usuń</UnlockRM>
   <Jukebox_Path>Ścieżka do Jukebox:</Jukebox_Path>
   <Port>Port:</Port>
   <Version>Wersja:</Version>
@@ -66,3 +67,14 @@
   <Imdb_Info>Utwórz pliki info</Imdb_Info>
   <Imdb_MaxDl>Równoczesne pobieranie</Imdb_MaxDl>
 </Imdb>
+<MEdit>
+  <EditMenu>Menu Edycja</EditMenu>
+  <rmPoster>Usuń Plakat</rmPoster>
+  <rmSheet>Wyjmij arkusz</rmSheet>
+  <rmNfo>Usuń NFO</rmNfo>
+  <rmMovie>Usuń film</rmMovie>
+  <ValPoster>Czy na pewno chcesz, aby stłumić tylko plakat ?</ValPoster>
+  <ValSheet>Czy na pewno chcesz, aby stłumić tylko karta ?</ValSheet>
+  <ValNfo>Czy na pewno chcesz, aby stłumić tylko NFO ?</ValNfo>
+  <ValMovie>Czy na pewno chcesz, aby stłumić wszystkie pliki z filmem?</ValMovie>
+</MEdit>
