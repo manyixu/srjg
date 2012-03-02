@@ -129,7 +129,12 @@ DBMovieDelete()
 echo "Removing movies from the Database ...."
 while read LINE
 do
-  ${Sqlite} "${Database}"  "DELETE from t1 WHERE file='<file>${LINE}</file>'";
+  MOVIEPATH="${LINE%/*}"  # Shell builtins instead of dirname
+  MOVIEFILE="${LINE##*/}" # Shell builtins instead of basename
+  MOVIEEXT="${MOVIEFILE##*.}"  # only ext
+  MOVIEFILE="${MOVIEFILE%.*}"  # Strip off .ext
+
+  ${Sqlite} "${Database}"  "DELETE from t1 WHERE file='<file>${MOVIEFILE}</file>' AND path='<path>${MOVIEPATH}</path>' AND ext='<ext>${MOVIEEXT}</ext>'";
 done < $DeleteList
 ${Sqlite} "${Database}"  "VACUUM";
 }
