@@ -715,7 +715,7 @@ EOF
 if ([ $Jukebox_Size = "2x6" ] ||  [ $Jukebox_Size = "3x8" ]); then
 cat <<EOF 
 <!-- Show Folder Name -->
-<text offsetXPC="7" offsetYPC="88.8" widthPC="60" heightPC="5" fontSize="14" useBackgroundSurface="yes" foregroundColor="195:196:195" redraw="yes" lines="1">
+<text offsetXPC="7" offsetYPC="88.8" widthPC="75" heightPC="5" fontSize="14" useBackgroundSurface="yes" foregroundColor="195:196:195" redraw="yes" lines="1">
  <script>
     displayTitle = getItemInfo(-1, "title"); 
     displayTitle;
@@ -723,7 +723,7 @@ cat <<EOF
 </text>
 
 <!-- Show Page Info -->
-<text offsetXPC="85" offsetYPC="88.8" widthPC="8" heightPC="5" fontSize="14" foregroundColor="195:196:195" useBackgroundSurface="yes" redraw="yes" lines="1">
+<text offsetXPC="82" offsetYPC="88.8" widthPC="10" heightPC="5" fontSize="14" foregroundColor="195:196:195" useBackgroundSurface="yes" redraw="yes" lines="1" align="right">
  <script>
   pageInfo = Add(getFocusItemIndex(),1) + "/" + Jukebox_itemSize;
   pageInfo;
@@ -995,7 +995,7 @@ fi
 
 if [ "$mode" = "yearSelection" ]; then
 # pulls out the years of the movies
-${Sqlite} -separator ''  "${Database}"  "SELECT DISTINCT year FROM t1 ORDER BY year COLLATE NOCASE" > /tmp/srjg_year.list
+${Sqlite} -separator ''  "${Database}"  "SELECT DISTINCT year FROM t1 ORDER BY year DESC" > /tmp/srjg_year.list
 while read LINE
 do
 echo "<item>"
