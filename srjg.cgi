@@ -1534,7 +1534,7 @@ cat <<EOF
 	</script>
 </title>
 <selection>Lang</selection>
-<param>en%20fr%20pl</param>
+<param>en%20es%20fr%20pl</param>
 <pos>25</pos>
 </item>
 
@@ -2075,7 +2075,7 @@ cat <<EOF
   ImdbLink = "http://playon.unixstorm.org/IMDB/movie_beta.php?" + LnParam;
 </script>
 
-<image offsetXPC=5 offsetYPC=5 widthPC=90 heightPC=90><script> print(ImdbLink); </script></image>
+<image offsetXPC=0 offsetYPC=0 widthPC=100 heightPC=100><script> print(ImdbLink); </script></image>
 
 </backgroundDisplay>
 

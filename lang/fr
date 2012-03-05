@@ -5,7 +5,7 @@
 	<recent>Ajout Récent</recent>
 	<select>Sélection par:</select>
 	<update>Mise à Jour</update>
-	<notwatched>Pas Regardé</notwatched>
+	<notwatched>Pas Regardés</notwatched>
 	<year>Année</year>
 	<search>Recherche</search>
   <config>Config</config>
@@ -51,7 +51,7 @@
 </FBrowser>
 <Imdb>
   <Imdb_Use>Activer Imdb</Imdb_Use>
-  <Imdb_Lang>Langage</Imdb_Lang>
+  <Imdb_Lang>Interface</Imdb_Lang>
   <Imdb_Source>Source</Imdb_Source>
   <Imdb_Poster>Télécharger Pochette</Imdb_Poster>
   <Imdb_PBox>Cadre de la pochette</Imdb_PBox>
@@ -73,8 +73,8 @@
   <rmSheet>Supprimer le Sheet</rmSheet>
   <rmNfo>Supprimer le Nfo</rmNfo>
   <rmMovie>Supprimer le Film</rmMovie>
-  <ValPoster>Voulez-vous suprimer uniquement le Poster ?</ValPoster>
-  <ValSheet>Voulez-vous suprimer uniquement le Sheet ?</ValSheet>
-  <ValNfo>Voulez-vous suprimer uniquement le Nfo ?</ValNfo>
-  <ValMovie>Voulez-vous suprimer le Film et tous ses fichiers ?</ValMovie>
+  <ValPoster>Voulez-vous supprimer uniquement le Poster ?</ValPoster>
+  <ValSheet>Voulez-vous supprimer uniquement le Sheet ?</ValSheet>
+  <ValNfo>Voulez-vous supprimer uniquement le Nfo ?</ValNfo>
+  <ValMovie>Voulez-vous supprimer le Film et tous ses fichiers ?</ValMovie>
 </MEdit>

@@ -51,7 +51,7 @@
 </FBrowser>
 <Imdb>
   <Imdb_Use>Activate Imdb</Imdb_Use>
-  <Imdb_Lang>Language</Imdb_Lang>
+  <Imdb_Lang>Interface</Imdb_Lang>
   <Imdb_Source>Source</Imdb_Source>
   <Imdb_Poster>Download Poster</Imdb_Poster>
   <Imdb_PBox>Poster Box</Imdb_PBox>
