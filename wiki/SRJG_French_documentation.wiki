@@ -21,27 +21,27 @@ Exemple
 `<Lang>en</Lang>`
 Le nom  du paramètre c’est « Lang » et sa valeur c’est « en »
 Liste des paramètres
-*Lang (defaut en)
+* Lang (defaut en)
 Permet de mettre l’interface dans la langue choisie.
 
-*Jukebox_Path ( defaut /usr/local/etc/srjg/)
+* Jukebox_Path ( defaut /usr/local/etc/srjg/)
 C’est le chemin où se trouve le SRJG. 
 Sur certains player, nottament HMB, le chemin sera /usr/local/etc/scripts/srjg/ 
 Nottez qu’il y a un « / » à la fin du chemin.
 
-*Jukebox_Size (defaut 2x6)
+* Jukebox_Size (defaut 2x6)
 C’est l’affichage par défaut des Jukebox.
 Liste des choix possibles
 2x6 2 rangées de 6 Pochettes
 3x8 3 rangées de 8 Pochettes
 Sheetwall C’est un mode avec l’image Sheet en pleine page et les Pochette en bas de l’écran.
 
-*Movies_Path (defaut /tmp/usbmounts/sdb1/)
+* Movies_Path (defaut /tmp/usbmounts/sdb1/)
 C’est le chemin vers l’emplacement de vos films.
 Ce chemin doit exister
 Nottez qu’il y a un « / » à la fin du chemin.
 
-*Nfo_Path (defaut MoviesPath)
+* Nfo_Path (defaut MoviesPath)
 Indique l’emplacement des fichiers .nfo
 Valeurs possibles
 MoviesPath les fichiers .nfo sont placés dans le dossier des Films définit dans le paramètre MoviesPath
