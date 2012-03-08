@@ -5,7 +5,7 @@
 
 =SRJG Video demonstration=
 
-<wiki:video url="http:/www.youtube.com/watch?v=1qjapUIsEiE"/>
+<wiki:video url="http://www.youtube.com/watch?v=1qjapUIsEiE"/>
 
 =Le paramétrage=
 
