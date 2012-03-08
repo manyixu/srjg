@@ -21,35 +21,35 @@ Exemple
 `<Lang>en</Lang>`
 Le nom  du paramètre c’est « Lang » et sa valeur c’est « en »
 Liste des paramètres
-* Lang (defaut en)
-Permet de mettre l’interface dans la langue choisie.
+ * Lang (defaut en)
+   Permet de mettre l’interface dans la langue choisie.
 
-* Jukebox_Path ( defaut /usr/local/etc/srjg/)
-C’est le chemin où se trouve le SRJG. 
-Sur certains player, nottament HMB, le chemin sera /usr/local/etc/scripts/srjg/ 
-Nottez qu’il y a un « / » à la fin du chemin.
+ * Jukebox_Path ( defaut /usr/local/etc/srjg/)
+   C’est le chemin où se trouve le SRJG. 
+   Sur certains player, nottament HMB, le chemin sera /usr/local/etc/scripts/srjg/
+   Nottez qu’il y a un « / » à la fin du chemin.
 
-* Jukebox_Size (defaut 2x6)
-C’est l’affichage par défaut des Jukebox.
-Liste des choix possibles
-2x6 2 rangées de 6 Pochettes
-3x8 3 rangées de 8 Pochettes
-Sheetwall C’est un mode avec l’image Sheet en pleine page et les Pochette en bas de l’écran.
+ * Jukebox_Size (defaut 2x6)
+   C’est l’affichage par défaut des Jukebox.
+   Liste des choix possibles
+   2x6 2 rangées de 6 Pochettes
+   3x8 3 rangées de 8 Pochettes
+   Sheetwall C’est un mode avec l’image Sheet en pleine page et les Pochette en bas de l’écran.
 
-* Movies_Path (defaut /tmp/usbmounts/sdb1/)
-C’est le chemin vers l’emplacement de vos films.
-Ce chemin doit exister
-Nottez qu’il y a un « / » à la fin du chemin.
+ * Movies_Path (defaut /tmp/usbmounts/sdb1/)
+   C’est le chemin vers l’emplacement de vos films.
+   Ce chemin doit exister
+   Nottez qu’il y a un « / » à la fin du chemin.
 
-* Nfo_Path (defaut MoviesPath)
-Indique l’emplacement des fichiers .nfo
-Valeurs possibles
-MoviesPath les fichiers .nfo sont placés dans le dossier des Films définit dans le paramètre MoviesPath
+ * Nfo_Path (defaut MoviesPath)
+   Indique l’emplacement des fichiers .nfo
+   Valeurs possibles
+   MoviesPath les fichiers .nfo sont placés dans le dossier des Films définit dans le paramètre MoviesPath
 SRJG les fichiers .nfo sont placés dans un sous dossier des films : <chemin des films>/SRJG/ImgNfo/ qui se trouve dans le dossier des Films définit dans le paramètre MoviesPath
 «Un chemin vers un dossier qui existe/» Vous pouvez indiquer le chemin de votre choix. Ce dossier doit exister et être accessible en écriture.
 Nottez qu’il y a un « / » à la fin du chemin.
 
-*Poster_Path (defaut MoviesPath)
+ * Poster_Path (defaut MoviesPath)
 Indique l’emplacement des Pochettes
 Valeurs possibles :
 MoviesPath les Pochettes  sont placées dans le dossier des Films définit dans le paramètre MoviesPath
@@ -57,7 +57,7 @@ SRJG les Pochettes  sont placées dans un sous dossier des films : <chemin des f
 «Un chemin vers un dossier qui existe/» Vous pouvez indiquer le chemin de votre choix. Ce dossier doit exister et être accessible en écriture.
 Nottez qu’il y a un « / » à la fin du chemin.
 
-*Sheet_Path (defatut MoviesPath)
+ * Sheet_Path (defatut MoviesPath)
 Indique l’emplacement des images Sheet.
 Valeurs possibles
 MoviesPath les images Sheet sont placées dans le dossier des Films définit dans le paramètre MoviesPath
@@ -65,14 +65,14 @@ SRJG les images Sheet sont placées dans un sous dossier des films : <chemin des
 «Un chemin vers un dossier qui existe/» Vous pouvez indiquer le chemin de votre choix. Ce dossier doit exister et être accessible en écriture.
 Nottez qu’il y a un « / » à la fin du chemin.
 
-*SingleDb (defaut no)
+ * SingleDb (defaut no)
 Valeur « yes » il n’y a qu’une seule base de données dans /usr/local/etc/
 Valeur « no » la base de données se situe dans <chemin des films>/SRJG/. Cela permet d’utiliser plusieurs Jukebox en ne changeant que le chemin des films.
 
-*UnlockRM (defaut no)
+ * UnlockRM (defaut no)
 Si ce paramètre est à « yes » cela active un menu lorsque l’on appuie sur la touche « Edit ». Il sert à supprimer des Pochettes, des images Sheet, des fichiers .nfo et des films.
 
-*Movie_Filter (defaut sample,"2 ch",cd2)
+ * Movie_Filter (defaut sample,"2 ch",cd2)
 Ce filtre contient une liste qui va permettre d’écarter des films qui contiennent ces termes.
 Ces éléments doivent être séparés par une virgule. Si un élément comporte un blanc, il doit être entre guillemets.
 Si une vidéo est coupée en deux, cd2 sert à masquer le deuxième cd. Les films en deux parties sont gérés par SRJG, qui passe automatiquement à la deuxième partie. Il faut impérativement que la partie 1 comporte l’élément cd1 à la fin de son nom et la partie 2 contienne cd2 :
@@ -84,80 +84,80 @@ Ou bien
 <nom du film>cd2.avi`
 Les minuscules sont importantes pour reconnaître cd1 et cd2.
 
-*Port (defaut 80)
+ * Port (defaut 80)
 Ce numéro de port permet d’exécuter les scripts cgi. Si vous ne connaissez pas votre numéro de port, vous avez un petit outil pour le trouver.
 Mettez-vous en Telnet et exécutez le script srjg/installer/port.sh
 
-*Recent_Max (defaut 24)
+ * Recent_Max (defaut 24)
 Indique le nombre maximum de films affichés dans la rubrique « Pas Regardés »
 
-*Dspl_Genre_txt (defaut white)
+ * Dspl_Genre_txt (defaut white)
 Indique la couleur d’affichage du texte sur les Pochettes des genres (blanc, noir).
 Valeurs possibles: white, black
 
-*Dspl_HelpBar (defaut top)
+ * Dspl_HelpBar (defaut top)
 Permet de décider de l’emplacement de la barre d’aide (haut, bas ou pas du tout).
 Valeurs possibles: up, down, no
 
-*Imdb (defaut no)
+ * Imdb (defaut no)
 Permet d’utiliser Imdb pour récupérer automatiquement des Pochettes, Jaquettes et/ou fichiers .nfo, en fonction des paramètres choisis.
 
-*Imdb_Lang (defaut en)
+ * Imdb_Lang (defaut en)
 Permet de definer la langue de l’interface sur une image Sheet (acteur, directeur, genre, année, durée). Pour définir la langue utilisée dans le synopsis, il faut utiliser le paramètre Imdb_Source.
 
-*Imdb_Source (defaut imdb)
+ * Imdb_Source (defaut imdb)
 Permet de défini sur quel site les images des Pochettes, les images Sheet et le fichier .nfo vont être récupéré. C’est le site qui définit la langue utilisé dans le Synopsis et les images. Pour le Français, il faut prendre allocine.
 Valeurs possibles: imdb, tmdb, allocine.
 
-*Imdb_Poster (defaut yes)
+ * Imdb_Poster (defaut yes)
 yes active la récupération des Pochettes
 no les pochettes ne seront pas récupérées. 
 
-*Imdb_PBox (defaut generic)
+ * Imdb_PBox (defaut generic)
 Valeurs possibles : no, bdrip, bluray, dtheater, dvd, generic, hddvd, hdtv, itunes
 Affiche un cadre pour la pochette.
 
-*Imdb_PPost (defaut yes)
+ * Imdb_PPost (defaut yes)
 Valeurs possibles: yes, no
 Si active, la pochette sera choisie aléatoirement parmi les images disponibles sur le site source.
 
-*Imdb_Sheet (defaut yes)
+ * Imdb_Sheet (defaut yes)
 yes active la récupération des images Sheet.
 no les images Sheet ne seront pas récupérées.
 
-*Imdb_SBox (defaut generic)
+ * Imdb_SBox (defaut generic)
 Valeurs possibles : no, bdrip, bluray, dtheater, dvd, generic, hddvd, hdtv, itunes
 Affiche un cadre pour la pochette à l’intérieur de l’image Sheet.
 
-*Imdb_SPost (defaut yes)
+ * Imdb_SPost (defaut yes)
 Valeurs possibles: yes, no
 Si active, la pochette sera choisie aléatoirement parmi les images disponibles sur le site source.
 
-*Imdb_Backdrop (defaut yes)
+ * Imdb_Backdrop (defaut yes)
 Valeurs possibles: yes, no
 Si active, le fond de l’image Sheet sera choisi aléatoirement parmi les images disponibles sur le site source.
 
-*Imdb_Font (defaut tahoma)
+ * Imdb_Font (defaut tahoma)
 Valeurs possibles :  arial, bookman, comic, tahoma, times, verdana
 Permet de définir la police de caractère utilize dans l’image Sheet.
 
-*Imdb_Genres (defaut no)
+ * Imdb_Genres (defaut no)
 Valeurs possibles: yes, no
 Si activé, ce seront des images qui vont être affichées à la place du texte. Ce système marche bien avec des genres en Anglais, à cause de la traduction, il se peut que certains genres Images ne s’affichent pas.
 
-*Imdb_Tagline (defaut yes)
+ * Imdb_Tagline (defaut yes)
 Valeurs possibles : yes, no
 Permet d’afficher la ligne Tag dans une images Sheet.
 
-*Imdb_Time (defaut no)
+ * Imdb_Time (defaut no)
 Permet de définir le format pour l’affichage de la durée dans une image Sheet.
 Valeurs possibles: no, real, hours
 
-*Imdb_Info (defaut yes)
+ * Imdb_Info (defaut yes)
 yes active la récupération des fichiers .nfo
 no les fichiers .nfo ne seront pas récupérés.
 
-*Imdb_MaxDl (defaut 3)
+ * Imdb_MaxDl (defaut 3)
 Indique le nombre de téléchargements simultanés pour récupérer les images et fichiers .nfo
 Ce réglage dépend du débit de votre connexion Internet et des ressources de votre Player.
 Si vous avez un petit débit, mettez le téléchargement à 1 ou 2.
@@ -237,10 +237,10 @@ Si Imdb est activé, les images et .nfo vont être récupérés lorsque vous lan
 Imdb ne remplacera pas les Pochettes, images Sheet et fichiers Nfo que vous avez déjà, il va se contenter d'aller chercher ce qu’il manque.
 Ce procédé est totalement anonyme, il n'y a aucune collecte d'informations. 
 Voilà comment ça marche :
-•	Recherche sur votre Player des vidéos pour lesquelles il manque une Pochette, une image Sheet ou un fichier Nfo
-•	Épuration de certains caractères dans le nom des fichiers pour être le plus près possible d'un nom de Film
-•	Envoi des titres générés à l'Api de playon.unixstorm.org
-•	Playon.unixstorm.org interroge les serveurs officiels de vidé comme imdb, allocine.fr pour récupérer les images et in
+ * Recherche sur votre Player des vidéos pour lesquelles il manque une Pochette, une image Sheet ou un fichier Nfo
+ * Épuration de certains caractères dans le nom des fichiers pour être le plus près possible d'un nom de Film
+ * Envoi des titres générés à l'Api de playon.unixstorm.org
+ * Playon.unixstorm.org interroge les serveurs officiels de vidé comme imdb, allocine.fr pour récupérer les images et in
 Si un site fait de la collecte d'informations, il ne verra que des demandes en provenance de Playon.unixstorm.org
 
 =Liste des paramètres=
@@ -254,8 +254,8 @@ Vous pouvez supprimer les Pochettes, Sheet, Nfo erronés depuis SRJG en RSS : ac
 Ainsi, lorsque vous êtes sur une pochette de Film (ou un Sheet), appuyez sur « Edit » et supprimez le fichier de votre choix. Lors de la prochaine mise à jour, ces fichiers seront récupérés à nouveau.
 Une suppression du fichier .nfo oblige à reconstruire le Jukebox.
 Astuce pour éviter une reconstruction :
-•	Changez le nom de votre film
-•	Lancez une mise à jour rapide
+ * Changez le nom de votre film
+ * Lancez une mise à jour rapide
 Si vous tenez à lui remettre son nom d’origine, refaites une autre mise à jour rapide.
 
 ==Manuellement==
@@ -275,10 +275,10 @@ Affichez le code source de la page avant de copier ce code dans un fichier du <n
 ==Depuis un ordinateur==
 
 Vous pouvez aussi utiliser d'autres outils pour récupérer ces informations
-*Thumbgen http://geekyhmb.niloo.fr/content/thumbgen-0
-*YAMJ http://geekyhmb.niloo.fr/content/yamj
-*SheetMaker http://geekyhmb.niloo.fr/content/sheetmaker
-*Tvixie2PlayOn!HD 
+ * Thumbgen http://geekyhmb.niloo.fr/content/thumbgen-0
+ * YAMJ http://geekyhmb.niloo.fr/content/yamj
+ * SheetMaker http://geekyhmb.niloo.fr/content/sheetmaker
+ * Tvixie2PlayOn!HD 
 
 =Gestion des Genres=
 
@@ -294,7 +294,7 @@ Vous pouvez avoir plusieurs genres qui vont utiliser la même image.
 <langue>_genreGrp
 Ce fichier va permettre de regrouper des genres entre eux. Par défaut nous avons décidé que tous les films qui appartiennent au genre Sci-Fi soient regroupés avec le genre Science-fiction.
 Vous pouvez regrouper d’autres genres entre eux. Par exemple (c’est juste un exemple ). Pour mettre les films qui appartiennent au genre Crime, avec ceux qui sont dans le genre Thriller, vous allez ajouter la ligne suivante dans le fichier :
-s:<name>Crime</name>:<name>Thriller</name>:
+`s:<name>Crime</name>:<name>Thriller</name>:`
 
 Ce système peut être utilisé pour traduire les genres. Si vous avez des fichiers Nfo en Anglais, les films vont être attachés à des genres Anglais. En ajoutant des lignes dans ce fichier, vous pouvez les regrouper avec des genres en Français.
 Vous pouvez aussi modifier directement les noms de genre dans le fichier Nfo, puisque c’est un simple fichier texte. Il faut repérer les balises <genre>…</genre>
@@ -343,7 +343,8 @@ Par exemple :
 <Movies_Path>/NAS/Films/</Movies_Path>
 <Nfo_Path>/home/Images/Posters/</Nfo_Path>
 <Poster_Path>/home/Images/Posters/</Poster_Path>
-<Sheet_Path>/home/Images/Posters/</Sheet_Path>`
+<Sheet_Path>/home/Images/Posters/</Sheet_Path>
+`
 
 ==NAS autorisé en lecture/écriture==
 
