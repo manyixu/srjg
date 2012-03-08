@@ -1,0 +1,6 @@
+#summary One-sentence summary of this page.
+
+= SRJG Video demonstration =
+
+<wiki:video url="http://youtu.be/1qjapUIsEiE" width="640" height="480" />
+
