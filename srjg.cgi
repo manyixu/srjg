@@ -219,9 +219,11 @@ Footer;
 WatcheUpDB()
 # Update the watched field in the Database.
 {
-cat <<EOF
+echo -e '
 <?xml version="1.0" ?>
 <rss version="2.0" xmlns:dc="http://purl.org/dc/elements/1.1/">
+'
+cat <<EOF
 <onEnter>
 showIdle();
 postMessage("return");
@@ -240,10 +242,10 @@ exit 0
 Header()
 #Insert RSS Header
 {
-cat <<EOF
+echo -e '
 <?xml version="1.0" ?>
 <rss version="2.0" xmlns:dc="http://purl.org/dc/elements/1.1/">
-EOF
+'
 }
 
 Footer()
@@ -258,10 +260,11 @@ EOF
 UpdateMenu()
 #Display UpdateMenu
 {
-cat <<EOF
+echo -e '
 <?xml version="1.0"   encoding="utf-8" ?>
 <rss version="2.0" xmlns:dc="http://purl.org/dc/elements/1.1/">
-
+'
+cat <<EOF
 <onEnter>
 		langpath = "${Jukebox_Path}lang/${Language}";
 		langfile = loadXMLFile(langpath);
@@ -1137,10 +1140,11 @@ EOF
 DsplCfgEdit()
 # RSS to edit Display
 {
-cat <<EOF
+echo -e '
 <?xml version="1.0" encoding="UTF-8" ?>
 <rss version="2.0" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:media="http://purl.org/dc/elements/1.1/">
-
+'
+cat <<EOF
 <onEnter>
   showIdle();
 	Config = "/usr/local/etc/srjg.cfg";
@@ -1300,10 +1304,11 @@ EOF
 MenuCfg()
 # RSS to edit srjg.cfg
 {
-cat <<EOF
+echo -e '
 <?xml version="1.0" encoding="UTF-8" ?>
 <rss version="2.0" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:media="http://purl.org/dc/elements/1.1/">
-
+'
+cat <<EOF
 <onEnter>
   showIdle();
 	Config = "/usr/local/etc/srjg.cfg";
@@ -1675,10 +1680,11 @@ FBrowser()
 #    Contact: w0m@seznam.cz, http://www.hddplayer.cz
 # Modified and adapted to the srjg project
 {
-cat <<EOF
+echo -e '
 <?xml version='1.0' ?>
 <rss version="2.0" xmlns:dc="http://purl.org/dc/elements/1.1/">
-
+'
+cat <<EOF
 <onEnter> 
   Jukebox_Path="$Jukebox_Path";
   langpath = Jukebox_Path + "lang/$Language";
@@ -1862,9 +1868,11 @@ EOF
 UpdateCfg()
 # Update the srjg.cfg
 {
-cat <<EOF
+echo -e '
 <?xml version="1.0" ?>
 <rss version="2.0" xmlns:dc="http://purl.org/dc/elements/1.1/">
+'
+cat <<EOF
 <onEnter>
 showIdle();
 postMessage("return");
@@ -1890,9 +1898,11 @@ ReplaceCd1byCd2()
 # replace string
 {
 Cd2=`echo "$CategoryTitle" | sed 's:\(.*\)cd1:\1cd2:'`
-cat <<EOF
+echo -e '
 <?xml version="1.0" ?>
 <rss version="2.0" xmlns:dc="http://purl.org/dc/elements/1.1/">
+'
+cat <<EOF
 <onEnter>
 setEnv("MovieCd2","$Cd2");
 showIdle();
@@ -1907,9 +1917,11 @@ exit 0
 DirList()
 # List HDD or Usb devices
 {
-cat <<EOF
+echo -e '
 <?xml version="1.0" ?>
 <rss version="2.0" xmlns:dc="http://purl.org/dc/elements/1.1/">
+'
+cat <<EOF
 <onEnter>
 showIdle();
 postMessage("return");
@@ -1943,10 +1955,11 @@ done
 
 YPos=$Jukebox_Size
 
-cat <<EOF
+echo -e '
 <?xml version="1.0"   encoding="utf-8" ?>
 <rss version="2.0" xmlns:dc="http://purl.org/dc/elements/1.1/">
-
+'
+cat <<EOF
 <onEnter>
 </onEnter>
 
@@ -2041,10 +2054,11 @@ echo '</channel></rss>' # to close the RSS
 ImdbSheetDspl()
 # fullscreen display demo Imdb sheet
 {
-cat <<EOF
+echo -e '
 <?xml version="1.0"?>
 <rss version="2.0" xmlns:media="http://purl.org/dc/elements/1.1/" xmlns:dc="http://purl.org/dc/elements/1.1/">
-
+'
+cat <<EOF
 <onEnter>
   showIdle();
   redrawDisplay();
@@ -2099,10 +2113,11 @@ ImdbCfgEdit()
 # Imdb Config editor
 {
 
-cat <<EOF
+echo -e '
 <?xml version="1.0" encoding="UTF-8" ?>
 <rss version="2.0" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:media="http://purl.org/dc/elements/1.1/">
-
+'
+cat <<EOF
 <onEnter>
   showIdle();
 	Config = "/usr/local/etc/srjg.cfg";
@@ -2556,10 +2571,11 @@ done
 
 YPos=$Jukebox_Size
 
-cat <<EOF
+echo -e '
 <?xml version="1.0" encoding="UTF-8" ?>
 <rss version="2.0" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:media="http://purl.org/dc/elements/1.1/">
-
+'
+cat <<EOF
 <onEnter>
 </onEnter>
 
@@ -2669,9 +2685,11 @@ echo '</channel></rss>' # to close the RSS
 DelMedia()
 # Remove Nfo, Poster, Sheet or/and Movie
 {
-cat <<EOF
+echo -e '
 <?xml version="1.0" encoding="UTF-8" ?>
 <rss version="2.0" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:media="http://purl.org/dc/elements/1.1/">
+'
+cat <<EOF
 <onEnter>
   showIdle();
   postMessage("return");
@@ -2722,9 +2740,11 @@ exit 0
 MenuEdit()
 # Menu to remove Poster, Sheet, Nfo or/and Movie File
 {
-cat <<EOF
+echo -e '
 <?xml version="1.0" encoding="UTF-8" ?>
 <rss version="2.0" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:media="http://purl.org/dc/elements/1.1/">
+'
+cat <<EOF
 <onEnter>
   showIdle();
   RedrawDisplay();
