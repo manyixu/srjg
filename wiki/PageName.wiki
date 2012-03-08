@@ -2,4 +2,4 @@
 
 = SRJG Video demonstration =
 
-<wiki:video url="http://www.youtube.com/watch?v=1qjapUIsEiE"/>
+http://youtu.be/1qjapUIsEiE
