@@ -35,11 +35,11 @@
   <Version>Version:</Version>
   <yes>Yes</yes>
   <no>No</no>
-	<top>Haut</top>
-	<bottom>Bas</bottom>
-	<white>Blanc</white>
-	<black>Noir</black>
-	<browse>Parcourir</browse>
+	<top>Top</top>
+	<bottom>Bottom</bottom>
+	<white>White</white>
+	<black>Black</black>
+	<browse>Browse</browse>
 </cfg>
 <Dspl>
   <Dspl_Genre_txt>Genre text:</Dspl_Genre_txt>
@@ -65,7 +65,7 @@
   <Imdb_Tagline>Tagline</Imdb_Tagline>
   <Imdb_Time>Format time</Imdb_Time>
   <Imdb_Info>Create file info</Imdb_Info>
-  <Imdb_MaxDl>Simultaneus downloads</Imdb_MaxDl>
+  <Imdb_MaxDl>Simultaneous downloads</Imdb_MaxDl>
 </Imdb>
 <MEdit>
   <EditMenu>Edit Menu</EditMenu>
@@ -73,8 +73,8 @@
   <rmSheet>Remove the Sheet</rmSheet>
   <rmNfo>Remove the Nfo</rmNfo>
   <rmMovie>Remove the Movie</rmMovie>
-  <ValPoster>Do you really want to suppress only the Poster ?</ValPoster>
-  <ValSheet>Do you really want to suppress only the Sheet ?</ValSheet>
-  <ValNfo>Do you really want to suppress only the Nfo ?</ValNfo>
-  <ValMovie>Do you really want to suppress all the movie's files ?</ValMovie>
+  <ValPoster>Do you really want to remove only the Poster ?</ValPoster>
+  <ValSheet>Do you really want to remove only the Sheet ?</ValSheet>
+  <ValNfo>Do you really want to remove only the Nfo ?</ValNfo>
+  <ValMovie>Do you really want to remove all the movie's files ?</ValMovie>
 </MEdit>

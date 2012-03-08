@@ -21,29 +21,29 @@
   <Lang>Jazyk</Lang>
   <Jukebox_Size>Zobrazení</Jukebox_Size>
   <Movies_Path>Cesta k filmu</Movies_Path>
- 	<Nfo_Path>Nfo path</Nfo_Path>
-	<Poster_Path>Poster path</Poster_Path>
-	<Sheet_Path>Sheet path</Sheet_Path>
+ 	<Nfo_Path>Cesta k Nfo</Nfo_Path>
+	<Poster_Path>Cesta k Poster</Poster_Path>
+	<Sheet_Path>Cesta k Sheet</Sheet_Path>
   <Movie_Filter>Filtr</Movie_Filter>
   <SingleDb>Jednoduhá databáze</SingleDb>
   <Recent_Max>Max. počet přidaných</Recent_Max>
   <Imdb>Použij Imdb</Imdb>
-	<Dspl>Display</Dspl>
-  <UnlockRM>Allow Delete</UnlockRM>
+	<Dspl>Zobrazit</Dspl>
+  <UnlockRM>Povolit Smazat</UnlockRM>
   <Jukebox_Path>Cesta k Jukeboxu:</Jukebox_Path>
   <Port>Port:</Port>
   <Version>Verze:</Version>
   <yes>Ano</yes>
   <no>Ne</no>
-	<top>Top</top>
-	<bottom>Bottom</bottom>
-	<white>White</white>
-	<black>Black</black>
-	<browse>Browse</browse>
+	<top>Kvalitní</top>
+	<bottom>Spodní</bottom>
+	<white>Bilá</white>
+	<black>Černá</black>
+	<browse>Prohlížet</browse>
 </cfg>
 <Dspl>
-  <Dspl_Genre_txt>Genre text:</Dspl_Genre_txt>
-	<Dspl_HelpBar>Help bar:</Dspl_HelpBar>
+  <Dspl_Genre_txt>Žánr textu:</Dspl_Genre_txt>
+	<Dspl_HelpBar>Pomoc bar:</Dspl_HelpBar>
 </Dspl>
 <FBrowser>
   <FBrowser_Title>Cesta k filmům:</FBrowser_Title>
@@ -68,13 +68,13 @@
   <Imdb_MaxDl>Vícenásobné stahování</Imdb_MaxDl>
 </Imdb>
 <MEdit>
-  <EditMenu>Edit Menu</EditMenu>
-  <rmPoster>Remove the Poster</rmPoster>
-  <rmSheet>Remove the Sheet</rmSheet>
-  <rmNfo>Remove the Nfo</rmNfo>
-  <rmMovie>Remove the Movie</rmMovie>
-  <ValPoster>Do you really want to suppress only the Poster ?</ValPoster>
-  <ValSheet>Do you really want to suppress only the Sheet ?</ValSheet>
-  <ValNfo>Do you really want to suppress only the Nfo ?</ValNfo>
-  <ValMovie>Do you really want to suppress all the movie's files ?</ValMovie>
+  <EditMenu>Upravit Menu</EditMenu>
+  <rmPoster>Odebrat Poster</rmPoster>
+  <rmSheet>Odebrat Sheet</rmSheet>
+  <rmNfo>Odebrat Nfo</rmNfo>
+  <rmMovie>Odebrat Movie</rmMovie>
+  <ValPoster>Opravdu chcete odstranit pouze Poster ?</ValPoster>
+  <ValSheet>Opravdu chcete odstranit pouze Sheet ?</ValSheet>
+  <ValNfo>Opravdu chcete odstranit pouze Nfo ?</ValNfo>
+  <ValMovie>Opravdu chcete odstranit všechny soubory, včetně filmu ?</ValMovie>
 </MEdit>
