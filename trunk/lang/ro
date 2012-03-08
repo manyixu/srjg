@@ -1,0 +1,80 @@
+<?xml encoding="UTF-8" version="1.0"?>
+<main>
+	<alpha>Alfabet</alpha>
+	<genre>Gen</genre>
+	<recent>Adaugate Recent</recent>
+	<select>Selectati Filme de:</select>
+	<update>Actualizare Jukebox</update>
+	<notwatched>Nevizionate</notwatched>
+	<year>An</year>
+	<search>Cautare</search>
+  <config>Configurare</config>
+</main>
+<jukebox>
+	<top>1 = Switch View | 2 = Mark as Watched | Enter = Select | Rtn = Previous Menu/View | Play = Play Video/Movie</top>
+</jukebox>
+<update>
+  <fast>Rapid</fast>
+  <rebuild>Reconstruire</rebuild>
+</update>
+<cfg>
+  <Lang>Limba</Lang>
+  <Jukebox_Size>Afisare</Jukebox_Size>
+  <Movies_Path>Cale Filme</Movies_Path>
+	<Nfo_Path>Nfo path</Nfo_Path>
+	<Poster_Path>Cale Poster</Poster_Path>
+	<Sheet_Path>Cale Sheet</Sheet_Path>
+  <Movie_Filter>Filtrul</Movie_Filter>
+  <SingleDb>O Singura Baza</SingleDb>
+  <Recent_Max>Max Filme Recente </Recent_Max>
+  <Imdb>Utilizati IMDB</Imdb>
+	<Dspl>Afiseaza</Dspl>
+	<UnlockRM>Allow Delete</UnlockRM>
+  <Jukebox_Path>Cale Jukebox:</Jukebox_Path>
+  <Port>Port:</Port>
+  <Version>Versiune:</Version>
+  <yes>Da</yes>
+  <no>Nu</no>
+	<top>Sus</top>
+	<bottom>Jos</bottom>
+	<white>Alb</white>
+	<black>Negru</black>
+	<browse>Navigare</browse>
+</cfg>
+<Dspl>
+  <Dspl_Genre_txt>Text Gen:</Dspl_Genre_txt>
+	<Dspl_HelpBar>Bara Ajutor:</Dspl_HelpBar>
+</Dspl>
+<FBrowser>
+  <FBrowser_Title>Cale Filme:</FBrowser_Title>
+  <FBrowser_Valid>pentru a valida</FBrowser_Valid>
+</FBrowser>
+<Imdb>
+  <Imdb_Use>Utilizati IMDB</Imdb_Use>
+  <Imdb_Lang>Sinopsis</Imdb_Lang>
+  <Imdb_Source>Poster Aleatoriu</Imdb_Source>
+  <Imdb_Poster>Descarcati Poster</Imdb_Poster>
+  <Imdb_PBox>Poster Box</Imdb_PBox>
+  <Imdb_PPost>Poster Aleatoriu</Imdb_PPost>
+  <Imdb_Sheet>Descarcati Sheet</Imdb_Sheet>
+  <Imdb_SBox>Poster Box in Sheet</Imdb_SBox>
+  <Imdb_SPost>Poster Aleatoriu in Sheet</Imdb_SPost>
+  <Imdb_Backdrop>Bankground Aleatoriu</Imdb_Backdrop>
+  <Imdb_Font>Font</Imdb_Font>
+  <Imdb_Genres>Imagini Genuri</Imdb_Genres>
+  <Imdb_Tagline>Tagline</Imdb_Tagline>
+  <Imdb_Time>Format de time</Imdb_Time>
+  <Imdb_Info>Creati fisier info</Imdb_Info>
+  <Imdb_MaxDl>Descarcari Simultane</Imdb_MaxDl>
+</Imdb>
+<MEdit>
+  <EditMenu>Edit Menu</EditMenu>
+  <rmPoster>Remove the Poster</rmPoster>
+  <rmSheet>Remove the Sheet</rmSheet>
+  <rmNfo>Remove the Nfo</rmNfo>
+  <rmMovie>Remove the Movie</rmMovie>
+  <ValPoster>Do you really want to suppress only the Poster ?</ValPoster>
+  <ValSheet>Do you really want to suppress only the Sheet ?</ValSheet>
+  <ValNfo>Do you really want to suppress only the Nfo ?</ValNfo>
+  <ValMovie>Do you really want to suppress all the movie's files ?</ValMovie>
+</MEdit>
