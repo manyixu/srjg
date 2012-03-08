@@ -1,6 +1,7 @@
 #labels Phase-Deploy
 = En cours d'écriture =
 
+<wiki:toc max_depth="1" />
 
 =SRJG Video demonstration=
 
@@ -17,7 +18,7 @@ Le fichier srjg.cfg doit être copié dans /usr/local/etc/
 
 Les paramètres sont entre balise. Ne modifiez pas les noms des balises.
 Exemple
- <Lang>en</Lang>
+ `<Lang>en</Lang>`
 Le nom  du paramètre c’est « Lang » et sa valeur c’est « en »
 Liste des paramètres
 Lang (defaut en) 
