@@ -678,6 +678,7 @@ cat <<EOF
 EOF
 fi
 
+if ([ $mode != "genreSelection" ] && [ $mode != "alphaSelection" ] && [ $mode != "yearSelection" ]); then
 cat <<EOF
         else if (userInput == "video_play") {
           M_ID=getItemInfo(-1, "IdMovie");
@@ -709,6 +710,10 @@ cat <<EOF
           } else Cd2 = "false";
 					"false";
         }
+EOF
+fi
+
+cat <<EOF
 		</onUserInput>
 EOF
 
@@ -1534,7 +1539,7 @@ cat <<EOF
 	</script>
 </title>
 <selection>Lang</selection>
-<param>en%20es%20fr%20pl</param>
+<param>cz%20en%20es%20fr%20pl%20ro</param>
 <pos>25</pos>
 </item>
 
@@ -1781,7 +1786,7 @@ cat <<EOF
 		      New_Ch_Base = Ch_Sel;
 		    }
         New_Ch_Base=urlEncode(New_Ch_Base);
-        dlok = loadXMLFile("http://127.0.0.1:80/cgi-bin/srjg.cgi?UpdateCfg@"+New_Ch_Base+"@$CategoryTitle");
+        dlok = loadXMLFile("http://127.0.0.1$Port/cgi-bin/srjg.cgi?UpdateCfg@"+New_Ch_Base+"@$CategoryTitle");
         postMessage("return");
         "true";
 
@@ -1795,7 +1800,7 @@ cat <<EOF
 
 <listDir>
     writeStringToFile(dir2File, Ch_Sel);
-    dlok = loadXMLFile("http://127.0.0.1:80/cgi-bin/srjg.cgi?DirList");
+    dlok = loadXMLFile("http://127.0.0.1:$Port/cgi-bin/srjg.cgi?DirList");
     test="";
     dirArray=null;
     titleArray=null;
@@ -1870,11 +1875,8 @@ EOF
 Cfg_Tag=$Jukebox_Size
 Cfg_Par=$CategoryTitle
 
-#&& [ $Cfg_Par != "SRJG" ]
-#   [ $Cfg_Par != "MoviesPath" ] || \
-
-if ([ $Cfg_Tag = "Movies_Path" ] || [ $Cfg_Tag = "Nfo_Path" ] || [ $Cfg_Tag = "Sheet_Path" ] || [ $Cfg_Tag = "Poster_Path" ]) \
-   && ([ $Cfg_Par != "SRJG" ] && [ $Cfg_Par != "MoviesPath" ]) ; then
+if ([ "$Cfg_Tag" = "Movies_Path" ] || [ "$Cfg_Tag" = "Nfo_Path" ] || [ "$Cfg_Tag" = "Sheet_Path" ] || [ "$Cfg_Tag" = "Poster_Path" ]) \
+   && ([ "$Cfg_Par" != "SRJG" ] && [ "$Cfg_Par" != "MoviesPath" ]) ; then
   sed -i "s:<$Cfg_Tag>.*</$Cfg_Tag>:<$Cfg_Tag>\"$Cfg_Par\"</$Cfg_Tag>:" /usr/local/etc/srjg.cfg
 else
   sed -i "s:<$Cfg_Tag>.*</$Cfg_Tag>:<$Cfg_Tag>$Cfg_Par</$Cfg_Tag>:" /usr/local/etc/srjg.cfg

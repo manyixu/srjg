@@ -99,8 +99,8 @@ MkDlList()
     elif [ "${Sheet_Path}" = "SRJG" ]; then SHEETPATH="${FSrjg_Path}"
     else SHEETPATH="${Sheet_Path}"; fi
 
-    # Remove CD parts and replace special characters with plus sign
-    MOVIENAME=`echo $MOVIENAMETEMP | sed "s/[cC][dD]*[1-9]//g;s/[ &']/+/g"`
+    # Remove CD parts, (1991)(1080p) and replace special characters with plus sign
+    MOVIENAME=`echo $MOVIENAMETEMP | sed "s/[cC][dD]*[1-9]//g;s/[ &']/+/g;s/(.*)//"`
 	
     # Download poster
     if ( [ $Imdb_Poster = "yes" ] && [ ! -e "$POSTERPATH/${MOVIEFILE}.jpg" ] )
