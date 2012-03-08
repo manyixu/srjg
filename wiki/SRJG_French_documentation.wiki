@@ -7,44 +7,43 @@
 
 http://youtu.be/1qjapUIsEiE
 
-
 =Le paramétrage=
 
-Deux paramètres ne peuvent pas être configurés depuis la TV en RSS :
-L’emplacement du Jukebox (Jukebox_Path), et le numéro du port utilisé (Port) pour exécuter les scripts cgi.
+Deux paramètres ne peuvent pas être configurés depuis la TV en RSS :<br>
+L’emplacement du Jukebox (Jukebox_Path), et le numéro du port utilisé (Port) pour exécuter les scripts cgi.<br>
 Le fichier srjg.cfg doit être copié dans /usr/local/etc/
 
 ==Fichier de config==
 
-Les paramètres sont entre balise. Ne modifiez pas les noms des balises.
-Exemple
-`<Lang>en</Lang>`
+Les paramètres sont entre balise. Ne modifiez pas les noms des balises.<br>
+Exemple:<br>
+`<Lang>en</Lang>`<br>
 Le nom  du paramètre c’est « Lang » et sa valeur c’est « en »
 Liste des paramètres
  * Lang (defaut en)
-   Permet de mettre l’interface dans la langue choisie.
+Permet de mettre l’interface dans la langue choisie.
 
  * Jukebox_Path ( defaut /usr/local/etc/srjg/)
-   C’est le chemin où se trouve le SRJG. 
-   Sur certains player, nottament HMB, le chemin sera /usr/local/etc/scripts/srjg/
-   Nottez qu’il y a un « / » à la fin du chemin.
+C’est le chemin où se trouve le SRJG. 
+Sur certains player, nottament HMB, le chemin sera /usr/local/etc/scripts/srjg/
+Nottez qu’il y a un « / » à la fin du chemin.
 
  * Jukebox_Size (defaut 2x6)
-   C’est l’affichage par défaut des Jukebox.
-   Liste des choix possibles
-   2x6 2 rangées de 6 Pochettes
-   3x8 3 rangées de 8 Pochettes
-   Sheetwall C’est un mode avec l’image Sheet en pleine page et les Pochette en bas de l’écran.
+C’est l’affichage par défaut des Jukebox.
+Liste des choix possibles
+2x6 2 rangées de 6 Pochettes
+3x8 3 rangées de 8 Pochettes
+Sheetwall C’est un mode avec l’image Sheet en pleine page et les Pochette en bas de l’écran.
 
  * Movies_Path (defaut /tmp/usbmounts/sdb1/)
-   C’est le chemin vers l’emplacement de vos films.
-   Ce chemin doit exister
-   Nottez qu’il y a un « / » à la fin du chemin.
+C’est le chemin vers l’emplacement de vos films.
+Ce chemin doit exister
+Nottez qu’il y a un « / » à la fin du chemin.
 
  * Nfo_Path (defaut MoviesPath)
-   Indique l’emplacement des fichiers .nfo
-   Valeurs possibles
-   MoviesPath les fichiers .nfo sont placés dans le dossier des Films définit dans le paramètre MoviesPath
+Indique l’emplacement des fichiers .nfo
+Valeurs possibles
+MoviesPath les fichiers .nfo sont placés dans le dossier des Films définit dans le paramètre MoviesPath
 SRJG les fichiers .nfo sont placés dans un sous dossier des films : <chemin des films>/SRJG/ImgNfo/ qui se trouve dans le dossier des Films définit dans le paramètre MoviesPath
 «Un chemin vers un dossier qui existe/» Vous pouvez indiquer le chemin de votre choix. Ce dossier doit exister et être accessible en écriture.
 Nottez qu’il y a un « / » à la fin du chemin.
@@ -175,8 +174,8 @@ Un icone va apparaître sur la pochette ou la jaquette, en haut à droite pour i
 =Organisation des fichiers=
 ==Les films==
 Vous avez une grande liberté sur l’organisation de vos fichiers : les films sont repérés automatiquement dans toutes les arborescences.
-`
-Dossier principal
+
+ Dossier principal
   |-- Film 1
   |-- Film 2
   |-- …
@@ -194,7 +193,7 @@ Dossier Principal
             |-- Film 333
             |-- Film 334
             |-- …
-`
+
 L'emplacement du « Dossier principal », c'est le chemin des Films. Il est à indiquer dans le fichier de config, ou bien dans le menu configuration de l’interface RSS.
 Pour le chemin /tmp/usbmounts/sdb1/film on aura :
 `<Movies_Path>/tmp/usbmounts/sdb1/film/</Movies_Path>`
