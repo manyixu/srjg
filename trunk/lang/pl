@@ -11,7 +11,7 @@
   <config>Konfiguracja</config>
 </main>
 <jukebox>
-	<top>1 = Zmiana widoku | 2 = Zaznacz jako oglądane | Enter = Wybierz | Rtn = Poprzednie menu/widok | Play = Odtwórz film</top>
+	<help>1 = Zmiana widoku | 2 = Zaznacz jako oglądane | Enter = Wybierz | Rtn = Poprzednie menu/widok | Play = Odtwórz film</help>
 </jukebox>
 <update>
   <fast>Szybko</fast>
