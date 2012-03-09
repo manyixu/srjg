@@ -11,7 +11,7 @@
   <config>Nastavení</config>
 </main>
 <jukebox>
-	<top>1 = Přepni zobrazení | 2 = Označ jako shlédnuté | Enter = Vyber | Rtn = Předchozí Menu/Zobrazení | Play = Přehraj Video/Film</top>
+	<help>1 = Přepni zobrazení | 2 = Označ jako shlédnuté | Enter = Vyber | Rtn = Předchozí Menu/Zobrazení | Play = Přehraj Video/Film</help>
 </jukebox>
 <update>
   <fast>Rychle</fast>

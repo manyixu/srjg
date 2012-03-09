@@ -11,7 +11,7 @@
   <config>Config</config>
 </main>
 <jukebox>
-	<top>1 = Switch View | 2 = Mark as Watched | Enter = Select | Rtn = Previous Menu/View | Play = Play Video/Movie</top>
+	<help>1 = Switch View | 2 = Mark as Watched | Enter = Select | Rtn = Previous Menu/View | Play = Play Video/Movie</help>
 </jukebox>
 <update>
   <fast>Fast</fast>
