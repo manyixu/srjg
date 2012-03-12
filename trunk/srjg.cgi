@@ -1,7 +1,7 @@
 #!/bin/sh
 
 # To kill all childs process when need to stop the script
-trap "kill 0" SIGINT EXIT
+trap "kill 0" SIGINT
 
 # Parsing query string provided by the server/client
 QUERY=$QUERY_STRING
@@ -656,7 +656,7 @@ cat <<EOF
 EOF
 fi
 
-if ([ $mode = "genre" ] || [ $mode = "year" ] || [ $mode = "alpha" ] || [ $mode = "recent" ] || [ $mode = "notwatched" ]); then
+if ([ $mode != "genreSelection" ] && [ $mode != "alphaSelection" ] && [ $mode != "yearSelection" ]); then
 cat <<EOF
         else if (userInput == "two") {
           MovieID=getItemInfo(-1, "IdMovie"); 
@@ -880,7 +880,7 @@ cat <<EOF
 </SRJGView>
 EOF
 
-if [ $mode = "genre" ] || [ $mode = "year" ] || [ $mode = "alpha" ] || [ $mode = "recent" ] || [ $mode = "notwatched" ] || [ $mode = "moviesearch" ]; then
+if ([ $mode != "genreSelection" ] && [ $mode != "alphaSelection" ] && [ $mode != "yearSelection" ]); then
 cat <<EOF
 <ViewSheet>
     <link>
@@ -976,9 +976,9 @@ cat <<EOF
     if ( SubTSel == "nosubtitle" ) playItemURL(Current_Movie_File, 10);
     else if ( SubTSel != "" &amp;&amp; SubTSel != null ) {
       UE_Srt=urlEncode(SubTSel);
-      loadXMLFile("http://127.0.0.1$Port/cgi-bin/srjg.cgi?SubTitleGen@"+UE_Srt+"@");
+      loadXMLFile("http://127.0.0.1:$Port/cgi-bin/srjg.cgi?SubTitleGen@"+UE_Srt+"@");
       UE_MovieFile=urlEncode(Current_Movie_File);
-      doModalRss("http://127.0.0.1$Port/cgi-bin/srjg.cgi?SubTPlay@"+UE_MovieFile+"@");
+      doModalRss("http://127.0.0.1:$Port/cgi-bin/srjg.cgi?SubTPlay@"+UE_MovieFile+"@");
     }
   }
 </PlayMovie>
@@ -1812,7 +1812,7 @@ cat <<EOF
 		      New_Ch_Base = Ch_Sel;
 		    }
         New_Ch_Base=urlEncode(New_Ch_Base);
-        dlok = loadXMLFile("http://127.0.0.1$Port/cgi-bin/srjg.cgi?UpdateCfg@"+New_Ch_Base+"@$CategoryTitle");
+        dlok = loadXMLFile("http://127.0.0.1:$Port/cgi-bin/srjg.cgi?UpdateCfg@"+New_Ch_Base+"@$CategoryTitle");
         postMessage("return");
         "true";
 
@@ -2226,11 +2226,6 @@ fontname="/usr/local/etc/scripts/srjg/arialnb.ttf";
 
     		<text fontFile="/usr/local/etc/scripts/srjg/arial.ttf" lines="1" useBackgroundSurface="yes" align="left" redraw="yes" offsetXPC="2.5" offsetYPC="2.5" widthPC="50" heightPC="6" fontSize="20" backgroundColor="-1:-1:-1" foregroundColor="255:255:255">
   			<script>stream_elapsed1;</script>
-  		</text>
-
-
-    		<text fontFile="/usr/local/etc/scripts/srjg/arial.ttf" lines="1" useBackgroundSurface="yes" align="left" redraw="yes" offsetXPC="2.5" offsetYPC="30.5" widthPC="50" heightPC="6" fontSize="20" backgroundColor="-1:-1:-1" foregroundColor="255:255:255">
-  			<script>print("TESTESTsfsdfsdfsdfsdf");</script>
   		</text>
 
     		<text align="center" redraw="yes" offsetXPC="0" useBackgroundSurface="yes">
