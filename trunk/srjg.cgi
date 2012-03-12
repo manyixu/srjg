@@ -632,7 +632,7 @@ cat <<EOF
             MExt=getItemInfo(-1, "ext");
             Current_Movie_File=MPath +"/"+ MFile +"."+ MExt;
             Cd2 = "false";
-            playItemURL(Current_Movie_File, 10);
+            executeScript("PlayMovie");
 					} else if (nextmode == "moviesheet") {
              Item_Pos=getFocusItemIndex();
 					   Genre_Title=urlEncode("$CategoryTitle");
@@ -690,7 +690,7 @@ cat <<EOF
           M_Ext=getItemInfo(-1, "ext");
           Current_Movie_File=M_Path +"/"+ M_File +"."+ M_Ext;
           Cd2 = "false";
-          playItemURL(Current_Movie_File, 10);
+          executeScript("PlayMovie");
 					"false";
         } else if (userInput == "video_completed") {
           FindCd1=findString(M_File, "cd1");
@@ -701,7 +701,7 @@ cat <<EOF
             Current_Movie_File=M_Path +"/"+ M_File +"."+ M_Ext;
             playItemURL(-1, 1);              /* reset play */
             Cd2 = "true";
-            playItemURL(Current_Movie_File, 10); /* play cd2 */
+            executeScript("PlayMovie"); /* play cd2 */
           }
           if ( Cd2 == "false" ) {
             Item_Watched="1"; /* mark item as watched */
@@ -962,6 +962,26 @@ cat <<EOF
 	ToggleEAWatched = "on";
   EndPlay="false";
 </WatchUpdate>
+
+<PlayMovie>
+  Current_Movie_Srt=M_Path +"/"+ M_File;
+  UE_Srt=urlEncode(Current_Movie_Srt);
+  dlok = loadXMLFile("http://127.0.0.1:$Port/cgi-bin/srjg.cgi?srtList@"+UE_Srt);
+  M_SubSrt = readStringFromFile( "/tmp/srjg_srt_dir.list" );
+  if ( M_SubSrt == "" || M_SubSrt == null ) playItemURL(Current_Movie_File, 10);
+  else {
+    SubTSel="";
+    Url=urlEncode(Current_Movie_Srt);
+    SubTSel=doModalRss("http://127.0.0.1:$Port/cgi-bin/srjg.cgi?MenuSubT@"+MovieID+"@");
+    if ( SubTSel == "nosubtitle" ) playItemURL(Current_Movie_File, 10);
+    else if ( SubTSel != "" &amp;&amp; SubTSel != null ) {
+      UE_Srt=urlEncode(SubTSel);
+      loadXMLFile("http://127.0.0.1$Port/cgi-bin/srjg.cgi?SubTitleGen@"+UE_Srt+"@");
+      UE_MovieFile=urlEncode(Current_Movie_File);
+      doModalRss("http://127.0.0.1$Port/cgi-bin/srjg.cgi?SubTPlay@"+UE_MovieFile+"@");
+    }
+  }
+</PlayMovie>
 
 <channel>
 	<title><script>Category_Title;</script></title>
@@ -1913,6 +1933,460 @@ postMessage("return");
 EOF
 exit 0
 }
+
+srtList()
+# Find srt files
+{
+ls "${CategoryTitle}"*.srt >/tmp/srjg_srt_dir.list 2>/dev/null
+
+echo -e '
+<?xml version="1.0" ?>
+<rss version="2.0" xmlns:dc="http://purl.org/dc/elements/1.1/">
+'
+cat <<EOF
+<onEnter>
+showIdle();
+postMessage("return");
+</onEnter>
+<mediaDisplay name="nullView"/>
+<channel></channel></rss>
+EOF
+exit 0
+}
+
+SubTitleGen()
+# convert srt -> xml
+{
+echo -e '
+<?xml version="1.0" ?>
+<rss version="2.0" xmlns:dc="http://purl.org/dc/elements/1.1/">
+'
+cat <<EOF
+<onEnter>
+showIdle();
+postMessage("return");
+</onEnter>
+<mediaDisplay name="nullView"/>
+EOF
+
+>/tmp/srjg_subtitle.xml
+
+LFeed=`printf '\015'`
+
+SubTGen="<subtitrare>\n"
+i=0
+
+sed "s:$LFeed::;s/\([0-9][0-9]\):\([0-9][0-9]\):\([0-9][0-9]\),\([0-9][0-9][0-9]\) --> \([0-9][0-9]\):\([0-9][0-9]\):\([0-9][0-9]\),\([0-9][0-9][0-9]\)/B1=\1;B2=\2;B3=\3;B4=\4;E1=\5;E2=\6;E3=\7;E4=\8/;/^[0-9][0-9]*$/d" \
+"${CategoryTitle}" | while read ligne
+do
+  if [ -n "$ligne" ]; then
+    if [ -z "${ligne%%B1=*}" ]; then 
+      eval ${ligne};
+      Tbegin=`expr 3600 '*' $B1 + 60 '*' $B2 + $B3 + $B4 / 1000`
+      Tend=`expr 3600 '*' $E1 + 60 '*' $E2 + $E3 + $E4 / 1000`
+      if [ $i -eq 2 ]; then SubTGen="${SubTGen}<line2></line2>\n"; fi
+      if [ $i -ne 0 ]; then 
+         echo -e "${SubTGen}</sub>" >>/tmp/srjg_subtitle.xml
+         SubTGen=""
+      fi
+      SubTGen="${SubTGen}<sub>\n<time1>$Tbegin</time1>\n<time2>$Tend</time2>\n" 
+      i=1
+    else 
+      SubTGen="${SubTGen}<line$i>$ligne</line$i>\n"
+      if [ $i -eq 1 ]; then i=2; else i=3; fi
+    fi
+  fi
+done
+
+echo "</subtitrare>" >>/tmp/srjg_subtitle.xml
+
+echo '<channel></channel></rss>' # to close the RSS
+exit 0
+}
+
+SubTPlay()
+{
+echo -e '
+<?xml version='1.0' encoding="UTF-8" ?>
+<rss version="2.0" xmlns:dc="http://purl.org/dc/elements/1.1/">
+'
+cat <<EOF
+
+<!--
+#
+#   http://code.google.com/media-translate/
+#   Copyright (C) 2010  Serge A. Timchenko
+#
+#   This program is free software: you can redistribute it and/or modify
+#   it under the terms of the GNU General Public License as published by
+#   the Free Software Foundation, either version 3 of the License, or
+#   (at your option) any later version.
+#
+#   This program is distributed in the hope that it will be useful,
+#   but WITHOUT ANY WARRANTY; without even the implied warranty of
+#   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#   GNU General Public License for more details.
+#
+#   You should have received a copy of the GNU General Public License
+#   along with this program. If not, see <http://www.gnu.org/licenses/>.
+#
+-->
+
+<onEnter>
+  pause = 0;
+  transp = "-1:-1:-1";
+  transp = "0:0:0";
+  culoare = "255:255:255";
+  fontsize = "20";
+  fontoffset = "0";
+  fontn = "1";
+
+if (fontsize &lt; 22)
+{
+  wh=7;
+  mt=2;
+}
+else
+{
+	if (fontsize &gt;=22 &amp;&amp; fontsize &lt; 26)
+		{
+			wh=8;
+			mt=2;
+		}	
+		else
+		{
+			wh=9;
+			mt=2.1;
+		}
+}
+
+if (fontn == "1")
+fontname="/usr/local/etc/scripts/srjg/arial.ttf";
+else if (fontn == "2")
+fontname="/usr/local/etc/scripts/srjg/arialrb.ttf";
+else if (fontn == "3")
+fontname="/usr/local/etc/scripts/srjg/arialnb.ttf";
+  
+  yy=0;
+  ref=0;
+  show_time = 0;
+  dlok = loadXMLFile("/tmp/srjg_subtitle.xml");
+  if (dlok != null)
+  {
+	    print("success");
+	    nTotSubs=getXMLElementCount("subtitrare","sub");
+		  ntime_start = 0;
+		  ntime_end = 0;
+	    ntime_next_start=0;
+		  tline1 = "Wait...";
+		  tline2 = "";
+	    last_tline1="";
+	    last_tline2="";
+	    nCurSub=0;
+	}
+  else
+	{
+	  nTotSubs = 0;
+		cancelIdle();
+		tline1="Fara subtitrare !";
+		tline2="";
+	}
+  playItemURL("${CategoryTitle}", 0, "mediaDisplay", "previewWindow");
+    
+  stream_elapsed = "Wait...";
+  check_counter = 15;
+  refresh_time = 100;
+  setRefreshTime(50);
+  cancelIdle();
+  redrawDisplay();
+</onEnter>
+
+<onExit>
+	playItemURL(-1, 1);
+	setRefreshTime(-1);
+</onExit>
+
+<onRefresh>
+	stream_progress  = getPlaybackStatus();
+	buffer_progress  = getCachedStreamDataSize(0, 262144);
+	buffer           = getStringArrayAt(buffer_progress, 0);
+	play_elapsed     = getStringArrayAt(stream_progress, 0);
+	play_total       = getStringArrayAt(stream_progress, 1);
+	play_rest        = play_total - play_elapsed;
+	play_status      = getStringArrayAt(stream_progress, 3);
+	
+
+	if (play_elapsed != 0)
+	{
+    arg_time = play_elapsed;
+		x = Integer(arg_time / 60);
+		h = Integer(arg_time / 3600);
+		s = arg_time - (x * 60);
+		m = x - (h * 60);
+		if(h &lt; 10) 
+			ret_string = "0" + sprintf("%s:", h);
+		else
+			ret_string = sprintf("%s:", h);
+		if(m &lt; 10)  ret_string += "0";
+		ret_string += sprintf("%s:", m);
+		if(s &lt; 10)  ret_string += "0";
+		ret_string += sprintf("%s", s);
+    stream_elapsed = ret_string;
+    
+		  arg_time = play_total;
+  		x = Integer(arg_time / 60);
+  		h = Integer(arg_time / 3600);
+  		s = arg_time - (x * 60);
+  		m = x - (h * 60);
+  		if(h &lt; 10) 
+  			ret_string = "0" + sprintf("%s:", h);
+  		else
+  			ret_string = sprintf("%s:", h);
+  		if(m &lt; 10)  ret_string += "0";
+  		ret_string += sprintf("%s:", m);
+  		if(s &lt; 10)  ret_string += "0";
+  		ret_string += sprintf("%s", s);
+		  stream_total = ret_string;
+    xx = Integer(play_elapsed / 90);
+    yy = play_elapsed - (xx * 90);
+    if (show_time == 1)
+        stream_elapsed1 = stream_elapsed + " / " + stream_total;
+    if (yy == 0 &amp;&amp; ref == 0)
+    {
+     ref = 1;
+     postMessage("edit");
+    } 
+		if (play_total &gt; 0 &amp;&amp; play_total &lt; 1000000 &amp;&amp; nTotSubs &gt; 2 &amp;&amp; nCurSub &lt;= nTotSubs)
+		{
+	    if (yy !=0) ref = 0;
+	    nNext = nCurSub + 1;
+		  ntime_start = getXMLText("subtitrare", "sub", nCurSub, "time1");
+		  ntime_end = getXMLText("subtitrare", "sub", nCurSub, "time2");
+		  ntime_next_start = getXMLText("subtitrare", "sub", nNext, "time1");
+		  if (play_elapsed &gt;= ntime_start &amp;&amp; play_elapsed &lt; ntime_end)
+		  {
+		    tline1 = getXMLText("subtitrare", "sub", nCurSub, "line1");
+		    tline2 = getXMLText("subtitrare", "sub", nCurSub, "line2");
+		    updatePlaybackProgress(buffer_progress, "mediaDisplay", "infoDisplay");
+
+		  }	   
+      else if (play_elapsed &gt;= ntime_end)
+      {
+        while (1)
+        {
+        nCurSub = nCurSub + 1 ;
+        if (nCurSub &gt; nTotSubs)
+          {
+           tline1="";
+           tline2="";
+           break;
+          }
+           tt1 = getXMLText("subtitrare", "sub", nCurSub, "time1");
+           if (tt1 &gt;= play_elapsed) break;             
+        }
+        if (ntime_next_start == ntime_end)
+          updatePlaybackProgress(buffer_progress, "mediaDisplay", "infoDisplay");
+      }
+      else if (show_time == 1)
+         updatePlaybackProgress(buffer_progress, "mediaDisplay", "infoDisplay");
+		}
+    else
+    {
+    tline1="Fara subtitrare !";
+    }
+	}
+	else
+	{
+	updatePlaybackProgress(buffer_progress, "mediaDisplay", "infoDisplay");
+	}
+
+</onRefresh>
+
+<mediaDisplay name="threePartsView" 
+  showDefaultInfo="no" 
+  showHeader="no" 
+  sideLeftWidthPC="0" 
+  sideRightWidthPC="0" 
+  backgroundColor="0:0:0"
+  idleImageXPC="5" idleImageYPC="5" idleImageWidthPC="8" idleImageHeightPC="10"
+  >
+        <idleImage>image/POPUP_LOADING_01.png</idleImage>
+        <idleImage>image/POPUP_LOADING_02.png</idleImage>
+        <idleImage>image/POPUP_LOADING_03.png</idleImage>
+        <idleImage>image/POPUP_LOADING_04.png</idleImage>
+        <idleImage>image/POPUP_LOADING_05.png</idleImage>
+        <idleImage>image/POPUP_LOADING_06.png</idleImage>
+        <idleImage>image/POPUP_LOADING_07.png</idleImage>
+        <idleImage>image/POPUP_LOADING_08.png</idleImage>
+
+  <previewWindow windowColor="0:0:0" offsetXPC="0" widthPC="100" offsetYPC="0" heightPC="100">
+
+  </previewWindow>
+<infoDisplay offsetXPC="0" offsetYPC="0" widthPC="100" heightPC="100">
+
+    		<text fontFile="/usr/local/etc/scripts/srjg/arial.ttf" lines="1" useBackgroundSurface="yes" align="left" redraw="yes" offsetXPC="2.5" offsetYPC="2.5" widthPC="50" heightPC="6" fontSize="20" backgroundColor="-1:-1:-1" foregroundColor="255:255:255">
+  			<script>stream_elapsed1;</script>
+  		</text>
+
+
+    		<text fontFile="/usr/local/etc/scripts/srjg/arial.ttf" lines="1" useBackgroundSurface="yes" align="left" redraw="yes" offsetXPC="2.5" offsetYPC="30.5" widthPC="50" heightPC="6" fontSize="20" backgroundColor="-1:-1:-1" foregroundColor="255:255:255">
+  			<script>print("TESTESTsfsdfsdfsdfsdf");</script>
+  		</text>
+
+    		<text align="center" redraw="yes" offsetXPC="0" useBackgroundSurface="yes">
+  			<script>tline1;</script>
+  			<fontFile>
+  			<script>
+  			fontname;
+  			</script>
+  			</fontFile>
+  			<offsetYPC>
+  			<script>
+  			99 + fontoffset - mt*wh;
+  			</script>
+  			</offsetYPC>
+  			<fontSize>
+  			<script>
+  			fontsize;
+  			</script>
+  			</fontSize>
+  			<foregroundColor>
+  			<script>
+           fontcol;
+  			</script>
+  			</foregroundColor>
+  			<backgroundColor>
+  			<script>
+        transp;
+  			</script>
+  			</backgroundColor>
+  			<widthPC>
+  			<script>
+  			if (nTotSubs &gt; 2)
+  			   100;
+  			else
+  			   1;
+  			</script> 
+  			</widthPC>
+  			<heightPC>
+  			<script>
+  			if (nTotSubs &gt; 2 )
+  			  {
+            wh;
+          }
+  			else
+  			   1; 
+  			</script>
+  			</heightPC>
+  		</text>
+    		<text align="center" redraw="yes" offsetXPC="0" useBackgroundSurface="yes">
+  			<script>tline2;</script>
+  			<fontFile>
+  			<script>
+        fontname;
+  			</script>
+  			</fontFile>
+  			<offsetYPC>
+  			<script>
+  			 98 + fontoffset - wh; 			
+  			</script>
+  			</offsetYPC>
+  			<fontSize>
+  			<script>
+  			fontsize;
+  			</script>
+  			</fontSize>
+  			<foregroundColor>
+  			<script>
+  			fontcol;
+  			</script>
+  			</foregroundColor>
+  			<backgroundColor>
+  			<script>
+        transp;
+  			</script>
+  			</backgroundColor>
+  			<widthPC>
+  			<script>
+  			if (nTotSubs &gt; 2)
+  			   100;
+  			else
+  			   1;
+  			</script> 
+  			</widthPC>
+  			<heightPC>
+  			<script>
+  			if (nTotSubs &gt; 2 )
+           wh;
+  			else
+  			   1; 
+  			</script>
+  			</heightPC>
+  		</text>
+</infoDisplay>
+<onUserInput>
+input = currentUserInput();
+print("**** input=",input);
+ret = "false";
+if (input == "display" || input == "DISPLAY")
+{
+redrawDisplay("yes");
+}
+else if ((input == "enter" || input == "ENTR") &amp;&amp; pause == 1)
+{
+postMessage("video_play");
+pause = 0;
+ret = "true";
+}
+else if ((input == "enter" || input == "ENTR") &amp;&amp; pause == 0)
+{
+postMessage("video_pause");
+pause = 1;
+ret = "true";
+}
+else if (input == "video_completed" || input == "video_stop")
+{
+playItemURL(-1, 1);
+postMessage("return");
+}
+else if (input == "zero" || input == "0")
+{ 
+  show_time = 1 - show_time;
+  stream_elapsed1 = "";
+  ret = "true";
+}
+else if (input == "right" || input == "left" || input == "R" || input == "L")
+{
+	status = getPlaybackStatus();
+	playStatus = getStringArrayAt(status, 3);
+	if (playStatus == "2")
+	{
+		setEnv("videoStatus", status);
+		playItemURL(-1, 2);
+		print("LOUIS - link to seekpop");
+		timePoint = doModalRss("/usr/local/etc/www/cgi-bin/scripts/util/podcast_seekpopup.rss");
+		if (timePoint != -1)
+		{
+			playAtTime(timePoint);
+		}
+
+		ret = "true";
+	}
+}
+		ret;
+</onUserInput>
+	
+</mediaDisplay>
+
+
+<channel>
+	<title>video stream player</title>
+</channel>
+
+</rss>
+EOF
+}
+
 
 DirList()
 # List HDD or Usb devices
@@ -2884,6 +3358,126 @@ cat <<EOF
 EOF
 }
 
+MenuSubT()
+# Menu to chose Subtitle
+{
+echo -e '
+<?xml version="1.0" encoding="UTF-8" ?>
+<rss version="2.0" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:media="http://purl.org/dc/elements/1.1/">
+'
+cat <<EOF
+<onEnter>
+  showIdle();
+  RedrawDisplay();
+</onEnter>
+
+<script>
+  langpath = "${Jukebox_Path}lang/${Language}";
+  langfile = loadXMLFile(langpath);
+  if (langfile != null) {
+    lang_EditMenu = getXMLText("MEdit", "EditMenu");
+    Lang_rmPoster = getXMLText("MEdit", "rmPoster");
+    Lang_rmSheet = getXMLText("MEdit", "rmSheet");
+    Lang_rmNfo = getXMLText("MEdit", "rmNfo");
+		Lang_rmMovie = getXMLText("MEdit", "rmMovie");
+  }
+</script>
+
+<mediaDisplay name="onePartView" sideLeftWidthPC="0" sideColorLeft="0:0:0" sideRightWidthPC="0" fontSize="14" focusFontColor="210:16:16" itemAlignt="center" viewAreaXPC=29.7 viewAreaYPC=26 viewAreaWidthPC=40 viewAreaHeightPC=50 headerImageWidthPC="0" itemImageHeightPC="0" itemImageWidthPC="0" itemXPC="10" itemYPC="15" itemWidthPC="80" itemHeightPC="10" itemBackgroundColor="0:0:0" itemPerPage="6" itemGap="0" infoYPC="90" infoXPC="90" backgroundColor="0:0:0" showHeader="no" showDefaultInfo="no">
+<idleImage> image/POPUP_LOADING_01.png </idleImage>
+<idleImage> image/POPUP_LOADING_02.png </idleImage>
+<idleImage> image/POPUP_LOADING_03.png </idleImage>
+<idleImage> image/POPUP_LOADING_04.png </idleImage>
+<idleImage> image/POPUP_LOADING_05.png </idleImage>
+<idleImage> image/POPUP_LOADING_06.png </idleImage>
+<idleImage> image/POPUP_LOADING_07.png </idleImage>
+<idleImage> image/POPUP_LOADING_08.png </idleImage>
+
+<backgroundDisplay>
+  <image type="image/jpg" offsetXPC=0 offsetYPC=0 widthPC=100 heightPC=100>
+    <script>print("${Jukebox_Path}images/FBrowser_Bg.jpg");</script>
+  </image>
+</backgroundDisplay>
+
+<text align="center" offsetXPC=2 offsetYPC=0 widthPC=96 heightPC=10 fontSize=14 backgroundColor=-1:-1:-1    foregroundColor=70:140:210>
+  <script>print("Subtitle menu");</script>
+</text>
+
+<text align="left" offsetXPC=2 offsetYPC=89 widthPC=96 heightPC=10 fontSize=12 backgroundColor=-1:-1:-1    foregroundColor=200:200:200>
+<script>MTitle=getEnv("MTitle");print(MTitle);</script>
+</text>
+
+<onUserInput>
+  <script>
+    userInput = currentUserInput();
+	
+    if (userInput == "enter" ) {
+      indx=getFocusItemIndex();
+      SelParam=getItemInfo(indx, "param");
+      setReturnString(SelParam);
+      postMessage("return");
+      "true";
+    }
+  </script>
+</onUserInput>
+
+<itemDisplay>
+  <image type="image/png" redraw="yes" offsetXPC="0" offsetYPC="0" widthPC="100" heightPC="100">
+    <script>
+  if (getDrawingItemState() == "focus")
+  {
+      print("${Jukebox_Path}images/focus_on.png");
+  }
+ else
+  {
+      print("${Jukebox_Path}images/FBrowser_unfocus.png");
+  }
+    </script>
+  </image>
+	
+<text redraw="yes" offsetXPC="0" offsetYPC="0" widthPC="94" heightPC="100" backgroundColor="-1:-1:-1" foregroundColor="200:200:200" fontSize="13" align="center">
+ <script>
+    getItemInfo(-1, "title");
+ </script>
+</text>
+</itemDisplay>
+
+</mediaDisplay>
+
+<channel>
+<title>Subtitle Menu</title>
+
+<item>
+<title>
+	<script>
+    print ( "Without subtitle" );
+	</script>
+</title>
+<param>nosubtitle</param>
+</item>
+EOF
+
+cat /tmp/srjg_srt_dir.list | while read ligne
+do
+  Nligne="${ligne##*/}"
+cat <<EOF
+<item>
+<title>
+	<script>
+    print ( "${Nligne}" );
+	</script>
+</title>
+<param>${ligne}</param>
+</item>
+EOF
+done
+
+cat <<EOF
+</channel>
+</rss>
+EOF
+}
+
 #***********************Main Program*********************************
 
 case $mode in
@@ -2913,9 +3507,13 @@ case $mode in
   ImdbCfgEdit) ImdbCfgEdit;;
 	DsplCfgEdit) DsplCfgEdit;;
   ReplaceCd1byCd2) ReplaceCd1byCd2;;
+  srtList) srtList;;
 	MenuEdit) MenuEdit;;
 	EM_Poster|EM_Sheet|EM_Nfo|EM_Movie) SubMenuEdit;;
   DelMedia) DelMedia;;
+  MenuSubT) MenuSubT;;
+  SubTitleGen) SubTitleGen;;
+  SubTPlay) SubTPlay;;
   *)
     SetVar
     Header
