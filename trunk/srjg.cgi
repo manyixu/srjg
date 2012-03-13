@@ -2061,11 +2061,11 @@ else
 }
 
 if (fontn == "1")
-fontname="/usr/local/etc/scripts/srjg/arial.ttf";
+fontname="/usr/local/etc/scripts/srjg/font/arial.ttf";
 else if (fontn == "2")
-fontname="/usr/local/etc/scripts/srjg/arialrb.ttf";
+fontname="/usr/local/etc/scripts/srjg/font/arialrb.ttf";
 else if (fontn == "3")
-fontname="/usr/local/etc/scripts/srjg/arialnb.ttf";
+fontname="/usr/local/etc/scripts/srjg/font/arialnb.ttf";
   
   yy=0;
   ref=0;
@@ -2224,7 +2224,7 @@ fontname="/usr/local/etc/scripts/srjg/arialnb.ttf";
   </previewWindow>
 <infoDisplay offsetXPC="0" offsetYPC="0" widthPC="100" heightPC="100">
 
-    		<text fontFile="/usr/local/etc/scripts/srjg/arial.ttf" lines="1" useBackgroundSurface="yes" align="left" redraw="yes" offsetXPC="2.5" offsetYPC="2.5" widthPC="50" heightPC="6" fontSize="20" backgroundColor="-1:-1:-1" foregroundColor="255:255:255">
+    		<text fontFile="/usr/local/etc/scripts/srjg/font/arial.ttf" lines="1" useBackgroundSurface="yes" align="left" redraw="yes" offsetXPC="2.5" offsetYPC="2.5" widthPC="50" heightPC="6" fontSize="20" backgroundColor="-1:-1:-1" foregroundColor="255:255:255">
   			<script>stream_elapsed1;</script>
   		</text>
 
