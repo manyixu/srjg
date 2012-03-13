@@ -1969,69 +1969,51 @@ postMessage("return");
 <mediaDisplay name="nullView"/>
 EOF
 
->/tmp/srjg_subtitle.xml
-
+Fxml="/tmp/srjg_subtitle.xml"
 LFeed=`printf '\015'`
-
-SubTGen="<subtitrare>\n"
+SubTGen=""
 i=0
+j=0
 
-sed "s:$LFeed::;s/\([0-9][0-9]\):\([0-9][0-9]\):\([0-9][0-9]\),\([0-9][0-9][0-9]\) --> \([0-9][0-9]\):\([0-9][0-9]\):\([0-9][0-9]\),\([0-9][0-9][0-9]\)/B1=\1;B2=\2;B3=\3;B4=\4;E1=\5;E2=\6;E3=\7;E4=\8/;/^[0-9][0-9]*$/d" \
+rm ${Fxml} 2>/dev/null
+
+sed "s:$LFeed::;s/\([0-9][0-9]\):\([0-9][0-9]\):\([0-9][0-9]\),\([0-9][0-9][0-9]\) --> \([0-9][0-9]\):\([0-9][0-9]\):\([0-9][0-9]\),\([0-9][0-9][0-9]\)/B1=\1;B2=\2;B3=\3;B4=\4;E1=\5;E2=\6;E3=\7;E4=\8/;/^[0-9][0-9]*$/d;s:<i>::;s:</i>::" \
 "${CategoryTitle}" | while read ligne
 do
   if [ -n "$ligne" ]; then
-    if [ -z "${ligne%%B1=*}" ]; then 
+    if [ -z "${ligne%%B1=*}" ]; then
       eval ${ligne};
       Tbegin=`expr 3600 '*' $B1 + 60 '*' $B2 + $B3 + $B4 / 1000`
       Tend=`expr 3600 '*' $E1 + 60 '*' $E2 + $E3 + $E4 / 1000`
-      if [ $i -eq 2 ]; then SubTGen="${SubTGen}<line2></line2>\n"; fi
-      if [ $i -ne 0 ]; then 
-         echo -e "${SubTGen}</sub>" >>/tmp/srjg_subtitle.xml
-         SubTGen=""
-      fi
-      SubTGen="${SubTGen}<sub>\n<time1>$Tbegin</time1>\n<time2>$Tend</time2>\n" 
+      if [ $i -eq 2 ]; then SubTGen="${SubTGen}\n"; fi # if line 2 don't exist, add CR
+      SubTGen="$Tbegin\n$Tend"
       i=1
-    else 
-      SubTGen="${SubTGen}<line$i>$ligne</line$i>\n"
-      if [ $i -eq 1 ]; then i=2; else i=3; fi
+    else
+      SubTGen="${SubTGen}\n$ligne"
+		  if [ $i -eq 1 ]; then i=2; else i=3; fi
     fi
   fi
+  if [ $i -eq 3 ]; then echo -e "${SubTGen}" >>${Fxml}; i=0; fi
+  let j+=1
+  if [ $j -eq 60 ]; then echo '<t></t>'; j=0; fi # RSS keep alive
 done
-
-echo "</subtitrare>" >>/tmp/srjg_subtitle.xml
 
 echo '<channel></channel></rss>' # to close the RSS
 exit 0
 }
 
 SubTPlay()
+# Screen to play movie with subtitle
+# Original code from Serge A. Timchenko
+# http://code.google.com/media-translate/
+# free software (GNU General Public License) http://www.gnu.org/licenses/
+# Modified and adapted to the srjg project
 {
 echo -e '
 <?xml version='1.0' encoding="UTF-8" ?>
 <rss version="2.0" xmlns:dc="http://purl.org/dc/elements/1.1/">
 '
 cat <<EOF
-
-<!--
-#
-#   http://code.google.com/media-translate/
-#   Copyright (C) 2010  Serge A. Timchenko
-#
-#   This program is free software: you can redistribute it and/or modify
-#   it under the terms of the GNU General Public License as published by
-#   the Free Software Foundation, either version 3 of the License, or
-#   (at your option) any later version.
-#
-#   This program is distributed in the hope that it will be useful,
-#   but WITHOUT ANY WARRANTY; without even the implied warranty of
-#   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-#   GNU General Public License for more details.
-#
-#   You should have received a copy of the GNU General Public License
-#   along with this program. If not, see <http://www.gnu.org/licenses/>.
-#
--->
-
 <onEnter>
   pause = 0;
   transp = "-1:-1:-1";
@@ -2070,11 +2052,19 @@ fontname="/usr/local/etc/scripts/srjg/font/arialnb.ttf";
   yy=0;
   ref=0;
   show_time = 0;
-  dlok = loadXMLFile("/tmp/srjg_subtitle.xml");
-  if (dlok != null)
+  ASubt= readStringFromFile("/tmp/srjg_subtitle.xml");
+  if (ASubt != null)
   {
 	    print("success");
-	    nTotSubs=getXMLElementCount("subtitrare","sub");
+      i=0;
+      EASubt="Start";
+      while ( EASubt != null )
+      {
+        EASubt = getStringArrayAt(ASubt,i);
+        i += 4;
+      }
+      nTotSubs=(i-4)/4;
+print("--------------------------"+nTotSubs);
 		  ntime_start = 0;
 		  ntime_end = 0;
 	    ntime_next_start=0;
@@ -2156,32 +2146,31 @@ fontname="/usr/local/etc/scripts/srjg/font/arialnb.ttf";
      ref = 1;
      postMessage("edit");
     } 
-		if (play_total &gt; 0 &amp;&amp; play_total &lt; 1000000 &amp;&amp; nTotSubs &gt; 2 &amp;&amp; nCurSub &lt;= nTotSubs)
+		if (play_total &gt; 0 &amp;&amp; play_total &lt; 1000000 &amp;&amp; nTotSubs &gt; 2 &amp;&amp; (nCurSub/4) &lt;= nTotSubs)
 		{
 	    if (yy !=0) ref = 0;
-	    nNext = nCurSub + 1;
-		  ntime_start = getXMLText("subtitrare", "sub", nCurSub, "time1");
-		  ntime_end = getXMLText("subtitrare", "sub", nCurSub, "time2");
-		  ntime_next_start = getXMLText("subtitrare", "sub", nNext, "time1");
+      ntime_start = getStringArrayAt(ASubt,nCurSub);
+      ntime_end = getStringArrayAt(ASubt,Add(nCurSub, 1));
+      ntime_next_start = getStringArrayAt(ASubt,Add(nCurSub, 4));
+print("----start:"+ntime_start+"---end:"+ntime_end+"---Next:"+ntime_next_start);
 		  if (play_elapsed &gt;= ntime_start &amp;&amp; play_elapsed &lt; ntime_end)
 		  {
-		    tline1 = getXMLText("subtitrare", "sub", nCurSub, "line1");
-		    tline2 = getXMLText("subtitrare", "sub", nCurSub, "line2");
+		    tline1 = getStringArrayAt(ASubt,Add(nCurSub, 2));
+        tline2 = getStringArrayAt(ASubt,Add(nCurSub, 3));
 		    updatePlaybackProgress(buffer_progress, "mediaDisplay", "infoDisplay");
-
 		  }	   
       else if (play_elapsed &gt;= ntime_end)
       {
         while (1)
         {
-        nCurSub = nCurSub + 1 ;
-        if (nCurSub &gt; nTotSubs)
+        nCurSub += 4 ;
+        if ( (nCurSub/4) &gt; nTotSubs)
           {
            tline1="";
            tline2="";
            break;
           }
-           tt1 = getXMLText("subtitrare", "sub", nCurSub, "time1");
+           tt1 = getStringArrayAt(ASubt,nCurSub);
            if (tt1 &gt;= play_elapsed) break;             
         }
         if (ntime_next_start == ntime_end)
