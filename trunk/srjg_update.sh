@@ -2,7 +2,7 @@
 # Simple RSS Jukebox Generator
 
 # To kill all childs process when need to stop the script
-trap "kill 0" SIGINT EXIT
+trap "kill 0" SIGINT
 
 # Reading/parsing xml configuration file and assign variables.
 
@@ -69,7 +69,7 @@ do
          echo -e "The specified directory doesn't exist: ${Movies_Path}"
          exit 1
        fi
-       sed -i "s:\(Movies_Path>\)\(.*\)\(</.*\):\1${Movies_Path}\3:" ${CfgFile}	# write param in cfg file
+       sed -i "s:\(Movies_Path>\)\(.*\)\(</.*\):\1\"${Movies_Path}\"\3:" ${CfgFile}	# write param in cfg file
        ;;
      f)
        Movie_Filter=$OPTARG
