@@ -18,69 +18,70 @@ Le fichier srjg.cfg doit être copié dans /usr/local/etc/
 Les paramètres sont entre balise. Ne modifiez pas les noms des balises.<br>
 Exemple:<br>
 `<Lang>en</Lang>`<br>
-Le nom  du paramètre c’est « Lang » et sa valeur c’est « en »
-Liste des paramètres
+Le nom  du paramètre c’est « Lang » et sa valeur c’est « en »<br>
+===Liste des paramètres===
+
  * Lang (defaut en)
 Permet de mettre l’interface dans la langue choisie.
 
  * Jukebox_Path ( defaut /usr/local/etc/srjg/)
-C’est le chemin où se trouve le SRJG. 
-Sur certains player, nottament HMB, le chemin sera /usr/local/etc/scripts/srjg/
+C’est le chemin où se trouve le SRJG.<br>
+Sur certains player, nottament HMB, le chemin sera /usr/local/etc/scripts/srjg/<br>
 Nottez qu’il y a un « / » à la fin du chemin.
 
  * Jukebox_Size (defaut 2x6)
-C’est l’affichage par défaut des Jukebox.
-Liste des choix possibles
-2x6 2 rangées de 6 Pochettes
-3x8 3 rangées de 8 Pochettes
+C’est l’affichage par défaut des Jukebox.<br>
+Liste des choix possibles<br>
+2x6 2 rangées de 6 Pochettes<br>
+3x8 3 rangées de 8 Pochettes<br>
 Sheetwall C’est un mode avec l’image Sheet en pleine page et les Pochette en bas de l’écran.
 
  * Movies_Path (defaut /tmp/usbmounts/sdb1/)
-C’est le chemin vers l’emplacement de vos films.
-Ce chemin doit exister
+C’est le chemin vers l’emplacement de vos films.<br>
+Ce chemin doit exister<br>
 Nottez qu’il y a un « / » à la fin du chemin.
 
  * Nfo_Path (defaut MoviesPath)
-Indique l’emplacement des fichiers .nfo
-Valeurs possibles
-MoviesPath les fichiers .nfo sont placés dans le dossier des Films définit dans le paramètre MoviesPath
-SRJG les fichiers .nfo sont placés dans un sous dossier des films : <chemin des films>/SRJG/ImgNfo/ qui se trouve dans le dossier des Films définit dans le paramètre MoviesPath
-«Un chemin vers un dossier qui existe/» Vous pouvez indiquer le chemin de votre choix. Ce dossier doit exister et être accessible en écriture.
+Indique l’emplacement des fichiers .nfo<br>
+Valeurs possibles:<br>
+MoviesPath les fichiers .nfo sont placés dans le dossier des Films définit dans le paramètre MoviesPath<br>
+SRJG les fichiers .nfo sont placés dans un sous dossier des films : <chemin des films>/SRJG/ImgNfo/ qui se trouve dans le dossier des Films définit dans le paramètre MoviesPath<br>
+«Un chemin vers un dossier qui existe/» Vous pouvez indiquer le chemin de votre choix. Ce dossier doit exister et être accessible en écriture.<br>
 Nottez qu’il y a un « / » à la fin du chemin.
 
  * Poster_Path (defaut MoviesPath)
-Indique l’emplacement des Pochettes
-Valeurs possibles :
-MoviesPath les Pochettes  sont placées dans le dossier des Films définit dans le paramètre MoviesPath
-SRJG les Pochettes  sont placées dans un sous dossier des films : <chemin des films>/SRJG/ImgNfo/ qui se trouve dans le dossier des Films définit dans le paramètre MoviesPath
-«Un chemin vers un dossier qui existe/» Vous pouvez indiquer le chemin de votre choix. Ce dossier doit exister et être accessible en écriture.
+Indique l’emplacement des Pochettes<br>
+Valeurs possibles :<br>
+MoviesPath les Pochettes  sont placées dans le dossier des Films définit dans le paramètre MoviesPath<br>
+SRJG les Pochettes  sont placées dans un sous dossier des films : <chemin des films>/SRJG/ImgNfo/ qui se trouve dans le dossier des Films définit dans le paramètre MoviesPath<br>
+«Un chemin vers un dossier qui existe/» Vous pouvez indiquer le chemin de votre choix. Ce dossier doit exister et être accessible en écriture.<br>
 Nottez qu’il y a un « / » à la fin du chemin.
 
  * Sheet_Path (defatut MoviesPath)
-Indique l’emplacement des images Sheet.
-Valeurs possibles
-MoviesPath les images Sheet sont placées dans le dossier des Films définit dans le paramètre MoviesPath
-SRJG les images Sheet sont placées dans un sous dossier des films : <chemin des films>/SRJG/ImgNfo/ qui se trouve dans le dossier des Films définit dans le paramètre MoviesPath
-«Un chemin vers un dossier qui existe/» Vous pouvez indiquer le chemin de votre choix. Ce dossier doit exister et être accessible en écriture.
+Indique l’emplacement des images Sheet.<br>
+Valeurs possibles:<br>
+MoviesPath les images Sheet sont placées dans le dossier des Films définit dans le paramètre MoviesPath<br>
+SRJG les images Sheet sont placées dans un sous dossier des films : <chemin des films>/SRJG/ImgNfo/ qui se trouve dans le dossier des Films définit dans le paramètre MoviesPath<br>
+«Un chemin vers un dossier qui existe/» Vous pouvez indiquer le chemin de votre choix. Ce dossier doit exister et être accessible en écriture.<br>
 Nottez qu’il y a un « / » à la fin du chemin.
 
  * SingleDb (defaut no)
-Valeur « yes » il n’y a qu’une seule base de données dans /usr/local/etc/
+Valeur « yes » il n’y a qu’une seule base de données dans /usr/local/etc/<br>
 Valeur « no » la base de données se situe dans <chemin des films>/SRJG/. Cela permet d’utiliser plusieurs Jukebox en ne changeant que le chemin des films.
 
  * UnlockRM (defaut no)
 Si ce paramètre est à « yes » cela active un menu lorsque l’on appuie sur la touche « Edit ». Il sert à supprimer des Pochettes, des images Sheet, des fichiers .nfo et des films.
 
  * Movie_Filter (defaut sample,"2 ch",cd2)
-Ce filtre contient une liste qui va permettre d’écarter des films qui contiennent ces termes.
-Ces éléments doivent être séparés par une virgule. Si un élément comporte un blanc, il doit être entre guillemets.
+Ce filtre contient une liste qui va permettre d’écarter des films qui contiennent ces termes.<br>
+Ces éléments doivent être séparés par une virgule. Si un élément comporte un blanc, il doit être entre guillemets.<br>
 Si une vidéo est coupée en deux, cd2 sert à masquer le deuxième cd. Les films en deux parties sont gérés par SRJG, qui passe automatiquement à la deuxième partie. Il faut impérativement que la partie 1 comporte l’élément cd1 à la fin de son nom et la partie 2 contienne cd2 :
-Exemple
-`<nom du film>_cd1.avi
-<nom du film>_cd2.avi`
+Exemple<br>
+{{{<nom du film>_cd1.avi
+<nom du film>_cd2.avi}}}
 Ou bien 
-`<nom du film>cd1.avi
-<nom du film>cd2.avi`
+{{{<nom du film>cd1.avi
+<nom du film>cd2.avi}}}
 Les minuscules sont importantes pour reconnaître cd1 et cd2.
 
  * Port (defaut 80)
@@ -91,12 +92,12 @@ Mettez-vous en Telnet et exécutez le script srjg/installer/port.sh
 Indique le nombre maximum de films affichés dans la rubrique « Pas Regardés »
 
  * Dspl_Genre_txt (defaut white)
+Valeurs possibles: white, black<br>
 Indique la couleur d’affichage du texte sur les Pochettes des genres (blanc, noir).
-Valeurs possibles: white, black
 
  * Dspl_HelpBar (defaut top)
+Valeurs possibles: up, down, no<br>
 Permet de décider de l’emplacement de la barre d’aide (haut, bas ou pas du tout).
-Valeurs possibles: up, down, no
 
  * Imdb (defaut no)
 Permet d’utiliser Imdb pour récupérer automatiquement des Pochettes, Jaquettes et/ou fichiers .nfo, en fonction des paramètres choisis.
@@ -105,76 +106,76 @@ Permet d’utiliser Imdb pour récupérer automatiquement des Pochettes, Jaquett
 Permet de definer la langue de l’interface sur une image Sheet (acteur, directeur, genre, année, durée). Pour définir la langue utilisée dans le synopsis, il faut utiliser le paramètre Imdb_Source.
 
  * Imdb_Source (defaut imdb)
+Valeurs possibles: imdb, tmdb, allocine.<br>
 Permet de défini sur quel site les images des Pochettes, les images Sheet et le fichier .nfo vont être récupéré. C’est le site qui définit la langue utilisé dans le Synopsis et les images. Pour le Français, il faut prendre allocine.
-Valeurs possibles: imdb, tmdb, allocine.
 
  * Imdb_Poster (defaut yes)
 yes active la récupération des Pochettes
 no les pochettes ne seront pas récupérées. 
 
  * Imdb_PBox (defaut generic)
-Valeurs possibles : no, bdrip, bluray, dtheater, dvd, generic, hddvd, hdtv, itunes
+Valeurs possibles : no, bdrip, bluray, dtheater, dvd, generic, hddvd, hdtv, itunes<br>
 Affiche un cadre pour la pochette.
 
  * Imdb_PPost (defaut yes)
-Valeurs possibles: yes, no
+Valeurs possibles: yes, no<br>
 Si active, la pochette sera choisie aléatoirement parmi les images disponibles sur le site source.
 
  * Imdb_Sheet (defaut yes)
-yes active la récupération des images Sheet.
+yes active la récupération des images Sheet.<br>
 no les images Sheet ne seront pas récupérées.
 
  * Imdb_SBox (defaut generic)
-Valeurs possibles : no, bdrip, bluray, dtheater, dvd, generic, hddvd, hdtv, itunes
+Valeurs possibles : no, bdrip, bluray, dtheater, dvd, generic, hddvd, hdtv, itunes<br>
 Affiche un cadre pour la pochette à l’intérieur de l’image Sheet.
 
  * Imdb_SPost (defaut yes)
-Valeurs possibles: yes, no
+Valeurs possibles: yes, no<br>
 Si active, la pochette sera choisie aléatoirement parmi les images disponibles sur le site source.
 
  * Imdb_Backdrop (defaut yes)
-Valeurs possibles: yes, no
+Valeurs possibles: yes, no<br>
 Si active, le fond de l’image Sheet sera choisi aléatoirement parmi les images disponibles sur le site source.
 
  * Imdb_Font (defaut tahoma)
-Valeurs possibles :  arial, bookman, comic, tahoma, times, verdana
+Valeurs possibles :  arial, bookman, comic, tahoma, times, verdana<br>
 Permet de définir la police de caractère utilize dans l’image Sheet.
 
  * Imdb_Genres (defaut no)
-Valeurs possibles: yes, no
+Valeurs possibles: yes, no<br>
 Si activé, ce seront des images qui vont être affichées à la place du texte. Ce système marche bien avec des genres en Anglais, à cause de la traduction, il se peut que certains genres Images ne s’affichent pas.
 
  * Imdb_Tagline (defaut yes)
-Valeurs possibles : yes, no
+Valeurs possibles : yes, no<br>
 Permet d’afficher la ligne Tag dans une images Sheet.
 
  * Imdb_Time (defaut no)
+Valeurs possibles: no, real, hours<br>
 Permet de définir le format pour l’affichage de la durée dans une image Sheet.
-Valeurs possibles: no, real, hours
 
  * Imdb_Info (defaut yes)
-yes active la récupération des fichiers .nfo
+yes active la récupération des fichiers .nfo<br>
 no les fichiers .nfo ne seront pas récupérés.
 
  * Imdb_MaxDl (defaut 3)
-Indique le nombre de téléchargements simultanés pour récupérer les images et fichiers .nfo
-Ce réglage dépend du débit de votre connexion Internet et des ressources de votre Player.
-Si vous avez un petit débit, mettez le téléchargement à 1 ou 2.
-Si vous mettez un trop gros chiffre, votre Player va être surchargé et sur la durée cela va être aussi long que de se contenter d’un petit nombre.
+Indique le nombre de téléchargements simultanés pour récupérer les images et fichiers .nfo<br>
+Ce réglage dépend du débit de votre connexion Internet et des ressources de votre Player.<br>
+Si vous avez un petit débit, mettez le téléchargement à 1 ou 2.<br>
+Si vous mettez un trop gros chiffre, votre Player va être surchargé et sur la durée cela va être aussi long que de se contenter d’un petit nombre.<br>
 Les meilleures performances sont généralement atteintes avec 3 ou 4 téléchargements simultanés.
 
 =Films en 2 cd=
 
-Fichiers doivent se terminer par cd1 cd2
-Par exemple
-`Nom du film cd2.avi
-Nom_du_film_cd2.avi`
-Dans le filtre, il faut qu’il y ait écrit cd2 pour que les 2èmes parties des films ne soient pas intégrées dans le Jukebox.
+Fichiers doivent se terminer par cd1 cd2<br>
+Par exemple:<br>
+{{{Nom du film cd2.avi
+Nom_du_film_cd2.avi}}}
+Dans le filtre, il faut qu’il y ait écrit cd2 pour que les 2èmes parties des films ne soient pas intégrées dans le Jukebox.<br>
 Un icone va apparaître sur la pochette ou la jaquette, en haut à droite pour indiquer qu’il y a une deuxième partie. Lors du visionnage, à la fin de la première partie, ou si vous appuyez sur la touche arrêt, la deuxième partie va s’enchaîner automatiquement.
 =Organisation des fichiers=
 ==Les films==
 Vous avez une grande liberté sur l’organisation de vos fichiers : les films sont repérés automatiquement dans toutes les arborescences.
-
+{{{
  Dossier principal
   |-- Film 1
   |-- Film 2
@@ -193,48 +194,52 @@ Dossier Principal
             |-- Film 333
             |-- Film 334
             |-- …
+}}}
 
-L'emplacement du « Dossier principal », c'est le chemin des Films. Il est à indiquer dans le fichier de config, ou bien dans le menu configuration de l’interface RSS.
-Pour le chemin /tmp/usbmounts/sdb1/film on aura :
-`<Movies_Path>/tmp/usbmounts/sdb1/film/</Movies_Path>`
-Pour le chemin /tmp/public/zozo(usb)/film, à cause des parenthèses, il faudra mettre des guillements:
-`<Movies_Path>"/tmp/public/zozo(usb)/film/"</Movies_Path>`
+L'emplacement du « Dossier principal », c'est le chemin des Films. Il est à indiquer dans le fichier de config, ou bien dans le menu configuration de l’interface RSS.<br>
+Pour le chemin /tmp/usbmounts/sdb1/film on aura:<br>
+{{{
+<Movies_Path>"/tmp/public/zozo(usb)/film/"</Movies_Path>
+}}}
 Notez qu’il y a un / à la fin du chemin.
 
 ==Les pochettes, les images Sheet et les fichiers Nfo==
 
-Les pochettes sont des petites images (souvent les affiches des films), en 150x220
-Les images Sheets ont une grande taille 1280x720. Elles comportent toute une série d’informations sur le film. Généralement il y aura le titre, des images du Film, un résumé  etc…
-Les fichiers Nfo, comportent toutes les informations du film au format texte. 
-Pour notre Jukebox, il va servir à retrouver :
-Le titre original du film et l’afficher à la place du nom de fichier. Si vous avez le nom du fichier lorsque vous sélectionnez un film dans le Jukebox, c’est que le fichier Nfo n’a pas été trouvé.
-Le genre auquel appartient le film. Lorsque vous allez rechercher un genre, par exemple science-fiction, vous allez retrouver tous vos films qui comportent le genre science-fiction dans le fichier Nfo. Le même film peut avoir plusieurs genres.
-Tous ces fichiers doivent avoir le même nom que les Films (attention, les noms sont sensibles à la case, il faut donc respecter les majuscules/minuscules) :
+Les pochettes sont des petites images (souvent les affiches des films), en 150x220<br>
+Les images Sheets ont une grande taille 1280x720. Elles comportent toute une série d’informations sur le film. Généralement il y aura le titre, des images du Film, un résumé  etc…<br>
+Les fichiers Nfo, comportent toutes les informations du film au format texte.<br>
+Pour notre Jukebox, il va servir à retrouver :<br>
+Le titre original du film et l’afficher à la place du nom de fichier. Si vous avez le nom du fichier lorsque vous sélectionnez un film dans le Jukebox, c’est que le fichier Nfo n’a pas été trouvé.<br>
+Le genre auquel appartient le film. Lorsque vous allez rechercher un genre, par exemple science-fiction, vous allez retrouver tous vos films qui comportent le genre science-fiction dans le fichier Nfo. Le même film peut avoir plusieurs genres.<br>
+Tous ces fichiers doivent avoir le même nom que les Films (attention, les noms sont sensibles à la case, il faut donc respecter les majuscules/minuscules) :<br>
+{{{
 Mon super Film.avi
 Mon super Film.jpg
 Mon super Film_sheet.jpg
 Mon super Film.nfo
-En fonction des paramètres dans le fichier de config, ces fichiers peuvent être situés à divers endroits :
-Nfo_Path, Poster_Path et Sheet_Path peuvent avoir les valeurs suivantes:
-MoviesPath :	Correspond au « chemin des films ». Ce sera mélangé avec les fichiers des Films.
-SRJG :	Correspond à un sous dossier dans le chemin des films <Chemin des films>/SRJG/ImgNfo
-Un chemin :	il faut que ce chemin pointe vers un dossier qui existe
-Nfo_Path, Poster_Path et Sheet_Path peuvent avoir des valeurs indépendamment les unes des autres.
-Par exemple
+}}}
+En fonction des paramètres dans le fichier de config, ces fichiers peuvent être situés à divers endroits:<br>
+Nfo_Path, Poster_Path et Sheet_Path peuvent avoir les valeurs suivantes:<br>
+MoviesPath :	Correspond au « chemin des films ». Ce sera mélangé avec les fichiers des Films.<br>
+SRJG :	Correspond à un sous dossier dans le chemin des films <Chemin des films>/SRJG/ImgNfo<br>
+Un chemin :	il faut que ce chemin pointe vers un dossier qui existe<br>
+Nfo_Path, Poster_Path et Sheet_Path peuvent avoir des valeurs indépendamment les unes des autres.<br>
+Par exemple:<br>
+{{{
 <Movies_Path>/tmp/usbmounts/sdb1/Films/</Movies_Path>
 <Nfo_Path>MoviesPath</Nfo_Path>
 <Poster_Path>/home/Images/Posters/</Poster_Path>
 <Sheet_Path>SRJG</Sheet_Path>
+}}}
 Cela peut être utile lorsque les films sont stockés sur une partition protégée en écriture (NAS), vous pouvez décider d’avoir les films sur votre NAS et les images sur un disque local dans votre Player.
 
-==Comment récupérer des Pochettes, des images Sheet et des fichiers Nfo
-IMDB==
+==Comment récupérer des Pochettes, des images Sheet et des fichiers Nfo avec IMDB==
 
-SRJG est capable de récupérer ces fichiers pour vous (pas besoin de Thumbgen, Yamj ou autre).
-Par défaut l'option Imdb est désactivée : elle est très consommatrice de temps, puisqu'elle va permettre à SRJG d'aller chercher sur internet les images et informations. Tout va dépendre de la quantité de films pour lesquels vous voulez ces images, mais aussi de la vitesse de votre connexion Internet.
-Si Imdb est activé, les images et .nfo vont être récupérés lorsque vous lancez une Mise à jour du Jukebox. Que ce soit une mise à jour rapide, ou une reconstruction, SRJG commencera par récupérer les fichiers avant de mettre à jour les films.
-Imdb ne remplacera pas les Pochettes, images Sheet et fichiers Nfo que vous avez déjà, il va se contenter d'aller chercher ce qu’il manque.
-Ce procédé est totalement anonyme, il n'y a aucune collecte d'informations. 
+SRJG est capable de récupérer ces fichiers pour vous (pas besoin de Thumbgen, Yamj ou autre).<br>
+Par défaut l'option Imdb est désactivée : elle est très consommatrice de temps, puisqu'elle va permettre à SRJG d'aller chercher sur internet les images et informations. Tout va dépendre de la quantité de films pour lesquels vous voulez ces images, mais aussi de la vitesse de votre connexion Internet.<br>
+Si Imdb est activé, les images et .nfo vont être récupérés lorsque vous lancez une Mise à jour du Jukebox. Que ce soit une mise à jour rapide, ou une reconstruction, SRJG commencera par récupérer les fichiers avant de mettre à jour les films.<br>
+Imdb ne remplacera pas les Pochettes, images Sheet et fichiers Nfo que vous avez déjà, il va se contenter d'aller chercher ce qu’il manque.<br>
+Ce procédé est totalement anonyme, il n'y a aucune collecte d'informations.<br>
 Voilà comment ça marche :
  * Recherche sur votre Player des vidéos pour lesquelles il manque une Pochette, une image Sheet ou un fichier Nfo
  * Épuration de certains caractères dans le nom des fichiers pour être le plus près possible d'un nom de Film
@@ -244,14 +249,14 @@ Si un site fait de la collecte d'informations, il ne verra que des demandes en p
 
 =Liste des paramètres=
 
-Si les images générées ne conviennent pas, ou bien les informations contenues correspondent à d'autres films, cela vient généralement du nom de vos fichiers qui ne correspondent pas tout à fait au nom du film. Commencez par vérifier le nom de vos fichiers.
+Si les images générées ne conviennent pas, ou bien les informations contenues correspondent à d'autres films, cela vient généralement du nom de vos fichiers qui ne correspondent pas tout à fait au nom du film. Commencez par vérifier le nom de vos fichiers.<br>
 Le site Allocine n’est pas très fiable au niveau des recherches. Ce qui explique que si vous cherchez le film « Le Pari » de Didier Bourdon, vous allez le retrouver en 150ème position dans la liste. Par conséquent le Synopsis de ce film sera le premier de la liste, et pas celui que vous attendiez. Pareil pour « Iron Man »…
 
 =Suppression des images et .nfo erronés=
 
-Vous pouvez supprimer les Pochettes, Sheet, Nfo erronés depuis SRJG en RSS : activez la fonction « Autoriser Suppression» (paramètre UnlockRM dans srjg.cfg). 
-Ainsi, lorsque vous êtes sur une pochette de Film (ou un Sheet), appuyez sur « Edit » et supprimez le fichier de votre choix. Lors de la prochaine mise à jour, ces fichiers seront récupérés à nouveau.
-Une suppression du fichier .nfo oblige à reconstruire le Jukebox.
+Vous pouvez supprimer les Pochettes, Sheet, Nfo erronés depuis SRJG en RSS : activez la fonction « Autoriser Suppression» (paramètre UnlockRM dans srjg.cfg).<br>
+Ainsi, lorsque vous êtes sur une pochette de Film (ou un Sheet), appuyez sur « Edit » et supprimez le fichier de votre choix. Lors de la prochaine mise à jour, ces fichiers seront récupérés à nouveau.<br>
+Une suppression du fichier .nfo oblige à reconstruire le Jukebox.<br>
 Astuce pour éviter une reconstruction :
  * Changez le nom de votre film
  * Lancez une mise à jour rapide
@@ -259,16 +264,22 @@ Si vous tenez à lui remettre son nom d’origine, refaites une autre mise à jo
 
 ==Manuellement==
 
-Sur votre explorateur Internet favori, vous pouvez récupérer les images en essayant des noms plus parlants que les noms vos fichiers.
-Le générateur de fichier est situé sur le site de Mikka  http://playon.unixstorm.org/imdb.php 
-Pour récupérer une Pochette
+Sur votre explorateur Internet favori, vous pouvez récupérer les images en essayant des noms plus parlants que les noms vos fichiers.<br>
+Le générateur de fichier est situé sur le site de Mikka  http://playon.unixstorm.org/imdb.php<br>
+Pour récupérer une Pochette<br>
+{{{
 http://playon.unixstorm.org/IMDB/movie.php?name=fight%20club&mode=poster
-Faites un clic droit sur l’image et enregistrez-la sous le <nom de votre film>.jpg
+}}}
+Faites un clic droit sur l’image et enregistrez-la sous le <nom de votre film>.jpg<br>
 Pour récupérer une image Sheet
+{{{
 http://playon.unixstorm.org/IMDB/movie.php?name=fight%20club&mode=sheet&backdrop=yes&box=generic&post=y&genres=yes
-Faites un clic droit sur l’image et enregistrez-la sous le <nom de votre film>_sheet.jpg
+}}}
+Faites un clic droit sur l’image et enregistrez-la sous le <nom de votre film>_sheet.jpg<br>
 Pour récupérer un fichier Nfo
+{{{
 http://playon.unixstorm.org/IMDB/movie.php?name=fight%20club&mode=info
+}}}
 Affichez le code source de la page avant de copier ce code dans un fichier du <nom de votre film>.nfo
 
 ==Depuis un ordinateur==
@@ -281,69 +292,83 @@ Vous pouvez aussi utiliser d'autres outils pour récupérer ces informations
 
 =Gestion des Genres=
 
-Les Genres sont dépendants de la langue utilisée dans le fichier Nfo. Tout va dépendre de la source utilisée pour récupérer ces fichiers, vous aurez des genres en Anglais, et d’autres dans votre langue.
+Les Genres sont dépendants de la langue utilisée dans le fichier Nfo. Tout va dépendre de la source utilisée pour récupérer ces fichiers, vous aurez des genres en Anglais, et d’autres dans votre langue.<br>
 Deux fichiers vont vous servir à paramétrer l’affichage des genres :
-<langue>_genre
+===fr_genre===
 Ce fichier va faire permettre de rediriger un nom de genre dans votre langue vers un nom de fichier d’images qui se trouve dans le dossier srjg/Images/genre. Le nom des fichiers d’images des genres est en anglais.
+{{{
 |Comédie>Comedy|
+}}}
 Le genre Comédie va avoir l’image srjg/Images/genre/Comedy.jpg
 Vous pouvez avoir plusieurs genres qui vont utiliser la même image.
+{{{
 |Comédie musicale>Music|
 |Musical>Music|
-<langue>_genreGrp
-Ce fichier va permettre de regrouper des genres entre eux. Par défaut nous avons décidé que tous les films qui appartiennent au genre Sci-Fi soient regroupés avec le genre Science-fiction.
+}}}
+===fr_genreGrp===
+Ce fichier va permettre de regrouper des genres entre eux. Par défaut nous avons décidé que tous les films qui appartiennent au genre Sci-Fi soient regroupés avec le genre Science-fiction.<br>
 Vous pouvez regrouper d’autres genres entre eux. Par exemple (c’est juste un exemple ). Pour mettre les films qui appartiennent au genre Crime, avec ceux qui sont dans le genre Thriller, vous allez ajouter la ligne suivante dans le fichier :
-`s:<name>Crime</name>:<name>Thriller</name>:`
+{{{
+s:<name>Crime</name>:<name>Thriller</name>:
+}}}
 
-Ce système peut être utilisé pour traduire les genres. Si vous avez des fichiers Nfo en Anglais, les films vont être attachés à des genres Anglais. En ajoutant des lignes dans ce fichier, vous pouvez les regrouper avec des genres en Français.
-Vous pouvez aussi modifier directement les noms de genre dans le fichier Nfo, puisque c’est un simple fichier texte. Il faut repérer les balises <genre>…</genre>
+Ce système peut être utilisé pour traduire les genres. Si vous avez des fichiers Nfo en Anglais, les films vont être attachés à des genres Anglais. En ajoutant des lignes dans ce fichier, vous pouvez les regrouper avec des genres en Français.<br>
+Vous pouvez aussi modifier directement les noms de genre dans le fichier Nfo, puisque c’est un simple fichier texte. Il faut repérer les balises
+{{{
+<genre>…</genre>
+}}}
 
 =Tag Vu=
 
-Vous pouvez marquer les films comme étant vu.
-Positionnez-vous sur la Pochette, ou bien sur la page Sheet, puis appuyez sur la touche 2. En appuyant une deuxième fois sur 2, vous pouvez enlever le Tag vu.
-Le fait de visionner un film va automatiquement le taguer comme vu. Le fait d'arrêter la lecture avec la touche arrêt, n'empêchera pas qu'il soit Tagué, il faudra le dé-taguer manuellement.
+Vous pouvez marquer les films comme étant vu.<br>
+Positionnez-vous sur la Pochette, ou bien sur la page Sheet, puis appuyez sur la touche 2. En appuyant une deuxième fois sur 2, vous pouvez enlever le Tag vu.<br>
+Le fait de visionner un film va automatiquement le taguer comme vu. Le fait d'arrêter la lecture avec la touche arrêt, n'empêchera pas qu'il soit Tagué, il faudra le dé-taguer manuellement.<br>
 Un film qui comporte un Tag vu, n'apparaît plus dans la liste des films « Pas regardés ».
 
 =Mises à jour=
 
-La première fois que l'on va créer le Jukebox, il va falloir créer la base de données en faisant une mise à jour complète (Reconstruire)
+La première fois que l'on va créer le Jukebox, il va falloir créer la base de données en faisant une mise à jour complète (Reconstruire)<br>
 Les mises à jour complètes doivent être exceptionnelles, uniquement si la base est endommagée. Il se peut qu'une nouvelle version du Jukebox demande de reconstruire la base de données. Cela reste tout de même des cas rares. Tant mieux, parce que ça peut être très long, tout dépend du nombre de films que vous avez.
 
 ==Base de données unique ou base de données par Jukebox==
 
-SingleDb est à Non (no dans le fichier srjg.cfg)
-La base de données va se créer là <Chemin des films>/SRJG/
-Ainsi, vous pouvez avoir plusieurs Jukebox. C'est utile si vous avez plusieurs disques durs (interne ou Usb), ou plusieurs chemins sur un même disque. Le fait d'avoir une base de données par chemin, vous évite de reconstruire la base si vous changez l'emplacement du  Jukebox.
-SingleDb est à Oui (yes dans le fichier srjg.cfg)
-La base de données est unique, cela veut dire qu'il n'y a qu'un seul Jukebox. Ce sera plutôt utilisé pour un NAS, ou un chemin qui est protégé contre l'écriture.
-L'autre avantage, c'est que les accès à la base seront plus rapides que sur une clé Usb puisqu'elle sera créée dans la mémoire Flash du Player `/usr/local/etc/`
-Dans quels cas faut-il faire une mise à jour ?
-Ajout de films	Mises à jour Rapide
-Suppression de films directement dans le disque	Mises à jour Rapide
-Suppression de films en RSS dans le Jukebox	Pas nécessaire
-Ajout d'une pochette	Pas nécessaire
-Ajout d'une page Sheet	Pas nécessaire
-Suppression d'une pochette	Pas nécessaire
-Suppression d'une page Sheet	Pas nécessaire
-Ajout, suppression, modification d'un fichier nfo	reconstruction complète
-Astuce pour éviter la reconstruction à cause d'un fichier nfo :
+SingleDb est à Non (no dans le fichier srjg.cfg)<br>
+La base de données va se créer là <Chemin des films>/SRJG/<br>
+Ainsi, vous pouvez avoir plusieurs Jukebox. C'est utile si vous avez plusieurs disques durs (interne ou Usb), ou plusieurs chemins sur un même disque.<br>
+Le fait d'avoir une base de données par chemin, vous évite de reconstruire la base si vous changez l'emplacement du  Jukebox.<br>
+SingleDb est à Oui (yes dans le fichier srjg.cfg)<br>
+La base de données est unique, cela veut dire qu'il n'y a qu'un seul Jukebox. Ce sera plutôt utilisé pour un NAS, ou un chemin qui est protégé contre l'écriture.<br>
+L'autre avantage, c'est que les accès à la base seront plus rapides que sur une clé Usb puisqu'elle sera créée dans la mémoire Flash du Player
+{{{
+/usr/local/etc/
+}}}
+==Dans quels cas faut-il faire une mise à jour ?==
+|| *Cas de figure* || *Type de mise à jour* ||
+||Ajout de films||Mises à jour Rapide||
+||Suppression de films directement dans le disque||Mises à jour Rapide||
+||Suppression de films en RSS dans le Jukebox||Pas nécessaire||
+||Ajout d'une pochette||Pas nécessaire||
+||Ajout d'une page Sheet||Pas nécessaire||
+||Suppression d'une pochette||Pas nécessaire||
+||Suppression d'une page Sheet||Pas nécessaire||
+||Ajout, suppression, modification d'un fichier nfo||reconstruction complète||
+Astuce pour éviter la reconstruction à cause d'un fichier nfo :<br>
 Déplacez les films et les nfo hors du chemin du Jukebox, faites une mise à jour rapide (cela va retirer ces films de la base de données) puis remettez-les et refaites une mise à jour rapide. Vos films seront ajoutés avec les données de leur nfo.
 
 =Utilisation du Jukebox avec un NAS=
 
 ==NAS autorisé en lecture seule==
 
-La base de données ne pourra pas accéder au dossier des films, il faudra donc activer le paramètre SingleDb à Oui (yes dans le fichier srjg.cfg).
-Il n'y aura qu'une seule base de données, vous n'aurez qu'un seul Jukebox.
-Si vous voulez mettre à jour les images Pochettes, Sheets et les fichiers nfo, vous devrez préciser les chemins pour chacun vers des dossiers accessibles en écriture.
+La base de données ne pourra pas accéder au dossier des films, il faudra donc activer le paramètre SingleDb à Oui (yes dans le fichier srjg.cfg).<br>
+Il n'y aura qu'une seule base de données, vous n'aurez qu'un seul Jukebox.<br>
+Si vous voulez mettre à jour les images Pochettes, Sheets et les fichiers nfo, vous devrez préciser les chemins pour chacun vers des dossiers accessibles en écriture.<br>
 Par exemple :
-`
+{{{
 <Movies_Path>/NAS/Films/</Movies_Path>
 <Nfo_Path>/home/Images/Posters/</Nfo_Path>
 <Poster_Path>/home/Images/Posters/</Poster_Path>
 <Sheet_Path>/home/Images/Posters/</Sheet_Path>
-`
+}}}
 
 ==NAS autorisé en lecture/écriture==
 
@@ -351,13 +376,14 @@ Vous avez le choix de l'utiliser comme un disque dur en local. Mais si vous trou
 
 =A voir=
 
-Comment faire reconnaître un montage NAS sur votre Player http://geekyhmb.niloo.fr/content/nas-et-lecteur-r%C3%A9seau
+Comment faire reconnaître un montage NAS sur votre Player<br>
+http://geekyhmb.niloo.fr/content/nas-et-lecteur-r%C3%A9seau
 
 =Dépannage=
-Le déplacement dans les Pochettes du Jukebox est extrêmement lent :
-Vérifiez la taille des images : 150x220 pour les Pochettes et 1280x
-Vous pouvez aussi jouer sur le taux de compression du JPEG.
-Comme plus ces images sont petites, plus le déplacement dans le Jukebox est rapide.
-Voir comment réduire les images par lot :
+ * Le déplacement dans les Pochettes du Jukebox est extrêmement lent :<br>
+Vérifiez la taille des images : 150x220 pour les Pochettes et 1280x<br>
+Vous pouvez aussi jouer sur le taux de compression du JPEG.<br>
+Comme plus ces images sont petites, plus le déplacement dans le Jukebox est rapide.<br>
+Voir comment réduire les images par lot :<br>
 Photofiltre http://geekyhmb.niloo.fr/content/photofiltre
 Phatch http://geekyhmb.niloo.fr/content/phatch
