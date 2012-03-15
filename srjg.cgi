@@ -1977,15 +1977,16 @@ j=0
 
 rm ${Fxml} 2>/dev/null
 
-sed "s:$LFeed::;s/\([0-9][0-9]\):\([0-9][0-9]\):\([0-9][0-9]\),\([0-9][0-9][0-9]\) --> \([0-9][0-9]\):\([0-9][0-9]\):\([0-9][0-9]\),\([0-9][0-9][0-9]\)/B1=\1;B2=\2;B3=\3;B4=\4;E1=\5;E2=\6;E3=\7;E4=\8/;/^[0-9][0-9]*$/d;s:<i>::;s:</i>::" \
+sed "s:$LFeed::;/^$/d;/^[0-9][0-9]*$/d;s/\([0-9][0-9]\):\([0-9][0-9]\):\([0-9][0-9]\),\([0-9][0-9][0-9]\) --> \([0-9][0-9]\):\([0-9][0-9]\):\([0-9][0-9]\),\([0-9][0-9][0-9]\)/B1=\1;B2=\2;B3=\3;B4=\4;E1=\5;E2=\6;E3=\7;E4=\8/;s:<i>::g;s:</i>::g" \
 "${CategoryTitle}" | while read ligne
 do
-  if [ -n "$ligne" ]; then
-    if [ -z "${ligne%%B1=*}" ]; then
+  if [ -n "$ligne" ]; then # if not empty
+    if [ -z "${ligne%%B1=*}" ]; then # if time line
       eval ${ligne};
       Tbegin=`expr 3600 '*' $B1 + 60 '*' $B2 + $B3 + $B4 / 1000`
       Tend=`expr 3600 '*' $E1 + 60 '*' $E2 + $E3 + $E4 / 1000`
       if [ $i -eq 2 ]; then SubTGen="${SubTGen}\n"; fi # if line 2 don't exist, add CR
+      if [ $i -gt 0 ]; then echo -e "${SubTGen}" >>${Fxml}; fi # write the previous block line
       SubTGen="$Tbegin\n$Tend"
       i=1
     else
@@ -1993,10 +1994,12 @@ do
 		  if [ $i -eq 1 ]; then i=2; else i=3; fi
     fi
   fi
-  if [ $i -eq 3 ]; then echo -e "${SubTGen}" >>${Fxml}; i=0; fi
   let j+=1
   if [ $j -eq 60 ]; then echo '<t></t>'; j=0; fi # RSS keep alive
 done
+
+if [ $i -eq 2 ]; then SubTGen="${SubTGen}\n"; fi # if line 2 don't exist, add CR
+echo -e "${SubTGen}" >>${Fxml} # write the last block line
 
 echo '<channel></channel></rss>' # to close the RSS
 exit 0
@@ -2064,7 +2067,6 @@ fontname="/usr/local/etc/scripts/srjg/font/arialnb.ttf";
         i += 4;
       }
       nTotSubs=(i-4)/4;
-print("--------------------------"+nTotSubs);
 		  ntime_start = 0;
 		  ntime_end = 0;
 	    ntime_next_start=0;
@@ -2152,7 +2154,6 @@ print("--------------------------"+nTotSubs);
       ntime_start = getStringArrayAt(ASubt,nCurSub);
       ntime_end = getStringArrayAt(ASubt,Add(nCurSub, 1));
       ntime_next_start = getStringArrayAt(ASubt,Add(nCurSub, 4));
-print("----start:"+ntime_start+"---end:"+ntime_end+"---Next:"+ntime_next_start);
 		  if (play_elapsed &gt;= ntime_start &amp;&amp; play_elapsed &lt; ntime_end)
 		  {
 		    tline1 = getStringArrayAt(ASubt,Add(nCurSub, 2));
