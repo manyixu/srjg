@@ -627,10 +627,10 @@ cat <<EOF
         } else if (userInput == "enter") {
           if ( "$Jukebox_Size" == "sheetmovie" ) {
             M_ID=getItemInfo(-1, "IdMovie");
-            MFile=getItemInfo(-1, "file");
-            MPath=getItemInfo(-1, "path");
-            MExt=getItemInfo(-1, "ext");
-            Current_Movie_File=MPath +"/"+ MFile +"."+ MExt;
+            M_File=getItemInfo(-1, "file");
+            M_Path=getItemInfo(-1, "path");
+            M_Ext=getItemInfo(-1, "ext");
+            Current_Movie_File=M_Path +"/"+ M_File +"."+ M_Ext;
             Cd2 = "false";
             executeScript("PlayMovie");
 					} else if (nextmode == "moviesheet") {
@@ -1044,7 +1044,7 @@ if [ "$mode" = "genreSelection" ]; then
   sed -i 1i"$AllMovies" /tmp/srjg_genre.list
   while read LINE
   do
-    # translate to find genre thumbnails 
+    # translate to find genre thumbnails
     Img_genre=`sed "/|${LINE}>/!d;s:.*>\(.*\)|:\1:" "${Jukebox_Path}lang/${Language}_genre"`
     if [ -z "$Img_genre" ] ; then Img_genre="Unknown"; fi
 cat <<EOF
@@ -1503,7 +1503,7 @@ cat <<EOF
           SelParam=inputFilter;
 					jumpToLink("SelectionEntered");
         }
-      } else
+      } else {
         SelParam=getItemInfo(indx, "param");
         YPos=getItemInfo(indx, "pos");
         jumpToLink("SelectionEntered");
@@ -1717,6 +1717,7 @@ cat <<EOF
   dir2File = "/tmp/srjg_Browser_dir.list";
   dirArray = null;
   Ch_Base = "/tmp/public/";
+/*   Ch_Base = "/tmp/ramfs/volumes/"; */
   Ch_Sel = Ch_Base;
   executeScript("listDir");
   setFocusItemIndex(0);
@@ -2007,9 +2008,10 @@ exit 0
 
 SubTPlay()
 # Screen to play movie with subtitle
-# Original code from Serge A. Timchenko
+# Idea from Serge A. Timchenko
 # http://code.google.com/media-translate/
-# free software (GNU General Public License) http://www.gnu.org/licenses/
+# Credit to vb6rocod for subtitle add-on
+# http://code.google.com/p/hdforall
 # Modified and adapted to the srjg project
 {
 echo -e '
@@ -2019,12 +2021,12 @@ echo -e '
 cat <<EOF
 <onEnter>
   pause = 0;
-  transp = "-1:-1:-1";
+/*  transp = "-1:-1:-1"; */
   transp = "0:0:0";
-  culoare = "255:255:255";
-  fontsize = "20";
+  fontcol = "255:255:255";
+  fontsize = "24";
   fontoffset = "0";
-  fontn = "1";
+  fontn = "2";
 
 if (fontsize &lt; 22)
 {
@@ -2046,11 +2048,11 @@ else
 }
 
 if (fontn == "1")
-fontname="/usr/local/etc/scripts/srjg/font/arial.ttf";
+fontname="${Jukebox_Path}font/arial.ttf";
 else if (fontn == "2")
-fontname="/usr/local/etc/scripts/srjg/font/arialrb.ttf";
+fontname="${Jukebox_Path}font/arialrb.ttf";
 else if (fontn == "3")
-fontname="/usr/local/etc/scripts/srjg/font/arialnb.ttf";
+fontname="${Jukebox_Path}font/arialnb.ttf";
   
   yy=0;
   ref=0;
@@ -2080,7 +2082,7 @@ fontname="/usr/local/etc/scripts/srjg/font/arialnb.ttf";
 	{
 	  nTotSubs = 0;
 		cancelIdle();
-		tline1="Fara subtitrare !";
+		tline1="";
 		tline2="";
 	}
   playItemURL("${CategoryTitle}", 0, "mediaDisplay", "previewWindow");
@@ -2182,7 +2184,7 @@ fontname="/usr/local/etc/scripts/srjg/font/arialnb.ttf";
 		}
     else
     {
-    tline1="Fara subtitrare !";
+    tline1="";
     }
 	}
 	else
@@ -2232,7 +2234,7 @@ fontname="/usr/local/etc/scripts/srjg/font/arialnb.ttf";
   			</offsetYPC>
   			<fontSize>
   			<script>
-  			fontsize;
+  			4 + fontsize;
   			</script>
   			</fontSize>
   			<foregroundColor>
@@ -2278,7 +2280,7 @@ fontname="/usr/local/etc/scripts/srjg/font/arialnb.ttf";
   			</offsetYPC>
   			<fontSize>
   			<script>
-  			fontsize;
+  			4 + fontsize;
   			</script>
   			</fontSize>
   			<foregroundColor>
@@ -2349,7 +2351,7 @@ else if (input == "right" || input == "left" || input == "R" || input == "L")
 		setEnv("videoStatus", status);
 		playItemURL(-1, 2);
 		print("LOUIS - link to seekpop");
-		timePoint = doModalRss("/usr/local/etc/www/cgi-bin/scripts/util/podcast_seekpopup.rss");
+		timePoint = doModalRss("${Jukebox_Path}podcast_seekpopup.rss");
 		if (timePoint != -1)
 		{
 			playAtTime(timePoint);
