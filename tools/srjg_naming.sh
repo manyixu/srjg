@@ -44,7 +44,7 @@ MOVIEPATH="${LINE%/*}"
 MOVIEFILE="${LINE##*/}"
 MOVIENAME="${MOVIEFILE%.*}"
 
-for FILE in "about.jpg" "0001.jpg"
+for FILE in "about.jpg" "0001.jpg" "poster.jpg"
 do
   [ ! -e "$MOVIEPATH/$FILE" ] && continue
   mv "${MOVIEPATH}/${FILE}" "${MOVIEPATH}/${MOVIENAME}_sheet.jpg"
@@ -72,7 +72,7 @@ MOVIEPATH="${LINE%/*}"
 MOVIEFILE="${LINE##*/}"
 MOVIENAME="${MOVIEFILE%.*}"
 
-for FILE in "about.jpg" "0001.jpg"
+for FILE in "about.jpg" "0001.jpg" "poster.jpg"
 do
   [ ! -e "$MOVIEPATH/$FILE" ] && continue
   cp "${MOVIEPATH}/${FILE}" "${MOVIEPATH}/${MOVIENAME}_sheet.jpg"
