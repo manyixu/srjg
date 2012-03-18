@@ -964,6 +964,9 @@ cat <<EOF
 </WatchUpdate>
 
 <PlayMovie>
+  RecentFile = "${Jukebox_Path}recently_played";
+  writeStringToFile(RecentFile, Current_Movie_File);
+  
   Current_Movie_Srt=M_Path +"/"+ M_File;
   UE_Srt=urlEncode(Current_Movie_Srt);
   dlok = loadXMLFile("http://127.0.0.1:$Port/cgi-bin/srjg.cgi?srtList@"+UE_Srt);
