@@ -3,6 +3,7 @@
 	<alpha>Alphabetique</alpha>
 	<genre>Genre</genre>
 	<recent>Ajout Récent</recent>
+	<lastplayed>Recently Played</lastplayed>
 	<select>Sélection par:</select>
 	<update>Mise à Jour</update>
 	<notwatched>Pas Regardés</notwatched>

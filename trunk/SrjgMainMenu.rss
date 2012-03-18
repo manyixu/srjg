@@ -85,6 +85,7 @@
     main_alpha = getXMLText("main", "alpha");
     main_genre = getXMLText("main", "genre");
     main_recent = getXMLText("main", "recent");
+    main_lastplayed = getXMLText("main", "lastplayed");
     main_select = getXMLText("main", "select");
     main_update = getXMLText("main", "update");
     main_notwatched = getXMLText("main", "notwatched");
@@ -132,6 +133,13 @@
     } else if (userInput == "edit") {
 			"true";
 		}
+		
+	else if (userInput == "one") {
+		LastFile = readStringFromFile(Jukebox_Path + "recently_played");
+		if (LastFile != null) {
+			playItemURL(LastFile, 10);
+		}
+	}
   </script>
 </onUserInput>
 
@@ -214,6 +222,22 @@
 </title>
 <selection>recent</selection>
 </item>
+
+
+
+
+<item>
+<title>
+	<script>
+		print(main_lastplayed);
+	</script>
+</title>
+<selection>/home/Jump.mp4</selection>
+</item>
+
+
+
+
 
 <item>
 <title>
