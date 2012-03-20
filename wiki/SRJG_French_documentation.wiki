@@ -1,5 +1,7 @@
 #labels Phase-Deploy
-= En cours d'écriture =
+*En cours d'écriture*
+
+https://lh6.googleusercontent.com/-m1X7mJnIQHY/T2j6Td1w66I/AAAAAAAAA9s/d669u1vk_PA/s800/srjg_menu_principal.jpg
 
 <wiki:toc max_depth="1" />
 
@@ -13,7 +15,11 @@ Deux paramètres ne peuvent pas être configurés depuis la TV en RSS :<br>
 L’emplacement du Jukebox (Jukebox_Path), et le numéro du port utilisé (Port) pour exécuter les scripts cgi.<br>
 Le fichier srjg.cfg doit être copié dans /usr/local/etc/
 
-==Fichier de config==
+Vous pouvez a présent modifier tous les autres paramètres depuis votre écran de télévision. Vous éviterez ainsi des éventuelles erreurs de saisie dans le fichier de configuration.
+
+https://lh6.googleusercontent.com/-fJn5femmgco/T2j6S6Uyl5I/AAAAAAAAA-s/C6MwHDxcpbs/s700/srjg_menu_config.jpg
+
+==Détail du Fichier de config==
 
 Les paramètres sont entre balise. Ne modifiez pas les noms des balises.<br>
 Exemple:<br>
@@ -235,7 +241,10 @@ Cela peut être utile lorsque les films sont stockés sur une partition protég�
 
 ==Comment récupérer des Pochettes, des images Sheet et des fichiers Nfo avec IMDB==
 
-SRJG est capable de récupérer ces fichiers pour vous (pas besoin de Thumbgen, Yamj ou autre).<br>
+SRJG est capable de récupérer ces fichiers pour vous (pas besoin de Thumbgen, Yamj ou autre).
+
+https://lh4.googleusercontent.com/-dEqggOwjwhk/T2j6TVb621I/AAAAAAAAA-w/YzTzeMob5q8/s700/srjg_menu_imdb.jpg
+
 Par défaut l'option Imdb est désactivée : elle est très consommatrice de temps, puisqu'elle va permettre à SRJG d'aller chercher sur internet les images et informations. Tout va dépendre de la quantité de films pour lesquels vous voulez ces images, mais aussi de la vitesse de votre connexion Internet.<br>
 Si Imdb est activé, les images et .nfo vont être récupérés lorsque vous lancez une Mise à jour du Jukebox. Que ce soit une mise à jour rapide, ou une reconstruction, SRJG commencera par récupérer les fichiers avant de mettre à jour les films.<br>
 Imdb ne remplacera pas les Pochettes, images Sheet et fichiers Nfo que vous avez déjà, il va se contenter d'aller chercher ce qu’il manque.<br>
