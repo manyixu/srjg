@@ -966,23 +966,26 @@ cat <<EOF
 <PlayMovie>
   RecentFile = "${Jukebox_Path}recently_played";
   writeStringToFile(RecentFile, Current_Movie_File);
-  
-  Current_Movie_Srt=M_Path +"/"+ M_File;
-  UE_Srt=urlEncode(Current_Movie_Srt);
-  dlok = loadXMLFile("http://127.0.0.1:$Port/cgi-bin/srjg.cgi?srtList@"+UE_Srt);
-  M_SubSrt = readStringFromFile( "/tmp/srjg_srt_dir.list" );
-  if ( M_SubSrt == "" || M_SubSrt == null ) playItemURL(Current_Movie_File, 10);
-  else {
-    SubTSel="";
-    Url=urlEncode(Current_Movie_Srt);
-    SubTSel=doModalRss("http://127.0.0.1:$Port/cgi-bin/srjg.cgi?MenuSubT@"+MovieID+"@");
-    if ( SubTSel == "nosubtitle" ) playItemURL(Current_Movie_File, 10);
-    else if ( SubTSel != "" &amp;&amp; SubTSel != null ) {
-      UE_Srt=urlEncode(SubTSel);
-      loadXMLFile("http://127.0.0.1:$Port/cgi-bin/srjg.cgi?SubTitleGen@"+UE_Srt+"@");
-      UE_MovieFile=urlEncode(Current_Movie_File);
-      doModalRss("http://127.0.0.1:$Port/cgi-bin/srjg.cgi?SubTPlay@"+UE_MovieFile+"@");
+  UE_MovieFile=urlEncode(Current_Movie_File);
+  UE_Srt=urlEncode(M_Path +"/"+ M_File);
+  SubTitle="false";
+  if ( M_Ext == "iso" || M_Ext == "ISO" ) { 
+    playItemURL(Current_Movie_File, 10);
+  } else {
+    /* search subt */
+    dlok = loadXMLFile("http://127.0.0.1:$Port/cgi-bin/srjg.cgi?srtList@"+UE_Srt);
+    M_SubSrt = readStringFromFile( "/tmp/srjg_srt_dir.list" );
+    if ( M_SubSrt != "" &amp;&amp; M_SubSrt != null ) { /* subt exists */
+      SubTSel="";
+      SubTSel=doModalRss("http://127.0.0.1:$Port/cgi-bin/srjg.cgi?MenuSubT@"+MovieID+"@");
+      if ( SubTSel != "nosubtitle" &amp;&amp; SubTSel != "" &amp;&amp; SubTSel != null ) {
+        UE_Srt=urlEncode(SubTSel);
+        loadXMLFile("http://127.0.0.1:$Port/cgi-bin/srjg.cgi?SubTitleGen@"+UE_Srt+"@");
+        SubTitle="true";
+      }
     }
+    /* Play movie */
+    doModalRss("http://127.0.0.1:$Port/cgi-bin/srjg.cgi?PlayMovie@"+UE_MovieFile+"@"+SubTitle)
   }
 </PlayMovie>
 
@@ -2009,8 +2012,8 @@ echo '<channel></channel></rss>' # to close the RSS
 exit 0
 }
 
-SubTPlay()
-# Screen to play movie with subtitle
+PlayMovie()
+# Screen to play movie with subtitle and Time seek
 # Idea from Serge A. Timchenko
 # http://code.google.com/media-translate/
 # Credit to vb6rocod for subtitle add-on
@@ -2023,6 +2026,7 @@ echo -e '
 '
 cat <<EOF
 <onEnter>
+  SubTitle="${Jukebox_Size}";
   pause = 0;
 /*  transp = "-1:-1:-1"; */
   transp = "0:0:0";
@@ -2060,10 +2064,15 @@ fontname="${Jukebox_Path}font/arialnb.ttf";
   yy=0;
   ref=0;
   show_time = 0;
-  ASubt= readStringFromFile("/tmp/srjg_subtitle.xml");
-  if (ASubt != null)
-  {
-	    print("success");
+
+  nTotSubs = 0;
+  tline1="";
+  tline2="";
+  if ( SubTitle == "true" ) {
+    ASubt= readStringFromFile("/tmp/srjg_subtitle.xml");
+    if (ASubt != null)
+    {
+      print("success");
       i=0;
       EASubt="Start";
       while ( EASubt != null )
@@ -2072,22 +2081,18 @@ fontname="${Jukebox_Path}font/arialnb.ttf";
         i += 4;
       }
       nTotSubs=(i-4)/4;
-		  ntime_start = 0;
-		  ntime_end = 0;
-	    ntime_next_start=0;
-		  tline1 = "Wait...";
-		  tline2 = "";
-	    last_tline1="";
-	    last_tline2="";
-	    nCurSub=0;
-	}
-  else
-	{
-	  nTotSubs = 0;
-		cancelIdle();
-		tline1="";
-		tline2="";
-	}
+      ntime_start = 0;
+      ntime_end = 0;
+      ntime_next_start=0;
+      tline1 = "Wait...";
+      tline2 = "";
+      last_tline1="";
+      last_tline2="";
+      nCurSub=0;
+	  }
+  }
+
+  cancelIdle();
   playItemURL("${CategoryTitle}", 0, "mediaDisplay", "previewWindow");
     
   stream_elapsed = "Wait...";
@@ -2354,7 +2359,7 @@ else if (input == "right" || input == "left" || input == "R" || input == "L")
 		setEnv("videoStatus", status);
 		playItemURL(-1, 2);
 		print("LOUIS - link to seekpop");
-		timePoint = doModalRss("${Jukebox_Path}podcast_seekpopup.rss");
+		timePoint = doModalRss("http://127.0.0.1:$Port/cgi-bin/srjg.cgi?SeekPopup");
 		if (timePoint != -1)
 		{
 			playAtTime(timePoint);
@@ -3468,6 +3473,209 @@ cat <<EOF
 EOF
 }
 
+SeekPopup()
+# Seek popup during video play
+# Idea from Serge A. Timchenko
+# http://code.google.com/media-translate/
+# Credit to vb6rocod for subtitle add-on
+# http://code.google.com/p/hdforall
+# Modified and adapted to the srjg project
+{
+
+echo -e '
+<?xml version="1.0" encoding="UTF-8" ?>
+<rss version="2.0" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:media="http://purl.org/dc/elements/1.1/">
+'
+cat <<EOF
+<onEnter>
+print("enter seek popup.rss");
+
+	Config = "/usr/local/etc/srjg.cfg";
+    Config_ok = loadXMLFile(Config);
+    
+	if (Config_ok == null) {
+		print("Load Config fail ", Config);
+	}
+    else {
+        Config_itemSize = getXMLElementCount("Config");
+	}
+    
+  if (Config_itemSize > 0) {
+		Jukebox_Path = getXMLText("Config", "Jukebox_Path");
+  }
+
+img1=Jukebox_Path + "images/podcast_seek_bar_bg.bmp";
+img2=Jukebox_Path + "images/podcast_seek_bar_fg.bmp";
+bReturn = 1;
+
+vidProgress = getEnv("videoStatus");
+elapsed = getStringArrayAt(vidProgress, 0);
+total = getStringArrayAt(vidProgress, 1);
+/* if total time is longer than 30 seconds */
+if (total &lt; 30)
+{
+	step_left = 1;
+	step_right = 1;
+}
+else
+{
+	step_left = 10;
+	step_right = 30;
+}
+if (total &gt; 0 &amp;&amp; total &lt; 1000000)
+{
+  arg_time = total;
+	x = Integer(arg_time / 60);
+	h = Integer(arg_time / 3600);
+	s = arg_time - (x * 60);
+	m = x - (h * 60);
+	if(h &lt; 10) 
+		ret_string = "0" + sprintf("%s:", h);
+	else
+		ret_string = sprintf("%s:", h);
+	if(m &lt; 10)  ret_string += "0";
+	ret_string += sprintf("%s:", m);
+	if(s &lt; 10)  ret_string += "0";
+	ret_string += sprintf("%s", s);
+  stream_total = ret_string;
+}
+else
+{
+  stream_total = "";
+}
+redrawDisplay();
+</onEnter>
+	
+<mediaDisplay
+	name=photoView
+	viewAreaXPC=40
+	viewAreaYPC=2
+	viewAreaWidthPC=59.77
+	viewAreaHeightPC=21.39
+
+	topArea.heightPC=0
+	topArea.yPC=100
+	bottomYPC=100
+
+	drawItemBorder=no
+
+	showHeader=no
+	showDefaultInfo=no
+
+	backgroundColor=-1:-1:-1
+	itemBackgroundColor =-1:-1:-1
+	itemGrid.elementBackground = -1:-1:-1
+>
+
+<image redraw=yes offsetXPC=40 offsetYPC=10 widthPC=50 heightPC=9>
+<script>
+img1;
+</script>
+</image>
+
+<image redraw=yes offsetXPC=40 offsetYPC=10 heightPC=9>
+<script>
+img2;
+</script>
+<widthPC>
+<script>
+(elapsed/total)*50;
+</script>
+</widthPC>
+</image>
+<text offsetXPC=65 offsetYPC=20 heightPC=12  widthPC=26 backgroundColor=-1:-1:-1 foregroundColor=255:255:0 useBackgroundSurface=yes fontSize=12>
+<script>
+    arg_time = elapsed;
+		x = Integer(arg_time / 60);
+		h = Integer(arg_time / 3600);
+		s = arg_time - (x * 60);
+		m = x - (h * 60);
+		if(h &lt; 10) 
+			ret_string = "0" + sprintf("%s:", h);
+		else
+			ret_string = sprintf("%s:", h);
+		if(m &lt; 10)  ret_string += "0";
+		ret_string += sprintf("%s:", m);
+		if(s &lt; 10)  ret_string += "0";
+		ret_string += sprintf("%s", s);
+    stream_elapsed = ret_string + " / " + stream_total;
+    stream_elapsed;
+</script>
+</text>
+
+<onUserInput>
+ret = "false";
+input = currentUserInput();
+print("1user input is : ", input);
+if (input == "right" || input == "R")
+{
+	elapsed = Add(elapsed, step_right);
+	if (elapsed &gt; total)
+	{
+		elapsed = total;
+	}
+	redrawDisplay("widget");
+	ret = "true";
+}
+else if (input == "left" || input == "L")
+{
+	elapsed = Minus(elapsed, step_left);
+	if (elapsed &lt; 0)
+	{
+		elapsed = 0;
+	}
+	redrawDisplay("widget");
+	ret = "true";
+}
+else if (input == "enter" || input == "ENTR")
+{
+	bReturn = 0;
+	postMessage("return");
+	/* avoid transition effect */
+	redrawDisplay("no");
+	ret = "true";
+}
+if (input == "return" || input == "RET")
+{
+	print("LOUIS - bReturn : ",bReturn);
+	if (bReturn == 1)
+	{
+		elapsed = -1;
+	}
+	/* avoid transition effect */
+	redrawDisplay("no");
+	ret = "false";
+}
+else if (input == "video_completed" || input == "video_stop")
+{
+	bReturn = 0;
+	playItemURL(-1, 1);
+	postMessage("return");
+	postMessage("return");
+}
+ret;
+</onUserInput>
+</mediaDisplay>
+
+
+<channel>
+<itemSize>
+0
+</itemSize>
+</channel>
+
+<onExit>
+	stream_total="";
+setReturnString(elapsed);
+/* enable drawbackbuffer */
+setRefreshTime(-1);
+redrawDisplay("yes");
+
+</onExit>
+
+</rss>
+EOF
+}
 #***********************Main Program*********************************
 
 case $mode in
@@ -3503,7 +3711,8 @@ case $mode in
   DelMedia) DelMedia;;
   MenuSubT) MenuSubT;;
   SubTitleGen) SubTitleGen;;
-  SubTPlay) SubTPlay;;
+  PlayMovie) PlayMovie;;
+  SeekPopup) SeekPopup;;
   *)
     SetVar
     Header

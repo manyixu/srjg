@@ -3,13 +3,13 @@
 	<alpha>Alfabético</alpha>
 	<genre>Género</genre>
 	<recent>Adjunta reciente</recent>
-	<lastplayed>Recently Played</lastplayed>
 	<select>Selección por:</select>
 	<update>Actualizar</update>
 	<notwatched>No vistas</notwatched>
 	<year>Año</year>
 	<search>Buscar</search>
   <config>Config</config>
+  <textInfo>Bienvenido en el SRJG !&#x0A;&#x0A;1 - para reproducir el último vídeo visto.</textInfo>
 </main>
 <jukebox>
 	<help>1 = Canbia vista | 2 = Marca como visto | Enter = Selecciona | Rtn = Plantalla anterior | Play = Ver el vídeo</help>
