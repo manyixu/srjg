@@ -3,13 +3,13 @@
 	<alpha>Alphabet</alpha>
 	<genre>Genre</genre>
 	<recent>Recently Added</recent>
-	<lastplayed>Recently Played</lastplayed>
 	<select>Select Movies by:</select>
 	<update>Update Jukebox</update>
 	<notwatched>Not Watched</notwatched>
 	<year>Year</year>
 	<search>Search</search>
   <config>Config</config>
+  <textInfo>Wellcome on SRJG !&#x0A;&#x0A;1 - to play the last watched video.</textInfo>
 </main>
 <jukebox>
 	<help>1 = Switch View | 2 = Mark as Watched | Enter = Select | Rtn = Previous Menu/View | Play = Play Video/Movie</help>
