@@ -119,9 +119,14 @@
     userInput = currentUserInput();
 
     ret="false";
-    if (userInput == "enter") {
-      if(displayInfos == "true") displayInfos = "false";
-      else {
+    if (displayInfos == "true") {
+      ret="true";
+      if (userInput == "enter" || userInput == "return" || userInput == "display") {
+        displayInfos = "false";
+      	redrawDisplay();
+      }
+    } else {
+      if (userInput == "enter") {
         indx=getFocusItemIndex();
         mode=getItemInfo(indx, "selection");		/* getItemInfo(-1, "selection"); don't work with the last item */
         if ( mode == "moviesearch") {
@@ -131,23 +136,18 @@
         SelTitle=urlEncode(SelTitle);	
         mode=urlEncode(mode);
         jumpToLink("SelectionEntered");
+        ret="false";
+      } else if (userInput == "edit") {
+        ret="true";
+      } else if (userInput == "one") {
+	    	LastFile = readStringFromFile(Jukebox_Path + "recently_played");
+	    	if (LastFile != null) playItemURL(LastFile, 10);
+        ret="false";
+	    } else if (userInput == "display") {
+	    	displayInfos = "true";
+	    	redrawDisplay();
+        ret="true";
       }
-      ret="false";
-    } else if (userInput == "edit") {
-      ret="true";
-    } else if (userInput == "one") {
-	  	LastFile = readStringFromFile(Jukebox_Path + "recently_played");
-	  	if (LastFile != null) playItemURL(LastFile, 10);
-      ret="false";
-	  } else if (userInput == "display") {
-	  	if (displayInfos == "true") displayInfos = "false";
-      else displayInfos = "true";
-	  	redrawDisplay();
-      ret="true";
-    } else if (userInput == "return" &amp;&amp; displayInfos == "true") {
-	  	displayInfos = "false";
-	  	redrawDisplay();
-      ret="true";
     }
     ret;
   </script>
