@@ -714,6 +714,14 @@ cat <<EOF
 				   jumpToLink("Watchcgi"); /* update watched state in database */
           } else Cd2 = "false";
 					"false";
+        } else if (userInput == "video_search") {
+          SelNum = doModalRss("http://127.0.0.1:$Port/cgi-bin/srjg.cgi?JSeekPopup@"+Jukebox_itemSize);
+          if ( SelNum != 0 ) {
+            SelNum -= 1;
+				  	setFocusItemIndex(SelNum);
+				  	redrawDisplay();
+          }
+          "false";
         }
 EOF
 fi
@@ -3674,6 +3682,77 @@ redrawDisplay("yes");
 </rss>
 EOF
 }
+
+JSeekPopup()
+# Seek popup in Jukebox during move in Items
+# Idea from Cristian
+{
+echo -e '
+<?xml version="1.0" encoding="UTF-8" ?>
+<rss version="2.0" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:media="http://purl.org/dc/elements/1.1/">
+'
+cat <<EOF
+<onEnter>
+  SelNum=0;
+  Max_Item=${CategoryTitle};
+  showIdle();
+  RedrawDisplay();
+</onEnter>
+
+<mediaDisplay name="onePartView" sideLeftWidthPC="0" sideColorLeft="0:0:0" sideRightWidthPC="0" viewAreaXPC="60" viewAreaYPC="85" viewAreaWidthPC="20" viewAreaHeightPC="10" headerImageWidthPC="0" infoYPC="90" infoXPC="90" backgroundColor="-1:-1:-1" showHeader="no" showDefaultInfo="no">
+
+<backgroundDisplay>
+  <image type="image/png" offsetXPC="0" offsetYPC="0" widthPC="100" heightPC="100">
+    <script>print("${Jukebox_Path}images/Seek_Button.png");</script>
+  </image>
+</backgroundDisplay>
+
+<text align="right" offsetXPC="30" offsetYPC="10" widthPC="60" heightPC="65" fontSize="16" backgroundColor="-1:-1:-1" foregroundColor="250:250:250">
+  <script>print(SelNum);</script>
+</text>
+
+<onUserInput>
+    userInput = currentUserInput();
+
+    InputNum=99;
+    ret="false";
+    if (userInput == "enter" ) {
+      setReturnString(SelNum);
+      postMessage("return");
+      ret="true";
+    } else if ( userInput == "one" ) { InputNum=1;
+    } else if ( userInput == "two" ) { InputNum=2;
+    } else if ( userInput == "three" ) { InputNum=3;
+    } else if ( userInput == "four" ) { InputNum=4;
+    } else if ( userInput == "five" ) { InputNum=5;
+    } else if ( userInput == "six" ) { InputNum=6;
+    } else if ( userInput == "seven" ) { InputNum=7;
+    } else if ( userInput == "eight" ) { InputNum=8;
+    } else if ( userInput == "nine" ) { InputNum=9;
+    } else if ( userInput == "zero" ) { InputNum=0;
+    } else if ( userInput == "left" ) {
+      SelNum=Integer(SelNum / 10);
+      RedrawDisplay();
+      ret="true";
+    }
+
+    if ( InputNum != 99 ) {
+      SelNum=SelNum * 10;
+      SelNum=Add(SelNum, InputNum);
+      if ( SelNum &gt;= Max_Item ) SelNum = Max_Item;
+      InputNum=99;
+      RedrawDisplay();
+      ret="true";
+    }
+    ret;
+</onUserInput>
+</mediaDisplay>
+<channel>
+<title></title>
+</channel>
+</rss>
+EOF
+}
 #***********************Main Program*********************************
 
 case $mode in
@@ -3710,7 +3789,8 @@ case $mode in
   MenuSubT) MenuSubT;;
   SubTitleGen) SubTitleGen;;
   PlayMovie) PlayMovie;;
-  SeekPopup) SeekPopup;;
+  SeekPopup) SeekPopup;; # during video play
+  JSeekPopup) JSeekPopup;; # in Jukebox
   *)
     SetVar
     Header
