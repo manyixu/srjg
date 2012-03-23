@@ -79,3 +79,7 @@
   <ValNfo>Do you really want to remove only the Nfo ?</ValNfo>
   <ValMovie>Do you really want to remove all the movie's files ?</ValMovie>
 </MEdit>
+<MSubt>
+  <SubtMenu>Select subtitle</SubtMenu>
+  <WtSubt>Without subtitle</WtSubt>
+</MSubt>
