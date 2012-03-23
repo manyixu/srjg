@@ -1,4 +1,6 @@
 #!/bin/sh
+# Simple RSS Jukebox Generator
+# http://code.google.com/p/srjg/
 
 # To kill all childs process when need to stop the script
 trap "kill 0" SIGINT
@@ -1977,36 +1979,32 @@ postMessage("return");
 EOF
 
 Fxml="/tmp/srjg_subtitle.xml"
-LFeed=`printf '\015'`
 SubTGen=""
 i=0
 j=0
 
 rm ${Fxml} 2>/dev/null
 
-sed "s:$LFeed::;/^$/d;/^[0-9][0-9]*$/d;s/\([0-9][0-9]\):\([0-9][0-9]\):\([0-9][0-9]\),\([0-9][0-9][0-9]\) --> \([0-9][0-9]\):\([0-9][0-9]\):\([0-9][0-9]\),\([0-9][0-9][0-9]\)/B1=\1;B2=\2;B3=\3;B4=\4;E1=\5;E2=\6;E3=\7;E4=\8/;s:<i>::g;s:</i>::g" \
-"${CategoryTitle}" | while read ligne
-do
-  if [ -n "$ligne" ]; then # if not empty
-    if [ -z "${ligne%%B1=*}" ]; then # if time line
-      eval ${ligne};
-      Tbegin=`expr 3600 '*' $B1 + 60 '*' $B2 + $B3 + $B4 / 1000`
-      Tend=`expr 3600 '*' $E1 + 60 '*' $E2 + $E3 + $E4 / 1000`
-      if [ $i -eq 2 ]; then SubTGen="${SubTGen}\n"; fi # if line 2 don't exist, add CR
-      if [ $i -gt 0 ]; then echo -e "${SubTGen}" >>${Fxml}; fi # write the previous block line
-      SubTGen="$Tbegin\n$Tend"
-      i=1
-    else
-      SubTGen="${SubTGen}\n$ligne"
-		  if [ $i -eq 1 ]; then i=2; else i=3; fi
-    fi
-  fi
-  let j+=1
-  if [ $j -eq 60 ]; then echo '<t></t>'; j=0; fi # RSS keep alive
-done
+awk '
+$0 ~ /\015$/ { sub( "\015$", "" ) }
+/^[0-9][0-9]:[0-9][0-9]:[0-9][0-9],[0-9][0-9][0-9] -->/ { 
+  B1=substr($0, 1, 2); B2=substr($0, 4, 2); B3=substr($0, 7, 2); B4=substr($0, 10, 3);
+  E1=substr($0, 18, 2); E2=substr($0, 21, 2); E3=substr($0, 24, 2); E4=substr($0, 27, 3);
+  Tbeg = 3600 * B1 + 60 * B2 + B3 + B4 / 1000 
+  Tend = 3600 * E1 + 60 * E2 + E3 + E4 / 1000  
+  if (i==3) { print Ligne[1]"\n"Ligne[2] } else {if (i==2) { print "\n"Ligne[1] }}
+  i=1 ; Ligne[1]=""; Ligne[2]=""
+  printf("%i\n%i\n", Tbeg,Tend)
+}
+$0 !~ /^[0-9][0-9]:[0-9][0-9]:[0-9][0-9],[0-9][0-9][0-9] -->/ && ! /^[0-9][0-9]*$/ && ! /^$/ {
+  Ligne[i]=$0
+  if ( i == 1 ) { i=2 } else { i=3 }
+}
 
-if [ $i -eq 2 ]; then SubTGen="${SubTGen}\n"; fi # if line 2 don't exist, add CR
-echo -e "${SubTGen}" >>${Fxml} # write the last block line
+END {
+  if (i==3) { print Ligne[1]"\n"Ligne[2] } else {if (i==2) { print "\n"Ligne[1] }}
+}
+' "${CategoryTitle}" >"${Fxml}"
 
 echo '<channel></channel></rss>' # to close the RSS
 exit 0
