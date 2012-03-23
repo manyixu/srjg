@@ -79,3 +79,7 @@
   <ValNfo>Opravdu chcete odstranit pouze Nfo ?</ValNfo>
   <ValMovie>Opravdu chcete odstranit všechny soubory, včetně filmu ?</ValMovie>
 </MEdit>
+<MSubt>
+  <SubtMenu>Select subtitle</SubtMenu>
+  <WtSubt>Without subtitle</WtSubt>
+</MSubt>

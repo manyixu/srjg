@@ -79,3 +79,7 @@
   <ValNfo>Czy na pewno chcesz, aby stłumić tylko NFO ?</ValNfo>
   <ValMovie>Czy na pewno chcesz, aby stłumić wszystkie pliki z filmem?</ValMovie>
 </MEdit>
+<MSubt>
+  <SubtMenu>Select subtitle</SubtMenu>
+  <WtSubt>Without subtitle</WtSubt>
+</MSubt>

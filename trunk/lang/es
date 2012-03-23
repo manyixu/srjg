@@ -79,3 +79,7 @@
   <ValNfo>¿Quieres eliminar sólo el Nfo ?</ValNfo>
   <ValMovie>¿Quieres eliminar la película y todos esos archivos?</ValMovie>
 </MEdit>
+<MSubt>
+  <SubtMenu>Seleccione los subtítulos</SubtMenu>
+  <WtSubt>Sin subtítulos</WtSubt>
+</MSubt>

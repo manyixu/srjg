@@ -79,3 +79,7 @@
   <ValNfo>Sigur doriti sa stergeti numai Nfo ?</ValNfo>
   <ValMovie>Sigur doriti sa stergeti toate fisierele inclusiv filmu ?</ValMovie>
 </MEdit>
+<MSubt>
+  <SubtMenu>Select subtitle</SubtMenu>
+  <WtSubt>Without subtitle</WtSubt>
+</MSubt>

@@ -979,6 +979,7 @@ cat <<EOF
   UE_MovieFile=urlEncode(Current_Movie_File);
   UE_Srt=urlEncode(M_Path +"/"+ M_File);
   SubTitle="false";
+  DontPlay="false";
   if ( M_Ext == "iso" || M_Ext == "ISO" ) { 
     playItemURL(Current_Movie_File, 10);
   } else {
@@ -992,10 +993,10 @@ cat <<EOF
         UE_Srt=urlEncode(SubTSel);
         loadXMLFile("http://127.0.0.1:$Port/cgi-bin/srjg.cgi?SubTitleGen@"+UE_Srt+"@");
         SubTitle="true";
-      }
+      } else if ( SubTSel == "" || SubTSel == null ) DontPlay="true";
     }
     /* Play movie */
-    doModalRss("http://127.0.0.1:$Port/cgi-bin/srjg.cgi?PlayMovie@"+UE_MovieFile+"@"+SubTitle)
+    if (DontPlay == "false") doModalRss("http://127.0.0.1:$Port/cgi-bin/srjg.cgi?PlayMovie@"+UE_MovieFile+"@"+SubTitle);
   }
 </PlayMovie>
 
@@ -3376,11 +3377,8 @@ cat <<EOF
   langpath = "${Jukebox_Path}lang/${Language}";
   langfile = loadXMLFile(langpath);
   if (langfile != null) {
-    lang_EditMenu = getXMLText("MEdit", "EditMenu");
-    Lang_rmPoster = getXMLText("MEdit", "rmPoster");
-    Lang_rmSheet = getXMLText("MEdit", "rmSheet");
-    Lang_rmNfo = getXMLText("MEdit", "rmNfo");
-		Lang_rmMovie = getXMLText("MEdit", "rmMovie");
+    lang_SubtMenu = getXMLText("MSubt", "SubtMenu");
+    Lang_WtSubt = getXMLText("MSubt", "WtSubt");
   }
 </script>
 
@@ -3400,12 +3398,8 @@ cat <<EOF
   </image>
 </backgroundDisplay>
 
-<text align="center" offsetXPC=2 offsetYPC=0 widthPC=96 heightPC=10 fontSize=14 backgroundColor=-1:-1:-1    foregroundColor=70:140:210>
-  <script>print("Subtitle menu");</script>
-</text>
-
-<text align="left" offsetXPC=2 offsetYPC=89 widthPC=96 heightPC=10 fontSize=12 backgroundColor=-1:-1:-1    foregroundColor=200:200:200>
-<script>MTitle=getEnv("MTitle");print(MTitle);</script>
+<text align="center" offsetXPC=2 offsetYPC=0 widthPC=96 heightPC=10 fontSize=14 backgroundColor=-1:-1:-1 foregroundColor=70:140:210>
+  <script>print(lang_SubtMenu);</script>
 </text>
 
 <onUserInput>
@@ -3451,7 +3445,7 @@ cat <<EOF
 <item>
 <title>
 	<script>
-    print ( "Without subtitle" );
+    print ( Lang_WtSubt );
 	</script>
 </title>
 <param>nosubtitle</param>
