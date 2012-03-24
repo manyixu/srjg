@@ -211,6 +211,9 @@ GenerateInsDelFiles;
 [[ -s $DeleteList ]] && DBMovieDelete
 [[ -s $InsertList ]] && DBMovieInsert
 
+# Force disk buffers to be written
+sync
+
 # End the RSS keep alive
 kill $TaskChild >/dev/null 2>&1
 
@@ -2883,7 +2886,7 @@ cat <<EOF
 	</script>
 </title>
 <selection>Imdb_Source</selection>
-<param>imdb%20tmdb%20allocine</param>
+<param>imdb%20tmdb%20allocine%20screenrush%20filmstarts%20sensacine%20beyazperde</param>
 <pos>8</pos>
 </item>
 

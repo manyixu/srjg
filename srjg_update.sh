@@ -261,5 +261,6 @@ GenerateInsDelFiles;
 [[ -s $DeleteList ]] && DBMovieDelete
 [[ -s $InsertList ]] && DBMovieInsert
 echo -e "\nDone!"
-
+# Force disk buffers to be written
+sync
 
