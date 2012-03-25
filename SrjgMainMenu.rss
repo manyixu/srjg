@@ -203,7 +203,7 @@
     </script>
   </image>
 
-	<text redraw="yes" align="center" lines="12" fontSize="15" offsetXPC="21.5" offsetYPC="30" heightPC="50" backgroundColor="-1:-1:-1" foregroundColor="200:200:200">
+	<text redraw="yes" align="left" lines="15" fontSize="15" offsetXPC="23" offsetYPC="18" heightPC="70" backgroundColor="-1:-1:-1" foregroundColor="200:200:200">
 		<widthPC>
 			<script>
 				if(displayInfos == "true") 55;
