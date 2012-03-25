@@ -359,7 +359,10 @@ fi
 # return the sheetmovie watched array to previous 
 if [ $Jukebox_Size = "sheetmovie" ]; then
 cat <<EOF
-<onEnter>redrawDisplay();</onEnter>
+<onEnter>
+  redrawDisplay();
+  displayInfos = "false";
+</onEnter>
 <onExit>
   setEnv("EAWatched", AWatched);
   setEnv("EAWatched_size", AWatched_size);
@@ -371,6 +374,7 @@ else
 
 cat <<EOF
 	<onEnter>
+    displayInfos = "false";
     EAWatched=getEnv("EAWatched");
     EAWatched_size=getEnv("EAWatched_size");
     if ( EAWatched_size &gt; 0 ){
@@ -423,7 +427,9 @@ cat <<EOF
 		langfile = loadXMLFile(langpath);
 		if (langfile != null)
 		{
-			jukebox_top = getXMLText("jukebox", "help");
+			jukebox_helpGP = getXMLText("jukebox", "helpGP");
+      jukebox_helpJbx = getXMLText("jukebox", "helpJbx");
+      jukebox_helpSheet = getXMLText("jukebox", "helpSheet");
 		}
 
     /* array to keep update Watchcgi during views */
@@ -433,7 +439,7 @@ cat <<EOF
     setEnv("EAWatched", "");
     setEnv("EAWatched_size", 0);
     Cd2 = "false";
-    EndPlay="false"
+    EndPlay="false";
 	</script>
 
 <mediaDisplay name="photoView" rowCount="$row" columnCount="$col" imageFocus="null" showHeader="no" showDefaultInfo="no" drawItemBorder="no" viewAreaXPC="0" viewAreaYPC="0" viewAreaWidthPC="100" viewAreaHeightPC="100" itemGapXPC="0.7" itemGapYPC="1" itemWidthPC="$itemWidth" itemHeightPC="$itemHeight" itemOffsetXPC="$itemXPC" itemOffsetYPC="$itemYPC" itemBorderPC="0" itemBorderColor="7:99:176" itemBackgroundColor="-1:-1:-1" sideTopHeightPC="0" sideBottomHeightPC="0" bottomYPC="100" idleImageXPC="67.81" idleImageYPC="89.17" idleImageWidthPC="4.69" idleImageHeightPC="4.17" backgroundColor="0:0:0">
@@ -460,25 +466,7 @@ cat <<EOF
 				</script>
 		  	</image>      
 		</backgroundDisplay>   
-EOF
 
-if [ "$Dspl_HelpBar" != "no" ]; then
-cat <<EOF
-        <text redraw="no" align="center" offsetXPC="2" widthPC="96" heightPC="3" fontSize="12" backgroundColor="-1:-1:-1" foregroundColor="130:130:130">
-			<offsetYPC>
-			  <script>
-			    if ( "$Dspl_HelpBar" == "top" ) 1;
-				  else 85;
-			  </script>
-			</offsetYPC>
-			<script>
-				print(jukebox_top);
-			</script>
-		</text>
-EOF
-fi # Dspl_HelpBar != "no"
-
-cat <<EOF
 		<text redraw="no" align="center" offsetXPC="2.5" offsetYPC="3" widthPC="90" heightPC="10" fontSize="20" backgroundColor="-1:-1:-1" foregroundColor="192:192:192">
 			<script>
 			    print(Category_Title);
@@ -596,6 +584,51 @@ cat <<EOF
 EOF
 fi
 
+# BEGIN Display help
+cat <<EOF
+  <image type="image/png" redraw="no" offsetXPC="0" offsetYPC="0">
+  <widthPC>
+    <script>
+      if(displayInfos == "true") 100;
+      else 0;
+    </script>
+  </widthPC>
+  <heightPC>
+    <script>
+      if(displayInfos == "true") 100;
+      else 0;
+    </script>
+  </heightPC>
+    <script>
+      print(Jukebox_Path + "images/focus_on.png");
+    </script>
+  </image>
+
+	<text redraw="yes" align="left" lines="15" fontSize="15" offsetXPC="23" offsetYPC="18" heightPC="70" backgroundColor="-1:-1:-1" foregroundColor="200:200:200">
+		<widthPC>
+			<script>
+				if(displayInfos == "true") 55;
+        else 0;
+			</script>
+		</widthPC>
+		<script>
+EOF
+
+if [ $mode = "genreSelection" ] || [ $mode = "alphaSelection" ] || [ $mode = "yearSelection" ]; then
+  echo 'jukebox_helpGP;';
+else
+  if [ $Jukebox_Size = "sheetmovie" ]; then
+    echo 'jukebox_helpSheet;'
+  else
+    echo 'jukebox_helpJbx;'
+  fi
+fi
+
+cat <<EOF
+		</script>
+	</text>
+EOF
+
 if ([ $mode = "genreSelection" ] || [ $mode = "alphaSelection" ] || [ $mode = "yearSelection" ]); then
 cat <<EOF	
 		<image type="image/jpeg" redraw="yes" offsetXPC="80" offsetYPC="5.5" widthPC="8" heightPC="6">
@@ -617,7 +650,18 @@ cat <<EOF
 				Prev10_index = (-10 + Current_Item_index);
 				Next10_index = (10 + Current_Item_index);
 
-				if (userInput == "pageup" &amp;&amp; Current_Item_index &gt; 9) {
+    if (displayInfos == "true") {
+      if (userInput == "enter" || userInput == "return" || userInput == "display") {
+        displayInfos = "false";
+      	redrawDisplay();
+      }
+      "true";
+    } else {
+        if (userInput == "display") {
+	    	  displayInfos = "true";
+	      	redrawDisplay();
+          "true";
+        } else if (userInput == "pageup" &amp;&amp; Current_Item_index &gt; 9) {
 					setFocusItemIndex(Prev10_index); 
 					"true";
 					redrawDisplay();
@@ -730,6 +774,7 @@ EOF
 fi
 
 cat <<EOF
+      }
 		</onUserInput>
 EOF
 

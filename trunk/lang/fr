@@ -12,7 +12,9 @@
   <textInfo>Bienvenue sur SRJG !&#x0A;&#x0A;1 - pour lancer la dernière vidéo regardée.</textInfo>
 </main>
 <jukebox>
-	<help>1 = Change vue | 2 = Marquer comme vu | Enter = Select | Rtn = Ecran précédent | Play = Joue la vidéo</help>
+	<helpGP>Liste des touches:&#x0A;1 = Change de vue pour le Jukebox&#x0A;Enter = Selectionner&#x0A;Rtn = Ecran précédent</helpGP>
+  <helpJbx>Liste des touches:&#x0A;2 = Marquer comme vu&#x0A;Enter = Selectionner&#x0A;Rtn = Ecran précédent&#x0A;Play = Joue la vidéo&#x0A;Goto = va a la vidéo sélectionnée&#x0A;<< = Recule de 10 vidéos&#x0A;>> = avance de 10 vidéos</helpJbx>
+  <helpSheet>Liste des touches:&#x0A;2 = Marquer comme vu&#x0A;Rtn = Ecran précédent&#x0A;Enter = Joue la vidéo&#x0A;Play = Joue la vidéo&#x0A;< = Vidéo précédente&#x0A;> = Vidéo suivante</helpSheet>
 </jukebox>
 <update>
   <fast>Rapide</fast>
