@@ -29,7 +29,6 @@
 		Port = getXMLText("Config", "Port");
 		Recent_Max = getXMLText("Config", "Recent_Max");
 		Dspl_Genre_txt = getXMLText("Config", "Dspl_Genre_txt");
-		Dspl_HelpBar = getXMLText("Config", "Dspl_HelpBar");
     Imdb = getXMLText("Config", "Imdb");
 		Imdb_Lang = getXMLText("Config", "Imdb_Lang");
 		Imdb_Source = getXMLText("Config", "Imdb_Source");
@@ -62,7 +61,6 @@
   tmpconfigArray=pushBackStringArray(tmpconfigArray, "Port="+Port);
   tmpconfigArray=pushBackStringArray(tmpconfigArray, "Recent_Max="+Recent_Max);
 	tmpconfigArray=pushBackStringArray(tmpconfigArray, "Dspl_Genre_txt="+Dspl_Genre_txt);
-	tmpconfigArray=pushBackStringArray(tmpconfigArray, "Dspl_HelpBar="+Dspl_HelpBar);
   tmpconfigArray=pushBackStringArray(tmpconfigArray, "Imdb="+Imdb);
   tmpconfigArray=pushBackStringArray(tmpconfigArray, "Imdb_Lang="+Imdb_Lang);
 	tmpconfigArray=pushBackStringArray(tmpconfigArray, "Imdb_Source="+Imdb_Source);

@@ -1029,7 +1029,7 @@ cat <<EOF
   SubTitle="false";
   DontPlay="false";
   if ( M_Ext == "iso" || M_Ext == "ISO" ) { 
-    playItemURL(Current_Movie_File, 10);
+    playItemURL(Current_Movie_File, 0);
   } else {
     /* search subt */
     dlok = loadXMLFile("http://127.0.0.1:$Port/cgi-bin/srjg.cgi?srtList@"+UE_Srt);
@@ -1168,7 +1168,6 @@ cat <<EOF
 		Port = getXMLText("Config", "Port");
 		Recent_Max = getXMLText("Config", "Recent_Max");
 		Dspl_Genre_txt = getXMLText("Config", "Dspl_Genre_txt");
-		Dspl_HelpBar = getXMLText("Config", "Dspl_HelpBar");
     Imdb = getXMLText("Config", "Imdb");
 		Imdb_Lang = getXMLText("Config", "Imdb_Lang");
 		Imdb_Source = getXMLText("Config", "Imdb_Source");
@@ -1201,7 +1200,6 @@ cat <<EOF
   tmpconfigArray=pushBackStringArray(tmpconfigArray, "Port="+Port);
   tmpconfigArray=pushBackStringArray(tmpconfigArray, "Recent_Max="+Recent_Max);
 	tmpconfigArray=pushBackStringArray(tmpconfigArray, "Dspl_Genre_txt="+Dspl_Genre_txt);
-	tmpconfigArray=pushBackStringArray(tmpconfigArray, "Dspl_HelpBar="+Dspl_HelpBar);
   tmpconfigArray=pushBackStringArray(tmpconfigArray, "Imdb="+Imdb);
   tmpconfigArray=pushBackStringArray(tmpconfigArray, "Imdb_Lang="+Imdb_Lang);
 	tmpconfigArray=pushBackStringArray(tmpconfigArray, "Imdb_Source="+Imdb_Source);
@@ -1250,7 +1248,6 @@ cat <<EOF
   langfile = loadXMLFile(langpath);
   if (langfile != null) {
     Lang_Dspl_Genre_txt = getXMLText("Dspl", "Dspl_Genre_txt");
-		Lang_Dspl_HelpBar = getXMLText("Dspl", "Dspl_HelpBar");
 		Lang_No = getXMLText("cfg", "no");
 		Lang_Yes = getXMLText("cfg", "yes");
 		Lang_White = getXMLText("cfg", "white");
@@ -1263,7 +1260,7 @@ cat <<EOF
   if ( Version == null ) print ("Version File not found");
 </onEnter>
 
-<mediaDisplay name="photoView" rowCount="2" columnCount="1" drawItemText="no" showHeader="no" showDefaultInfo="no" menuBorderColor="255:255:255" sideColorBottom="-1:-1:-1" sideColorTop="-1:-1:-1" itemAlignt="left" itemOffsetXPC="4" itemOffsetYPC="32" itemWidthPC="32" itemHeightPC="7.2" backgroundColor="-1:-1:-1" itemBackgroundColor="-1:-1:-1" sliding="no" itemGap="0" idleImageXPC="90" idleImageYPC="5" idleImageWidthPC="5" idleImageHeightPC="8" imageUnFocus="null" imageParentFocus="null" imageBorderPC="0" forceFocusOnItem="no" cornerRounding="yes" itemBorderColor="-1:-1:-1" focusBorderColor="-1:-1:-1" unFocusBorderColor="-1:-1:-1">
+<mediaDisplay name="photoView" rowCount="1" columnCount="1" drawItemText="no" showHeader="no" showDefaultInfo="no" menuBorderColor="255:255:255" sideColorBottom="-1:-1:-1" sideColorTop="-1:-1:-1" itemAlignt="left" itemOffsetXPC="4" itemOffsetYPC="32" itemWidthPC="32" itemHeightPC="7.2" backgroundColor="-1:-1:-1" itemBackgroundColor="-1:-1:-1" sliding="no" itemGap="0" idleImageXPC="90" idleImageYPC="5" idleImageWidthPC="5" idleImageHeightPC="8" imageUnFocus="null" imageParentFocus="null" imageBorderPC="0" forceFocusOnItem="no" cornerRounding="yes" itemBorderColor="-1:-1:-1" focusBorderColor="-1:-1:-1" unFocusBorderColor="-1:-1:-1">
 <idleImage> image/POPUP_LOADING_01.png </idleImage> 
 <idleImage> image/POPUP_LOADING_02.png </idleImage> 
 <idleImage> image/POPUP_LOADING_03.png </idleImage> 
@@ -1279,14 +1276,6 @@ cat <<EOF
 		if ( Dspl_Genre_txt == "no" ) print( Lang_No );
     else if ( Dspl_Genre_txt == "white" ) print( Lang_White );
 		else print( Lang_Black );
-	</script>
-</text>
-
-<text redraw="no" backgroundColor="-1:-1:-1" foregroundColor="200:200:200" offsetXPC="36" offsetYPC="43" widthPC="57" heightPC="4" fontSize="16" lines="1" align="left">
-	<script>
-		if ( Dspl_HelpBar == "no" ) print( Lang_No );
-    else if ( Dspl_HelpBar == "top" ) print( Lang_Top );
-		else print( Lang_Bottom );
 	</script>
 </text>
 
@@ -1367,17 +1356,6 @@ cat <<EOF
 </title>
 <selection>Dspl_Genre_txt</selection>
 <param>no%20white%20black</param>
-<pos>25</pos>
-</item>
-
-<item>
-<title>
-	<script>
-		print(Lang_Dspl_HelpBar);
-	</script>
-</title>
-<selection>Dspl_HelpBar</selection>
-<param>top%20no%20bottom</param>
 <pos>25</pos>
 </item>
 
@@ -2419,9 +2397,21 @@ else if (input == "right" || input == "left" || input == "R" || input == "L")
 		{
 			playAtTime(timePoint);
 		}
-
 		ret = "true";
 	}
+}
+else if ( transp == "-1:-1:-1" )
+{
+  if (input == "up" || input == "U")
+  {
+    fontoffset = fontoffset - "0.5" ;
+    ret = "true";
+    }
+      else if (input == "down" || input == "D")
+    {
+      fontoffset = "0.5" + fontoffset ;
+      ret = "true";
+  }
 }
 		ret;
 </onUserInput>
@@ -2931,7 +2921,7 @@ cat <<EOF
 	</script>
 </title>
 <selection>Imdb_Source</selection>
-<param>imdb%20tmdb%20allocine%20screenrush%20filmstarts%20sensacine%20beyazperde</param>
+<param>de_filmstarts%20en_imdb%20en_screenrush%20en_tmdb%20es_sensacine%20fr_allocine%20tr_beyazperde</param>
 <pos>8</pos>
 </item>
 
@@ -3810,7 +3800,7 @@ case $mode in
       UpdateMenu;
     fi;;
   Lang|Jukebox_Size|SingleDb|Port|Recent_Max|Nfo_Path|Poster_Path|Sheet_Path|UnlockRM|\
-	Dspl_Genre_txt|Dspl_HelpBar|\
+	Dspl_Genre_txt|\
 	Imdb|Imdb_Lang|Imdb_Source|\
   Imdb_Poster|Imdb_PBox|Imdb_PPost|Imdb_Sheet|\
   Imdb_SBox|Imdb_SPost|Imdb_Backdrop|Imdb_Font|\
