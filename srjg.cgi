@@ -1036,7 +1036,8 @@ cat <<EOF
     M_SubSrt = readStringFromFile( "/tmp/srjg_srt_dir.list" );
     if ( M_SubSrt != "" &amp;&amp; M_SubSrt != null ) { /* subt exists */
       SubTSel="";
-      SubTSel=doModalRss("http://127.0.0.1:$Port/cgi-bin/srjg.cgi?MenuSubT@"+MovieID+"@");
+       if ( "$Subt_OneAuto" == "yes" &amp;&amp; ( getStringArrayAt(M_SubSrt,1) == null || getStringArrayAt(M_SubSrt,1) == "" )) SubTSel=getStringArrayAt(M_SubSrt,0);
+       else SubTSel=doModalRss("http://127.0.0.1:$Port/cgi-bin/srjg.cgi?MenuSubT@"+MovieID+"@");
       if ( SubTSel != "nosubtitle" &amp;&amp; SubTSel != "" &amp;&amp; SubTSel != null ) {
         UE_Srt=urlEncode(SubTSel);
         loadXMLFile("http://127.0.0.1:$Port/cgi-bin/srjg.cgi?SubTitleGen@"+UE_Srt+"@");
@@ -1168,6 +1169,13 @@ cat <<EOF
 		Port = getXMLText("Config", "Port");
 		Recent_Max = getXMLText("Config", "Recent_Max");
 		Dspl_Genre_txt = getXMLText("Config", "Dspl_Genre_txt");
+		Subt_OneAuto = getXMLText("Config", "Subt_OneAuto");
+		Subt_FontPath = getXMLText("Config", "Subt_FontPath");
+		Subt_FontFile = getXMLText("Config", "Subt_FontFile");
+		Subt_Color = getXMLText("Config", "Subt_Color");
+		Subt_ColorBg = getXMLText("Config", "Subt_ColorBg");
+		Subt_Size = getXMLText("Config", "Subt_Size");
+		Subt_Pos = getXMLText("Config", "Subt_Pos");
     Imdb = getXMLText("Config", "Imdb");
 		Imdb_Lang = getXMLText("Config", "Imdb_Lang");
 		Imdb_Source = getXMLText("Config", "Imdb_Source");
@@ -1200,6 +1208,13 @@ cat <<EOF
   tmpconfigArray=pushBackStringArray(tmpconfigArray, "Port="+Port);
   tmpconfigArray=pushBackStringArray(tmpconfigArray, "Recent_Max="+Recent_Max);
 	tmpconfigArray=pushBackStringArray(tmpconfigArray, "Dspl_Genre_txt="+Dspl_Genre_txt);
+	tmpconfigArray=pushBackStringArray(tmpconfigArray, "Subt_OneAuto="+Subt_OneAuto);
+	tmpconfigArray=pushBackStringArray(tmpconfigArray, "Subt_FontPath="+Subt_FontPath);
+	tmpconfigArray=pushBackStringArray(tmpconfigArray, "Subt_FontFile="+Subt_FontFile);
+	tmpconfigArray=pushBackStringArray(tmpconfigArray, "Subt_Color="+Subt_Color);
+	tmpconfigArray=pushBackStringArray(tmpconfigArray, "Subt_ColorBg="+Subt_ColorBg);
+	tmpconfigArray=pushBackStringArray(tmpconfigArray, "Subt_Size="+Subt_Size);
+	tmpconfigArray=pushBackStringArray(tmpconfigArray, "Subt_Pos="+Subt_Pos);
   tmpconfigArray=pushBackStringArray(tmpconfigArray, "Imdb="+Imdb);
   tmpconfigArray=pushBackStringArray(tmpconfigArray, "Imdb_Lang="+Imdb_Lang);
 	tmpconfigArray=pushBackStringArray(tmpconfigArray, "Imdb_Source="+Imdb_Source);
@@ -1223,6 +1238,12 @@ EOF
 DsplCfgEdit()
 # RSS to edit Display
 {
+if [ "${Subt_FontPath}" = "JukeboxPath" ]; then
+  FontPath="${Jukebox_Path}font/"
+else
+  FontPath="${Subt_FontPath}"
+fi
+
 echo -e '
 <?xml version="1.0" encoding="UTF-8" ?>
 <rss version="2.0" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:media="http://purl.org/dc/elements/1.1/">
@@ -1248,19 +1269,29 @@ cat <<EOF
   langfile = loadXMLFile(langpath);
   if (langfile != null) {
     Lang_Dspl_Genre_txt = getXMLText("Dspl", "Dspl_Genre_txt");
+		Lang_Subt_OneAuto = getXMLText("Subt", "Subt_OneAuto");
+		Lang_Subt_FontPath = getXMLText("Subt", "Subt_FontPath");
+		Lang_Subt_FontFile = getXMLText("Subt", "Subt_FontFile");
+		Lang_Subt_Color = getXMLText("Subt", "Subt_Color");
+		Lang_Subt_ColorBg = getXMLText("Subt", "Subt_ColorBg");
+		Lang_Subt_Size = getXMLText("Subt", "Subt_Size");
+		Lang_Subt_Pos = getXMLText("Subt", "Subt_Pos");
 		Lang_No = getXMLText("cfg", "no");
 		Lang_Yes = getXMLText("cfg", "yes");
 		Lang_White = getXMLText("cfg", "white");
 		Lang_Black = getXMLText("cfg", "black");
+		Lang_Yellow = getXMLText("cfg", "yellow");
+		Lang_Transparent = getXMLText("cfg", "transparent");
 		Lang_Top = getXMLText("cfg", "top");
 		Lang_Bottom = getXMLText("cfg", "bottom");
   }
 
   Version = readStringFromFile(Jukebox_Path + "Version");
   if ( Version == null ) print ("Version File not found");
+  redrawDisplay();
 </onEnter>
 
-<mediaDisplay name="photoView" rowCount="1" columnCount="1" drawItemText="no" showHeader="no" showDefaultInfo="no" menuBorderColor="255:255:255" sideColorBottom="-1:-1:-1" sideColorTop="-1:-1:-1" itemAlignt="left" itemOffsetXPC="4" itemOffsetYPC="32" itemWidthPC="32" itemHeightPC="7.2" backgroundColor="-1:-1:-1" itemBackgroundColor="-1:-1:-1" sliding="no" itemGap="0" idleImageXPC="90" idleImageYPC="5" idleImageWidthPC="5" idleImageHeightPC="8" imageUnFocus="null" imageParentFocus="null" imageBorderPC="0" forceFocusOnItem="no" cornerRounding="yes" itemBorderColor="-1:-1:-1" focusBorderColor="-1:-1:-1" unFocusBorderColor="-1:-1:-1">
+<mediaDisplay name="photoView" rowCount="8" columnCount="1" drawItemText="no" showHeader="no" showDefaultInfo="no" menuBorderColor="255:255:255" sideColorBottom="-1:-1:-1" sideColorTop="-1:-1:-1" itemAlignt="left" itemOffsetXPC="4" itemOffsetYPC="32" itemWidthPC="32" itemHeightPC="7.2" backgroundColor="-1:-1:-1" itemBackgroundColor="-1:-1:-1" sliding="no" itemGap="0" idleImageXPC="90" idleImageYPC="5" idleImageWidthPC="5" idleImageHeightPC="8" imageUnFocus="null" imageParentFocus="null" imageBorderPC="0" forceFocusOnItem="no" cornerRounding="yes" itemBorderColor="-1:-1:-1" focusBorderColor="-1:-1:-1" unFocusBorderColor="-1:-1:-1">
 <idleImage> image/POPUP_LOADING_01.png </idleImage> 
 <idleImage> image/POPUP_LOADING_02.png </idleImage> 
 <idleImage> image/POPUP_LOADING_03.png </idleImage> 
@@ -1279,6 +1310,51 @@ cat <<EOF
 	</script>
 </text>
 
+<text redraw="no" backgroundColor="-1:-1:-1" foregroundColor="200:200:200" offsetXPC="36" offsetYPC="43" widthPC="57" heightPC="4" fontSize="16" lines="1" align="left">
+	<script>
+		if ( Subt_OneAuto == "no" ) print( Lang_No );
+		else print( Lang_Yes );
+	</script>
+</text>
+
+<text redraw="no" backgroundColor="-1:-1:-1" foregroundColor="200:200:200" offsetXPC="36" offsetYPC="51" widthPC="57" heightPC="4" fontSize="16" lines="1" align="left">
+	<script>
+		print( Subt_FontPath );
+	</script>
+</text>
+
+<text redraw="no" backgroundColor="-1:-1:-1" foregroundColor="200:200:200" offsetXPC="36" offsetYPC="59" widthPC="57" heightPC="4" fontSize="16" lines="1" align="left">
+	<script>
+		print( Subt_FontFile );
+	</script>
+</text>
+
+<text redraw="no" backgroundColor="-1:-1:-1" foregroundColor="200:200:200" offsetXPC="36" offsetYPC="67" widthPC="57" heightPC="4" fontSize="16" lines="1" align="left">
+	<script>
+		if ( Subt_Color == "white" ) print( Lang_White );
+		else print( Lang_Yellow );
+	</script>
+</text>
+
+<text redraw="no" backgroundColor="-1:-1:-1" foregroundColor="200:200:200" offsetXPC="36" offsetYPC="75" widthPC="57" heightPC="4" fontSize="16" lines="1" align="left">
+	<script>
+		if ( Subt_ColorBg == "black" ) print( Lang_Black );
+		else print( Lang_Transparent );
+	</script>
+</text>
+
+<text redraw="no" backgroundColor="-1:-1:-1" foregroundColor="200:200:200" offsetXPC="36" offsetYPC="83" widthPC="57" heightPC="4" fontSize="16" lines="1" align="left">
+	<script>
+		print( Subt_Size );
+	</script>
+</text>
+
+<text redraw="no" backgroundColor="-1:-1:-1" foregroundColor="200:200:200" offsetXPC="36" offsetYPC="91" widthPC="57" heightPC="4" fontSize="16" lines="1" align="left">
+	<script>
+		print( Subt_Pos );
+	</script>
+</text>
+
 <onUserInput>
   <script>
     userInput = currentUserInput();
@@ -1286,15 +1362,18 @@ cat <<EOF
     if (userInput == "enter" ) {
       indx=getFocusItemIndex();
       mode=getItemInfo(indx, "selection");
-      if ( mode == "Movie_Filter") {
-        inputFilter=getInput("userName","doModal");
-        if (inputFilter != NULL) {
-          mode="UpdateCfg";
-          YPos="Movie_Filter";
-          SelParam=inputFilter;
-					jumpToLink("SelectionEntered");
+      if ( mode == "Subt_FontFile" ) {
+        FontSel="";
+        dlok = loadXMLFile("http://127.0.0.1:$Port/cgi-bin/srjg.cgi?FontList@");
+        M_FontFile = readStringFromFile( "${FontPath}srjg_font_dir.list" );
+        if ( M_FontFile != "" &amp;&amp; M_FontFile != null ) { /* Font file exists */
+          if ( getStringArrayAt(M_FontFile,1) == null || getStringArrayAt(M_FontFile,1) == "" ) FontSel=getStringArrayAt(M_FontFile,0);
+          else FontSel=doModalRss("http://127.0.0.1:$Port/cgi-bin/srjg.cgi?MenuFont@");
         }
-      } else
+        UE_FontSel=urlEncode(FontSel);
+        dlok = loadXMLFile("http://127.0.0.1:$Port/cgi-bin/srjg.cgi?UpdateCfg@"+UE_FontSel+"@Subt_FontFile@");
+        executeScript("onEnter");
+      } else {
         SelParam=getItemInfo(indx, "param");
         YPos=getItemInfo(indx, "pos");
         jumpToLink("SelectionEntered");
@@ -1357,6 +1436,83 @@ cat <<EOF
 <selection>Dspl_Genre_txt</selection>
 <param>no%20white%20black</param>
 <pos>25</pos>
+</item>
+
+<item>
+<title>
+	<script>
+		print(Lang_Subt_OneAuto);
+	</script>
+</title>
+<selection>Subt_OneAuto</selection>
+<param>no%20yes</param>
+<pos>35</pos>
+</item>
+
+<item>
+<title>
+	<script>
+		print(Lang_Subt_FontPath);
+	</script>
+</title>
+<selection>Subt_FontPath</selection>
+<param>JukeboxPath%20browse</param>
+<pos>45</pos>
+</item>
+
+<item>
+<title>
+	<script>
+		print(Lang_Subt_FontFile);
+	</script>
+</title>
+<selection>Subt_FontFile</selection>
+<param></param>
+<pos></pos>
+</item>
+
+<item>
+<title>
+	<script>
+		print(Lang_Subt_Color);
+	</script>
+</title>
+<selection>Subt_Color</selection>
+<param>white%20yellow</param>
+<pos>60</pos>
+</item>
+
+<item>
+<title>
+	<script>
+		print(Lang_Subt_ColorBg);
+	</script>
+</title>
+<selection>Subt_ColorBg</selection>
+<param>transparent%20black</param>
+<pos>70</pos>
+</item>
+
+<item>
+<title>
+	<script>
+		print(Lang_Subt_Size);
+	</script>
+</title>
+<selection>Subt_Size</selection>
+<param>14%2018%2020%2022%2024%2026</param>
+<pos>35</pos>
+</item>
+
+<item>
+<title>
+	<script>
+		print(Lang_Subt_Pos);
+	</script>
+</title>
+<selection>Subt_Pos</selection>
+<param>0%20-0.500%20-1%20-1.500%20-2%20-2.500%20-3</param>
+<pos>35</pos>
 </item>
 
 </channel>
@@ -1814,14 +1970,8 @@ cat <<EOF
 <itemDisplay>
   <image type="image/png" redraw="yes" offsetXPC="0" offsetYPC="0" widthPC="100" heightPC="100">
     <script>
-  if (getDrawingItemState() == "focus")
-  {
-      print(Jukebox_Path + "images/focus_on.png");
-  }
- else
-  {
-      print(Jukebox_Path + "images/FBrowser_unfocus.png");
-  }
+  if (getDrawingItemState() == "focus") print(Jukebox_Path + "images/focus_on.png");
+  else print(Jukebox_Path + "images/FBrowser_unfocus.png");
     </script>
   </image>
   <image type="image/png" redraw="yes" offsetXPC="0" offsetYPC="25" widthPC="8" heightPC="50">
@@ -1947,8 +2097,8 @@ EOF
 Cfg_Tag=$Jukebox_Size
 Cfg_Par=$CategoryTitle
 
-if ([ "$Cfg_Tag" = "Movies_Path" ] || [ "$Cfg_Tag" = "Nfo_Path" ] || [ "$Cfg_Tag" = "Sheet_Path" ] || [ "$Cfg_Tag" = "Poster_Path" ]) \
-   && ([ "$Cfg_Par" != "SRJG" ] && [ "$Cfg_Par" != "MoviesPath" ]) ; then
+if ([ "$Cfg_Tag" = "Movies_Path" ] || [ "$Cfg_Tag" = "Nfo_Path" ] || [ "$Cfg_Tag" = "Sheet_Path" ] || [ "$Cfg_Tag" = "Poster_Path" ] || [ "$Cfg_Tag" = "Subt_FontPath" ] || [ "$Cfg_Tag" = "Subt_FontFile" ]) \
+   && ([ "$Cfg_Par" != "SRJG" ] && [ "$Cfg_Par" != "MoviesPath" ] && [ "$Cfg_Par" != "JukeboxPath" ]) ; then
   sed -i "s:<$Cfg_Tag>.*</$Cfg_Tag>:<$Cfg_Tag>\"$Cfg_Par\"</$Cfg_Tag>:" /usr/local/etc/srjg.cfg
 else
   sed -i "s:<$Cfg_Tag>.*</$Cfg_Tag>:<$Cfg_Tag>$Cfg_Par</$Cfg_Tag>:" /usr/local/etc/srjg.cfg
@@ -1982,6 +2132,34 @@ srtList()
 # Find srt files
 {
 ls "${CategoryTitle}"*.srt >/tmp/srjg_srt_dir.list 2>/dev/null
+
+echo -e '
+<?xml version="1.0" ?>
+<rss version="2.0" xmlns:dc="http://purl.org/dc/elements/1.1/">
+'
+cat <<EOF
+<onEnter>
+showIdle();
+postMessage("return");
+</onEnter>
+<mediaDisplay name="nullView"/>
+<channel></channel></rss>
+EOF
+exit 0
+}
+
+FontList()
+# Find fonts files
+{
+
+if [ "${Subt_FontPath}" = "JukeboxPath" ]; then
+  FontPath="${Jukebox_Path}font/"
+else
+  FontPath="${Subt_FontPath}"
+fi
+
+cd "${FontPath}"
+ls *.ttf >"${FontPath}srjg_font_dir.list" 2>/dev/null
 
 echo -e '
 <?xml version="1.0" ?>
@@ -2061,12 +2239,16 @@ cat <<EOF
 <onEnter>
   SubTitle="${Jukebox_Size}";
   pause = 0;
-/*  transp = "-1:-1:-1"; */
-  transp = "0:0:0";
-  fontcol = "255:255:255";
-  fontsize = "24";
-  fontoffset = "0";
-  fontn = "2";
+
+  if ( "$Subt_ColorBg" == "transparent" ) transp = "-1:-1:-1";
+  else transp = "0:0:0";
+  if ( "$Subt_Color" == "white" ) fontcol = "255:255:255";
+  else fontcol = "255:255:100";
+  fontsize = "${Subt_Size}";
+  fontoffset = "${Subt_Pos}";
+
+  if ( "${Subt_FontPath}" == "JukeboxPath" ) fontname="${Jukebox_Path}font/${Subt_FontFile}";
+  else fontname="${Subt_FontPath}${Subt_FontFile}";
 
 if (fontsize &lt; 22)
 {
@@ -2086,13 +2268,6 @@ else
 			mt=2.1;
 		}
 }
-
-if (fontn == "1")
-fontname="${Jukebox_Path}font/arial.ttf";
-else if (fontn == "2")
-fontname="${Jukebox_Path}font/arialrb.ttf";
-else if (fontn == "3")
-fontname="${Jukebox_Path}font/arialnb.ttf";
   
   yy=0;
   ref=0;
@@ -2139,6 +2314,15 @@ fontname="${Jukebox_Path}font/arialnb.ttf";
 <onExit>
 	playItemURL(-1, 1);
 	setRefreshTime(-1);
+  /* Save settings before exit */
+  if ( "${Subt_Pos}" != fontoffset ) {
+    UE_Subt_Pos=urlEncode(fontoffset);
+    dlok = loadXMLFile("http://127.0.0.1:$Port/cgi-bin/srjg.cgi?UpdateCfg@"+UE_Subt_Pos+"@Subt_Pos@");
+    srjgconf="/tmp/srjg.cfg";
+    tmpconfigArray=readStringFromFile(srjgconf);
+    tmpconfigArray=pushBackStringArray(tmpconfigArray, "Subt_Pos="+fontoffset);
+    writeStringToFile(srjgconf, tmpconfigArray);
+  }
 </onExit>
 
 <onRefresh>
@@ -2257,7 +2441,8 @@ fontname="${Jukebox_Path}font/arialnb.ttf";
   </previewWindow>
 <infoDisplay offsetXPC="0" offsetYPC="0" widthPC="100" heightPC="100">
 
-    		<text fontFile="/usr/local/etc/scripts/srjg/font/arial.ttf" lines="1" useBackgroundSurface="yes" align="left" redraw="yes" offsetXPC="2.5" offsetYPC="2.5" widthPC="50" heightPC="6" fontSize="20" backgroundColor="-1:-1:-1" foregroundColor="255:255:255">
+    		<text lines="1" useBackgroundSurface="yes" align="left" redraw="yes" offsetXPC="2.5" offsetYPC="2.5" widthPC="50" heightPC="6" fontSize="20" backgroundColor="-1:-1:-1" foregroundColor="255:255:255">
+            <fontFile><script>fontname;</script></fontFile>
   			<script>stream_elapsed1;</script>
   		</text>
 
@@ -2400,10 +2585,8 @@ else if (input == "right" || input == "left" || input == "R" || input == "L")
 		ret = "true";
 	}
 }
-else if ( transp == "-1:-1:-1" )
+else if (input == "up" || input == "U")
 {
-  if (input == "up" || input == "U")
-  {
     fontoffset = fontoffset - "0.5" ;
     ret = "true";
     }
@@ -2411,7 +2594,6 @@ else if ( transp == "-1:-1:-1" )
     {
       fontoffset = "0.5" + fontoffset ;
       ret = "true";
-  }
 }
 		ret;
 </onUserInput>
@@ -2543,13 +2725,15 @@ Item_nb=0
 for SelParam in $CategoryTitle
 do
   case ${SelParam} in
-    "yes") Item_dspl=`sed "/<yes>/!d;s:.*>\(.*\)<.*:\1:" "${Jukebox_Path}lang/${Language}"`; Action=UpdateCfg; Param=$mode;;
-    "no")  Item_dspl=`sed "/<no>/!d;s:.*>\(.*\)<.*:\1:" "${Jukebox_Path}lang/${Language}"`; Action=UpdateCfg; Param=$mode;;
-    "top")  Item_dspl=`sed "/<top>/!d;s:.*>\(.*\)<.*:\1:" "${Jukebox_Path}lang/${Language}"`; Action=UpdateCfg; Param=$mode;;
-    "bottom")  Item_dspl=`sed "/<bottom>/!d;s:.*>\(.*\)<.*:\1:" "${Jukebox_Path}lang/${Language}"`; Action=UpdateCfg; Param=$mode;;
-    "white")  Item_dspl=`sed "/<white>/!d;s:.*>\(.*\)<.*:\1:" "${Jukebox_Path}lang/${Language}"`; Action=UpdateCfg; Param=$mode;;
-    "black")  Item_dspl=`sed "/<black>/!d;s:.*>\(.*\)<.*:\1:" "${Jukebox_Path}lang/${Language}"`; Action=UpdateCfg; Param=$mode;;
-    "browse") Item_dspl=`sed "/<browse>/!d;s:.*>\(.*\)<.*:\1:" "${Jukebox_Path}lang/${Language}"`; Action=FBrowser; SelParam=$mode;;
+    "yes") Item_dspl=`sed "/<${SelParam}>/!d;s:.*>\(.*\)<.*:\1:" "${Jukebox_Path}lang/${Language}"`; Action=UpdateCfg; Param=$mode;;
+    "no")  Item_dspl=`sed "/<${SelParam}>/!d;s:.*>\(.*\)<.*:\1:" "${Jukebox_Path}lang/${Language}"`; Action=UpdateCfg; Param=$mode;;
+    "top")  Item_dspl=`sed "/<${SelParam}>/!d;s:.*>\(.*\)<.*:\1:" "${Jukebox_Path}lang/${Language}"`; Action=UpdateCfg; Param=$mode;;
+    "bottom")  Item_dspl=`sed "/<${SelParam}>/!d;s:.*>\(.*\)<.*:\1:" "${Jukebox_Path}lang/${Language}"`; Action=UpdateCfg; Param=$mode;;
+    "white")  Item_dspl=`sed "/<${SelParam}>/!d;s:.*>\(.*\)<.*:\1:" "${Jukebox_Path}lang/${Language}"`; Action=UpdateCfg; Param=$mode;;
+    "black")  Item_dspl=`sed "/<${SelParam}>/!d;s:.*>\(.*\)<.*:\1:" "${Jukebox_Path}lang/${Language}"`; Action=UpdateCfg; Param=$mode;;
+		"yellow")  Item_dspl=`sed "/<${SelParam}>/!d;s:.*>\(.*\)<.*:\1:" "${Jukebox_Path}lang/${Language}"`; Action=UpdateCfg; Param=$mode;;
+		"transparent")  Item_dspl=`sed "/<${SelParam}>/!d;s:.*>\(.*\)<.*:\1:" "${Jukebox_Path}lang/${Language}"`; Action=UpdateCfg; Param=$mode;;
+    "browse") Item_dspl=`sed "/<${SelParam}>/!d;s:.*>\(.*\)<.*:\1:" "${Jukebox_Path}lang/${Language}"`; Action=FBrowser; SelParam=$mode;;
     *)     Item_dspl=$SelParam; Action=UpdateCfg; Param=$mode;;
   esac
 cat <<EOF
@@ -3399,7 +3583,7 @@ EOF
 }
 
 MenuSubT()
-# Menu to chose Subtitle
+# Menu to choose Subtitle
 {
 echo -e '
 <?xml version="1.0" encoding="UTF-8" ?>
@@ -3501,6 +3685,103 @@ cat <<EOF
 	</script>
 </title>
 <param>${ligne}</param>
+</item>
+EOF
+done
+
+cat <<EOF
+</channel>
+</rss>
+EOF
+}
+
+MenuFont()
+# Menu to choose Fonts
+{
+echo -e '
+<?xml version="1.0" encoding="UTF-8" ?>
+<rss version="2.0" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:media="http://purl.org/dc/elements/1.1/">
+'
+cat <<EOF
+<onEnter>
+  showIdle();
+  RedrawDisplay();
+</onEnter>
+
+<script>
+  langpath = "${Jukebox_Path}lang/${Language}";
+  langfile = loadXMLFile(langpath);
+  if (langfile != null) {
+    lang_FontMenu = getXMLText("MFont", "FontMenu");
+  }
+</script>
+
+<mediaDisplay name="onePartView" sideLeftWidthPC="0" sideColorLeft="0:0:0" sideRightWidthPC="0" fontSize="14" focusFontColor="210:16:16" itemAlignt="center" viewAreaXPC=29.7 viewAreaYPC=26 viewAreaWidthPC=40 viewAreaHeightPC=50 headerImageWidthPC="0" itemImageHeightPC="0" itemImageWidthPC="0" itemXPC="10" itemYPC="15" itemWidthPC="80" itemHeightPC="10" itemBackgroundColor="0:0:0" itemPerPage="6" itemGap="0" infoYPC="90" infoXPC="90" backgroundColor="0:0:0" showHeader="no" showDefaultInfo="no">
+<idleImage> image/POPUP_LOADING_01.png </idleImage>
+<idleImage> image/POPUP_LOADING_02.png </idleImage>
+<idleImage> image/POPUP_LOADING_03.png </idleImage>
+<idleImage> image/POPUP_LOADING_04.png </idleImage>
+<idleImage> image/POPUP_LOADING_05.png </idleImage>
+<idleImage> image/POPUP_LOADING_06.png </idleImage>
+<idleImage> image/POPUP_LOADING_07.png </idleImage>
+<idleImage> image/POPUP_LOADING_08.png </idleImage>
+
+<backgroundDisplay>
+  <image type="image/jpg" offsetXPC=0 offsetYPC=0 widthPC=100 heightPC=100>
+    <script>print("${Jukebox_Path}images/FBrowser_Bg.jpg");</script>
+  </image>
+</backgroundDisplay>
+
+<text align="center" offsetXPC=2 offsetYPC=0 widthPC=96 heightPC=10 fontSize=14 backgroundColor=-1:-1:-1 foregroundColor=70:140:210>
+  <script>print(lang_FontMenu);</script>
+</text>
+
+<onUserInput>
+  <script>
+    userInput = currentUserInput();
+	
+    if (userInput == "enter" ) {
+      indx=getFocusItemIndex();
+      SelParam=getItemInfo(indx, "title");
+      setReturnString(SelParam);
+      postMessage("return");
+      "true";
+    }
+  </script>
+</onUserInput>
+
+<itemDisplay>
+  <image type="image/png" redraw="yes" offsetXPC="0" offsetYPC="0" widthPC="100" heightPC="100">
+    <script>
+  if (getDrawingItemState() == "focus") print("${Jukebox_Path}images/focus_on.png");
+  else print("${Jukebox_Path}images/FBrowser_unfocus.png");
+    </script>
+  </image>
+	
+<text redraw="yes" offsetXPC="0" offsetYPC="0" widthPC="94" heightPC="100" backgroundColor="-1:-1:-1" foregroundColor="200:200:200" fontSize="13" align="center">
+ <script>
+    getItemInfo(-1, "title");
+ </script>
+</text>
+</itemDisplay>
+
+</mediaDisplay>
+
+<channel>
+<title>Subtitle Menu</title>
+EOF
+
+if [ "${Subt_FontPath}" = "JukeboxPath" ]; then
+  FontPath="${Jukebox_Path}font/"
+else
+  FontPath="${Subt_FontPath}"
+fi
+
+cat "${FontPath}srjg_font_dir.list" | while read ligne
+do
+cat <<EOF
+<item>
+<title>${ligne}</title>
 </item>
 EOF
 done
@@ -3800,12 +4081,12 @@ case $mode in
       UpdateMenu;
     fi;;
   Lang|Jukebox_Size|SingleDb|Port|Recent_Max|Nfo_Path|Poster_Path|Sheet_Path|UnlockRM|\
-	Dspl_Genre_txt|\
+	Dspl_Genre_txt|Subt_OneAuto|Subt_Color|Subt_ColorBg|Subt_Size|Subt_Pos|Subt_FontPath|\
 	Imdb|Imdb_Lang|Imdb_Source|\
   Imdb_Poster|Imdb_PBox|Imdb_PPost|Imdb_Sheet|\
   Imdb_SBox|Imdb_SPost|Imdb_Backdrop|Imdb_Font|\
   Imdb_Genres|Imdb_Tagline|Imdb_Time|Imdb_Info|\
-  Imdb_MaxDl) SubMenucfg;;   # display submenu to chose settings
+  Imdb_MaxDl) SubMenucfg;;   # display submenu to choose settings
   UpdateCfg) UpdateCfg;;    # update the cfg file
   DirList) DirList;;        # FBrowser list directorys
   FBrowser) FBrowser;;
@@ -3815,10 +4096,12 @@ case $mode in
 	DsplCfgEdit) DsplCfgEdit;;
   ReplaceCd1byCd2) ReplaceCd1byCd2;;
   srtList) srtList;;
+  FontList) FontList;;
 	MenuEdit) MenuEdit;;
 	EM_Poster|EM_Sheet|EM_Nfo|EM_Movie) SubMenuEdit;;
   DelMedia) DelMedia;;
   MenuSubT) MenuSubT;;
+  MenuFont) MenuFont;;
   SubTitleGen) SubTitleGen;;
   PlayMovie) PlayMovie;;
   SeekPopup) SeekPopup;; # during video play
