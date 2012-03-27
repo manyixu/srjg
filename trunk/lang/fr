@@ -42,11 +42,12 @@
 	<bottom>Bas</bottom>
 	<white>Blanc</white>
 	<black>Noir</black>
+	<yellow>Jaune</yellow>
+	<transparent>Transparent</transparent>
 	<browse>Parcourir</browse>
 </cfg>
 <Dspl>
-  <Dspl_Genre_txt>Texte du Genre:</Dspl_Genre_txt>
-	<Dspl_HelpBar>Barre d'aide:</Dspl_HelpBar>
+  <Dspl_Genre_txt>Texte du Genre</Dspl_Genre_txt>
 </Dspl>
 <FBrowser>
   <FBrowser_Title>Chemin des films:</FBrowser_Title>
@@ -82,6 +83,18 @@
   <ValMovie>Voulez-vous supprimer le Film et tous ses fichiers ?</ValMovie>
 </MEdit>
 <MSubt>
-  <SubtMenu>Selectionnez un sous-titre</SubtMenu>
+  <SubtMenu>Sélectionnez un sous-titre</SubtMenu>
   <WtSubt>Sans sous-titrage</WtSubt>
 </MSubt>
+<Subt>
+  <Subt_OneAuto>Subt: Lecture auto</Subt_OneAuto>
+  <Subt_FontPath>Subt: Chemin Polices</Subt_FontPath>
+  <Subt_FontFile>Subt: Police active</Subt_FontFile>
+  <Subt_Color>Subt: Couleur</Subt_Color>
+  <Subt_ColorBg>Subt: Couleur de fond</Subt_ColorBg>
+	<Subt_Size>Subt: Taille</Subt_Size>
+	<Subt_Pos>Subt: Position</Subt_Pos>
+</Subt>
+<MFont>
+  <FontMenu>Sélectionnez une Police</FontMenu>
+</MFont>

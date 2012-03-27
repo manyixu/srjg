@@ -42,11 +42,12 @@
 	<bottom>Bajo</bottom>
 	<white>Blanco</white>
 	<black>Negro</black>
+	<yellow>amarillo</yellow>
+	<transparent>Transparente</transparent>
 	<browse>Explorar</browse>
 </cfg>
 <Dspl>
   <Dspl_Genre_txt>Texto del género:</Dspl_Genre_txt>
-	<Dspl_HelpBar>Barra de ayuda:</Dspl_HelpBar>
 </Dspl>
 <FBrowser>
   <FBrowser_Title>Camino des las películas:</FBrowser_Title>
@@ -85,3 +86,15 @@
   <SubtMenu>Seleccione los subtítulos</SubtMenu>
   <WtSubt>Sin subtítulos</WtSubt>
 </MSubt>
+<Subt>
+  <Subt_OneAuto>Subt: Auto play</Subt_OneAuto>
+  <Subt_FontPath>Subt: ruta de las fuentes</Subt_FontPath>
+  <Subt_FontFile>Subt: fuente activa</Subt_FontFile>
+  <Subt_Color>Subt: Color</Subt_Color>
+  <Subt_ColorBg>Subt: Color del fondo</Subt_ColorBg>
+	<Subt_Size>Subt: Tamaño</Subt_Size>
+	<Subt_Pos>Subt: Posición</Subt_Pos>
+</Subt>
+<MFont>
+  <FontMenu>Seleccione una fuente</FontMenu>
+</MFont>
