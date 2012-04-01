@@ -9,7 +9,7 @@
 	<year>Rok</year>
 	<search>Szukaj</search>
   <config>Konfiguracja</config>
-  <textInfo>Wellcome on SRJG !&#x0A;&#x0A;1 - to play the last watched video.</textInfo>
+  <textInfo>Witamy w SRJG !&#x0A;&#x0A;1 - aby odtworzyć ostatnio oglądany film.</textInfo>
 </main>
 <jukebox>
 	<helpGP>Keys list:&#x0A;1 = Switch View for the Jukebox&#x0A;Enter = To select&#x0A;Rtn = Previous screen</helpGP>
@@ -17,22 +17,22 @@
   <helpSheet>Keys list:&#x0A;2 = Mark as Watched&#x0A;Rtn = Previous screen&#x0A;Enter = Play video&#x0A;Play = Play video&#x0A;< = Previous video&#x0A;> = Next video</helpSheet>
 </jukebox>
 <update>
-  <fast>Szybko</fast>
-  <rebuild>Odbuduj</rebuild>
+  <fast>Szybka</fast>
+  <rebuild>Pełna</rebuild>
 </update>
 <cfg>
   <Lang>Język</Lang>
-  <Jukebox_Size>Zobacz</Jukebox_Size>
+  <Jukebox_Size>Widok</Jukebox_Size>
   <Movies_Path>Ścieżka do filmów</Movies_Path>
 	<Nfo_Path>Ścieżka do Nfo</Nfo_Path>
 	<Poster_Path>Ścieżka do plakatów</Poster_Path>
 	<Sheet_Path>Ścieżka do okładek</Sheet_Path>
   <Movie_Filter>Filtr</Movie_Filter>
-  <SingleDb>Jedna baza danych</SingleDb>
+  <SingleDb>Wspólna baza danych</SingleDb>
   <Recent_Max>Max ostatnich filmów</Recent_Max>
-  <Imdb>Użyj Imdb</Imdb>
-	<Dspl>Wyświetl</Dspl>
-	<UnlockRM>Pozwól Usuń</UnlockRM>
+  <Imdb>Użyj IMDB</Imdb>
+	<Dspl>Opcje wyświetlania</Dspl>
+	<UnlockRM>Zezwalaj na usuwanie</UnlockRM>
   <Jukebox_Path>Ścieżka do Jukebox:</Jukebox_Path>
   <Port>Port:</Port>
   <Version>Wersja:</Version>
@@ -42,19 +42,19 @@
 	<bottom>Dół</bottom>
 	<white>Białe</white>
 	<black>Czarne</black>
-	<yellow>yellow</yellow>
-	<transparent>Transparent</transparent>
+	<yellow>Żółte</yellow>
+	<transparent>Przezroczyste</transparent>
 	<browse>Przeglądaj</browse>
 </cfg>
 <Dspl>
-  <Dspl_Genre_txt>Tekst gatunku:</Dspl_Genre_txt>
+  <Dspl_Genre_txt>Kolor dla gatunku:</Dspl_Genre_txt>
 </Dspl>
 <FBrowser>
   <FBrowser_Title>Ścieżka do filmów:</FBrowser_Title>
   <FBrowser_Valid>do sprawdzenia</FBrowser_Valid>
 </FBrowser>
 <Imdb>
-  <Imdb_Use>Aktywacja Imdb</Imdb_Use>
+  <Imdb_Use>Aktywacja IMDB</Imdb_Use>
   <Imdb_Lang>Interfejs</Imdb_Lang>
   <Imdb_Source>Losowy plakat</Imdb_Source>
   <Imdb_Poster>Pobierz plakaty</Imdb_Poster>
@@ -87,14 +87,14 @@
   <WtSubt>Without subtitle</WtSubt>
 </MSubt>
 <Subt>
-  <Subt_OneAuto>Subt: Auto play</Subt_OneAuto>
-  <Subt_FontPath>Subt: Font path</Subt_FontPath>
-  <Subt_FontFile>Subt: Active Font</Subt_FontFile>
-  <Subt_Color>Subt: Color</Subt_Color>
-  <Subt_ColorBg>Subt: Background color</Subt_ColorBg>
-	<Subt_Size>Subt: Size</Subt_Size>
-	<Subt_Pos>Subt: Position</Subt_Pos>
+  <Subt_OneAuto>Autoodtwarzanie napisów</Subt_OneAuto>
+  <Subt_FontPath>Ścieżka do czcionki</Subt_FontPath>
+  <Subt_FontFile>Czcionka</Subt_FontFile>
+  <Subt_Color>Kolor napisów</Subt_Color>
+  <Subt_ColorBg>Kolor tła</Subt_ColorBg>
+	<Subt_Size>Rozmiar</Subt_Size>
+	<Subt_Pos>Pozycja</Subt_Pos>
 </Subt>
 <MFont>
-  <FontMenu>Select a font</FontMenu>
+  <FontMenu>Wybierz czcionkę</FontMenu>
 </MFont>

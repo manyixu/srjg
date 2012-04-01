@@ -1594,7 +1594,13 @@ cat <<EOF
 <idleImage> image/POPUP_LOADING_08.png </idleImage> 
 
 <!-- comment menu display -->
-<text redraw="no" backgroundColor="-1:-1:-1" foregroundColor="200:200:200" offsetXPC="36" offsetYPC="23" widthPC="57" heightPC="4" fontSize="16" lines="1" align="left">
+<image type="image/jpeg" redraw="no" offsetXPC="37" offsetYPC="23" widthPC="3" heightPC="4">
+	<script>
+		print(Jukebox_Path + "images/countries/" + Language + ".png");
+	</script>
+</image>
+
+<text redraw="no" backgroundColor="-1:-1:-1" foregroundColor="200:200:200" offsetXPC="40" offsetYPC="23" widthPC="57" heightPC="4" fontSize="16" lines="1" align="left">
 	<script>
 		print(Language);
 	</script>
