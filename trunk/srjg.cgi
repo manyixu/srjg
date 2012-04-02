@@ -1110,9 +1110,10 @@ if [ "$mode" = "genreSelection" ]; then
   sed -i 1i"$AllMovies" /tmp/srjg_genre.list
   while read LINE
   do
-    # translate to find genre thumbnails
+		# translate to find genre thumbnails
     Img_genre=`sed "/|${LINE}>/!d;s:.*>\(.*\)|:\1:" "${Jukebox_Path}lang/${Language}_genre"`
-    if [ -z "$Img_genre" ] ; then Img_genre="Unknown"; fi
+    if [ -z "$Img_genre" ]; then Img_genre=${LINE}; fi
+    if [ ! -e "${Jukebox_Path}images/genre/$Img_genre.jpg" ]; then Img_genre="Unknown"; fi
 cat <<EOF
     <item>
     <title>${LINE}</title>
@@ -1377,27 +1378,30 @@ cat <<EOF
       } else if ( mode == "Subt_FontPath" ) {
         SelParam=getItemInfo(indx, "param");
         YPos=getItemInfo(indx, "pos");
+        setEnv("New_Path","");
         dlok = doModalRss("http://127.0.0.1:"+Port+"/cgi-bin/srjg.cgi?"+mode+"@"+SelParam+"@"+YPos+"@"+XPos);
         New_Path=getEnv("New_Path");
-        if (( New_Path == "" || New_Path == null ) &amp;&amp; New_Path != "JukeboxPath" ) New_Path = FontPath;
-        if ( Subt_FontPath == "JukeboxPath" || New_Path == "JukeboxPath" ) FontPath=Jukebox_Path+"font/";
-        else FontPath = Subt_FontPath;
-        if ( FontPath != New_Path ) { /* save new tmp cfg */
-          srjgconf="/tmp/srjg.cfg";
-          tmpconfigArray=readStringFromFile(srjgconf);
-          tmpconfigArray=pushBackStringArray(tmpconfigArray, "Subt_FontPath='"+New_Path+"'");
-          writeStringToFile(srjgconf, tmpconfigArray);
-        }
-        FontSel="";
-        dlok = loadXMLFile("http://127.0.0.1:$Port/cgi-bin/srjg.cgi?FontList@");
-        M_FontFile = readStringFromFile( "/tmp/srjg_font_dir.list" );
-        if ( M_FontFile != null ) { /* Font file exists */
-          if ( getStringArrayAt(M_FontFile,1) == null || getStringArrayAt(M_FontFile,1) == "" ) FontSel=getStringArrayAt(M_FontFile,0);
-          else FontSel=doModalRss("http://127.0.0.1:$Port/cgi-bin/srjg.cgi?MenuFont@");
-        }
-        if ( FontSel != null ) {
-          UE_FontSel=urlEncode(FontSel);
-          dlok = loadXMLFile("http://127.0.0.1:$Port/cgi-bin/srjg.cgi?UpdateCfg@"+UE_FontSel+"@Subt_FontFile@");
+        if ( New_Path != "" &amp;&amp; New_Path != null ) {
+          if ( Subt_FontPath != New_Path ) { /* save new tmp cfg */
+            srjgconf="/tmp/srjg.cfg";
+            tmpconfigArray=readStringFromFile(srjgconf);
+            tmpconfigArray=pushBackStringArray(tmpconfigArray, "Subt_FontPath='"+New_Path+"'");
+            writeStringToFile(srjgconf, tmpconfigArray);
+          }
+          FontSel="";
+          dlok = loadXMLFile("http://127.0.0.1:$Port/cgi-bin/srjg.cgi?FontList@");
+          M_FontFile = readStringFromFile( "/tmp/srjg_font_dir.list" );
+          if ( M_FontFile != null ) { /* Font file exists */
+            if ( getStringArrayAt(M_FontFile,1) == null || getStringArrayAt(M_FontFile,1) == "" ) FontSel=getStringArrayAt(M_FontFile,0);
+            else FontSel=doModalRss("http://127.0.0.1:$Port/cgi-bin/srjg.cgi?MenuFont@");
+          }
+          if ( FontSel != null ) {
+            UE_FontSel=urlEncode(FontSel);
+            dlok = loadXMLFile("http://127.0.0.1:$Port/cgi-bin/srjg.cgi?UpdateCfg@"+UE_FontSel+"@Subt_FontFile@");
+          } else {
+            Tst_File = readStringFromFile( FontPath+Subt_FontFile );
+            if ( Tst_File == null ) dlok = loadXMLFile("http://127.0.0.1:$Port/cgi-bin/srjg.cgi?UpdateCfg@@Subt_FontFile@");
+          }
         }
         executeScript("onEnter");
       } else {
