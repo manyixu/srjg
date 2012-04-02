@@ -2222,7 +2222,11 @@ j=0
 
 rm ${Fxml} 2>/dev/null
 
-awk '
+if [ -z `awk 2>&1 | grep 1.1.3` ]; then
+  awkBin=awk
+else awkBin=/usr/local/bin/package/awk; fi
+
+${awkBin} '
 $0 ~ /\015$/ { sub( "\015$", "" ) }
 /^[0-9][0-9]:[0-9][0-9]:[0-9][0-9],[0-9][0-9][0-9] -->/ { 
   B1=substr($0, 1, 2); B2=substr($0, 4, 2); B3=substr($0, 7, 2); B4=substr($0, 10, 3);
