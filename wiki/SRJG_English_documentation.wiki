@@ -5,7 +5,7 @@ https://lh6.googleusercontent.com/-m1X7mJnIQHY/T2j6Td1w66I/AAAAAAAAA9s/d669u1vk_
 <br>
 <wiki:toc max_depth="1" />
 <br>
-=SRJG Video demonstration=<br>
+=SRJG Video demonstration=
 <br>
 <wiki:video url="http://www.youtube.com/watch?v=1qjapUIsEiE"/>
 <br>
@@ -69,7 +69,7 @@ Possible values are:<br>
 MoviesPath : NFO files are located/created in the Movies folders
 defined in the parameter "MoviesPath"<br>
 SRJG: NFO files are located/created in a subfolder of the movies
-&lt;movie path&gt;/SRJG/ImgNfo/ which is defined in the parameter
+<movie path>/SRJG/ImgNfo/ which is defined in the parameter
 "MoviesPath"<br>
 You can also specify the any path of your choice by entering it between
 the tags. This path must already exist and be writable.<br>
@@ -85,7 +85,7 @@ Possible values are:<br>
 MoviesPath : Thumbnail files are located/created in the Movies folders
 defined in the parameter "MoviesPath"<br>
 SRJG: Thumbnail files are located/created in a subfolder of the movies
-&lt;movie path&gt;/SRJG/ImgNfo/ which is defined in the parameter
+<movie path>/SRJG/ImgNfo/ which is defined in the parameter
 "MoviesPath"<br>
 You can also specify the any path of your choice by entering it between
 the tags. This path must already exist and be writable.<br>
@@ -101,7 +101,7 @@ Possible values are:<br>
 MoviesPath : Moviesheet files are located/created in the Movies folders
 defined in the parameter "MoviesPath"<br>
 SRJG: Moviesheet files are located/created in a subfolder of the movies
-&lt;movie path&gt;/SRJG/ImgNfo/ which is defined in the parameter
+<movie path>/SRJG/ImgNfo/ which is defined in the parameter
 "MoviesPath"<br>
 You can also specify the any path of your choice by entering it between
 the tags. This path must already exist and be writable.<br>
@@ -111,7 +111,7 @@ Note that there is a "/" at the end of the path and it must be included.<br>
 SingleDb (default "no")<br>
 <br>
 "Yes" there is only one database in /usr/local/etc/ <br>
-"No" the database is in &lt;MoviesPath&gt;/SRJG/. This allows multiple
+"No" the database is in <MoviesPath>/SRJG/. This allows multiple
 Jukebox by changing the location of the main movies path.<br>
 <br>
 <br>
@@ -125,7 +125,7 @@ and movies. <br>
 <br>
 Movie_Filter (default "sample, "2 ch", cd2")<br>
 <br>
-&nbsp;<br>
+<br>
 This filter contains a list that will allow to exclude films that
 contain these words. <br>
 These elements must be separated by a comma. If an item has a space, it
@@ -136,8 +136,8 @@ second part. <br>
 It is essential that Part 1 includes the element cd1 at the end of its
 name and part 2 contains cd2: <br>
 Example: <br>
-{{{&lt;Movie name&gt; cd1.avi &lt;movie name&gt; cd2.avi}}} The lower
-case is important to recognize cd1 and cd2.<br>
+<Movie name> cd1.avi <movie name> cd2.avi <br> 
+The lowercase is important to recognize cd1 and cd2.<br>
 <br>
 <br>
 Port (default 80) <br>
@@ -344,7 +344,7 @@ The location of the "Main Folder" is the path of movies. It should be
 entered in the config file, or the menu interface configuration RSS. <br>
 For the path /tmp/usbmounts/sdb1/Movies we have: <br>
 <br>
-<Movies_Path>/tmp/usbmounts/sdb1</Movies_Path><br>
+{{{<Movies_Path>/tmp/usbmounts/sdb1</Movies_Path>}}}<br>
 <br>
 <br>
 <br>
