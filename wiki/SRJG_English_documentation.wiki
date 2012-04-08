@@ -1,0 +1,359 @@
+#labels Phase-Deploy<br>
+*Currently in progress*<br>
+<br>
+https://lh6.googleusercontent.com/-m1X7mJnIQHY/T2j6Td1w66I/AAAAAAAAA9s/d669u1vk_PA/s800/srjg_menu_principal.jpg<br>
+<br>
+&lt;wiki:toc max_depth="1" /&gt;<br>
+<br>
+=SRJG Video demonstration=<br>
+<br>
+&lt;wiki:video url="http://www.youtube.com/watch?v=1qjapUIsEiE"/&gt;<br>
+<br>
+<br>
+=Parameters=<br>
+<br>
+Two parameters can not be configured from the TV feed: <br>
+The location of the Jukebox (Jukebox_Path), and the port number used
+(Port) to run cgi scripts. <br>
+Srjg.cfg the file must be copied to /usr/local/etc/<br>
+<br>
+You can change any other settings from your television screen. This
+will avoid any data entry errors in the configuration file.<br>
+<br>
+https://lh6.googleusercontent.com/-fJn5femmgco/T2j6S6Uyl5I/AAAAAAAAA-s/C6MwHDxcpbs/s700/srjg_menu_config.jpg<br>
+<br>
+<br>
+==Configuration file (srjg.cfg) details==<br>
+<br>
+The parameters are between tags. Do not change the tags names.&lt;br&gt;<br>
+Example:&lt;br&gt;<br>
+<br>
+`&lt;Lang&gt;en&lt;/Lang&gt;`&lt;br&gt;<br>
+The parameter name is "Lang" and its value is "en" &lt;br&gt;<br>
+<br>
+<br>
+===List of configuration parameters===<br>
+<br>
+Lang (default "en")<br>
+<br>
+Puts the interface in the chosen language.<br>
+<br>
+<br>
+Jukebox_Path (default "/usr/local/etc/srjg/")<br>
+<br>
+This is the path where you have installed SRJG. Note that there is a
+"/" at the end of the path and it must be included.<br>
+<br>
+<br>
+Jukebox_Size (default "2x6")<br>
+<br>
+This option determine how the movies thumbnails will be shown.&lt;br&gt;<br>
+<br>
+Possible values are:&lt;br&gt;<br>
+<br>
+2x6 : Two(2) rows of six(6) thumbnails&lt;br&gt;<br>
+3x8 : Three(3) rows of eight(8) thumbnails&lt;br&gt;<br>
+Sheetwall: Mode with full moviesheet view with thumbnails at the bottom
+of the screen.&lt;br&gt;<br>
+<br>
+<br>
+<br>
+Movies_Path (default "/tmp/usbmounts/sdb1/")<br>
+<br>
+This is the path to the locations of your movies.&nbsp; This path must
+already exist.&lt;br&gt;<br>
+Note that there is a "/" at the end of the path and it must be
+included.&lt;br&gt;<br>
+<br>
+Nfo_Path (default "MoviesPath")<br>
+<br>
+This is the path to the locations of your NFO movie files.<br>
+<br>
+Possible values are:<br>
+<br>
+MoviesPath : NFO files are located/created in the Movies folders
+defined in the parameter "MoviesPath"<br>
+SRJG: NFO files are located/created in a subfolder of the movies
+&lt;movie path&gt;/SRJG/ImgNfo/ which is defined in the parameter
+"MoviesPath"<br>
+You can also specify the any path of your choice by entering it between
+the tags. This path must already exist and be writable.<br>
+Note that there is a "/" at the end of the path and it must be included.<br>
+<br>
+<br>
+Poster_Path (default "MoviesPath")<br>
+<br>
+This is the path to the locations of your movie thumbnail files.<br>
+<br>
+Possible values are:<br>
+<br>
+MoviesPath : Thumbnail files are located/created in the Movies folders
+defined in the parameter "MoviesPath"<br>
+SRJG: Thumbnail files are located/created in a subfolder of the movies
+&lt;movie path&gt;/SRJG/ImgNfo/ which is defined in the parameter
+"MoviesPath"<br>
+You can also specify the any path of your choice by entering it between
+the tags. This path must already exist and be writable.<br>
+Note that there is a "/" at the end of the path and it must be included.<br>
+<br>
+<br>
+Sheet_Path (default "MoviesPath")<br>
+<br>
+This is the path to the locations of your movie sheets files.<br>
+<br>
+Possible values are:<br>
+<br>
+MoviesPath : Moviesheet files are located/created in the Movies folders
+defined in the parameter "MoviesPath"<br>
+SRJG: Moviesheet files are located/created in a subfolder of the movies
+&lt;movie path&gt;/SRJG/ImgNfo/ which is defined in the parameter
+"MoviesPath"<br>
+You can also specify the any path of your choice by entering it between
+the tags. This path must already exist and be writable.<br>
+Note that there is a "/" at the end of the path and it must be included.<br>
+<br>
+<br>
+SingleDb (default "no")<br>
+<br>
+"Yes" there is only one database in /usr/local/etc/ <br>
+"No" the database is in &lt;MoviesPath&gt;/SRJG/. This allows multiple
+Jukebox by changing the location of the main movies path.<br>
+<br>
+<br>
+UnlockRM (defaut "no")<br>
+<br>
+If this parameter is "yes" it activates a menu when you press the
+button "Edit". It is used to remove pockets, Sheet images, files. Nfo
+and movies. <br>
+<br>
+<br>
+<br>
+Movie_Filter (default "sample, "2 ch", cd2")<br>
+<br>
+&nbsp;<br>
+This filter contains a list that will allow to exclude films that
+contain these words. <br>
+These elements must be separated by a comma. If an item has a space, it
+must be quoted. <br>
+If a video is in two parts, cd2 serves to mask the second cd. The films
+in two parts are managed by SRJG, which automatically switches to the
+second part. <br>
+It is essential that Part 1 includes the element cd1 at the end of its
+name and part 2 contains cd2: <br>
+Example: <br>
+{{{&lt;Movie name&gt; cd1.avi &lt;movie name&gt; cd2.avi}}} The lower
+case is important to recognize cd1 and cd2.<br>
+<br>
+<br>
+Port (default 80) <br>
+<br>
+This port number is used to execute cgi scripts. If you do not know
+your port number, you have a small tool to find it. <br>
+Start Telnet and run the script "srjg/installer/port.sh". <br>
+<br>
+<br>
+Recent_Max? (defaut 24) <br>
+<br>
+Specifies the maximum number of movies shown in the "Recently Added"
+Thumbnail screen.<br>
+<br>
+<br>
+Dspl_Genre_txt (default white)<br>
+<br>
+Possible values: white, black <br>
+<br>
+Indicates the color of the text used on the movies genre thumbnails
+(white, black). <br>
+<br>
+<br>
+Dspl_HelpBar (default top)<br>
+<br>
+Possible values: up, down, no <br>
+<br>
+Determine the location or presence of the bar help (up, down or not at
+all).<br>
+<br>
+<br>
+The remainders of the settings only deals with the automatic creation
+of thumbnails, moviesheets and NFO files.&nbsp; If you choose to
+manually create those<br>
+then you do not have to worry about those settings.<br>
+<br>
+<br>
+Imdb (default no) <br>
+<br>
+Allows automatic retrieval of Imdb thumbnails, moviesheets or NFO files
+depending on the settings chosen. (yes/no)<br>
+<br>
+<br>
+Imdb_Lang (en default) <br>
+<br>
+Defines the interface language the Movie Sheet (actor, director, genre,
+year, duration). To set the language used in the synopsis, <br>
+you should use the parameter Imdb_Source. <br>
+<br>
+<br>
+<br>
+Imdb_Source (default imdb) <br>
+<br>
+Possible values are: imdb, tmdb, allocine.<br>
+<br>
+Set which site to use as source for the thumbnails, Movie Sheets and
+Nfo files. This site also defines the language used for Synopsis and
+pictures.<br>
+<br>
+<br>
+Imdb_Poster (default yes) <br>
+<br>
+Allows the automatic retrieval of the thumbnails. (yes/no)<br>
+<br>
+<br>
+Imdb_PBox (default generic)<br>
+<br>
+Possible values: No, bdrip, bluray, dtheater, dvd, generic, hddvd,
+hdtv, itunes <br>
+<br>
+Defines the display frame used for the thumbnails.<br>
+<br>
+<br>
+Imdb_PPost (default yes)<br>
+<br>
+if active, the thumbnail will be chosen at random from the available
+images on the source site.(yes/no)<br>
+<br>
+<br>
+Imdb_Sheet (default yes)<br>
+<br>
+Allows the automatic retrieval of the movie sheets. (yes/no)<br>
+<br>
+<br>
+Imdb_SBox (default generic)<br>
+<br>
+Possible values: No, bdrip, bluray, dtheater, dvd, generic, hddvd,
+hdtv, itunes<br>
+<br>
+Defines the display frame used for the thumbnail inside the movie
+sheets.<br>
+<br>
+<br>
+Imdb_SPost (default yes)<br>
+<br>
+if active, the thumbnail inside the movie sheets will be chosen at
+random from the available images on the source site.(yes/no)<br>
+<br>
+<br>
+Imdb_Backdrop (default yes)<br>
+<br>
+If active, the background of the movie Sheets will be randomly selected
+from the images available on the source site. (yes/no)<br>
+<br>
+<br>
+Imdb_Font (default tahoma)<br>
+<br>
+Possible values: Arial, Bookman, comic, tahoma, times, verdana <br>
+<br>
+Sets the font used for the movie Sheets. <br>
+<br>
+<br>
+<br>
+Imdb_Genres (default no) <br>
+<br>
+If enabled, images that will be displayed instead of text for genre
+types. This system works well with genres in English, but because of
+the translation, <br>
+it is possible that certain types Images do not displayed get displayed
+when other languages are selected. (yes/no)<br>
+<br>
+<br>
+<br>
+Imdb_Tagline (default yes)<br>
+<br>
+if active, displays the tag line in the movie Sheets. (yes/no)<br>
+<br>
+<br>
+<br>
+Imdb_Time (default no)<br>
+<br>
+Possible values: no, real, hours<br>
+<br>
+Sets the format for time display in the movie Sheets.<br>
+<br>
+<br>
+<br>
+Imdb_Info (default yes) <br>
+<br>
+if active, enable the creation of movies NFO files.<br>
+<br>
+<br>
+<br>
+Imdb_MaxDl (default 3) <br>
+<br>
+Indicates the number of simultaneous downloads to retrieve the images
+and NFO files.&nbsp; This setting depends on the speed of your Internet
+connection<br>
+and capability of your Player. If you have a small bandwitdh, put a
+download of one or two. If you put a number that is too big, your
+player will <br>
+be overloaded and over time it will be as long if not longer than using
+a small number. The best performance is generally achieved with 3 or 4
+simultaneous downloads. <br>
+<br>
+<br>
+<br>
+<br>
+Movies made up of 2 cd files<br>
+<br>
+Files must end with cd1 cd2 <br>
+<br>
+For example: <br>
+<br>
+{{{movie name cd2.avi movie name_cd2.avi}}}. In the filter parameter
+(Movie_Filter) , cd2 must be written so that the 2nd part of the movie
+(cd2)<br>
+does not get included in the Jukebox. An icon will appear on the movie
+thumbnail, top right to indicate that there is a second part. While
+viewing, <br>
+at the end of the first part, or if you press stop, the second part
+will automatically start.<br>
+<br>
+<br>
+<br>
+Organizing Files and folders<br>
+<br>
+Movies<br>
+<br>
+You have a lot of freedom in the organization of your files: movies are
+automatically detected in many types of directory trees.<br>
+<br>
+Main Folder<br>
+&nbsp;&nbsp; | - Movie 1<br>
+&nbsp;&nbsp; | - Movie 2&nbsp;&nbsp; <br>
+Main Folder<br>
+&nbsp;&nbsp; | - Feature Film
+1&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | - Movie 1<br>
+&nbsp;&nbsp; | - Feature Film 2 <br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | - Movie 2<br>
+Main Folder <br>
+&nbsp;&nbsp; | - other folder with all the movies <br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | - Movie 1<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | - Movie
+2 <br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | - ...<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |-- other
+folder<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+| - Movie 333&nbsp;&nbsp;&nbsp; <br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+| - Movie 334 <br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+| - ... <br>
+<br>
+The location of the "Main Folder" is the path of movies. It should be
+entered in the config file, or the menu interface configuration RSS. <br>
+For the path /tmp/usbmounts/sdb1/Movies we have: <br>
+<br>
+&lt;Movies_Path&gt;/tmp/usbmounts/sdb1&lt;/ Movies_Path&gt;<br>
+<br>
+<br>
+<br>
