@@ -23,7 +23,7 @@ will avoid any data entry errors in the configuration file.<br>
 https://lh6.googleusercontent.com/-fJn5femmgco/T2j6S6Uyl5I/AAAAAAAAA-s/C6MwHDxcpbs/s700/srjg_menu_config.jpg<br>
 <br>
 <br>
-==Configuration file (srjg.cfg) details==<br>
+==Configuration file (srjg.cfg) details==
 <br>
 The parameters are between tags. Do not change the tags names.<br>
 Exemple:<br>
@@ -32,7 +32,7 @@ Exemple:<br>
 The parameter name is "Lang" and its value is "en"<br>
 <br>
 <br>
-===List of configuration parameters===<br>
+===List of configuration parameters===
 <br>
 Lang (default "en")<br>
 <br>
@@ -313,9 +313,9 @@ will automatically start.<br>
 <br>
 <br>
 <br>
-=Organizing Files and folders=<br>
+=Organizing Files and folders=
 <br>
-==Movies==<br>
+==Movies==
 <br>
 You have a lot of freedom in the organization of your files: movies are
 automatically detected in many types of directory trees.<br>
