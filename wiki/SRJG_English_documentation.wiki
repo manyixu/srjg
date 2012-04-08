@@ -111,7 +111,7 @@ Note that there is a "/" at the end of the path and it must be included.<br>
 SingleDb (default "no")<br>
 <br>
 "Yes" there is only one database in /usr/local/etc/ <br>
-"No" the database is in <MoviesPath>/SRJG/. This allows multiple
+"No" the database is in {{{<MoviesPath>}}}/SRJG/. This allows multiple
 Jukebox by changing the location of the main movies path.<br>
 <br>
 <br>
