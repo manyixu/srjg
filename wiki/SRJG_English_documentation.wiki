@@ -1,16 +1,16 @@
-#labels Phase-Deploy<br>
+#labels Phase-Deploy
 *Currently in progress*<br>
 <br>
 https://lh6.googleusercontent.com/-m1X7mJnIQHY/T2j6Td1w66I/AAAAAAAAA9s/d669u1vk_PA/s800/srjg_menu_principal.jpg<br>
 <br>
-&lt;wiki:toc max_depth="1" /&gt;<br>
+<wiki:toc max_depth="1" />
 <br>
 =SRJG Video demonstration=<br>
 <br>
-&lt;wiki:video url="http://www.youtube.com/watch?v=1qjapUIsEiE"/&gt;<br>
+<wiki:video url="http://www.youtube.com/watch?v=1qjapUIsEiE"/>
 <br>
 <br>
-=Parameters=<br>
+=Parameters=
 <br>
 Two parameters can not be configured from the TV feed: <br>
 The location of the Jukebox (Jukebox_Path), and the port number used
@@ -25,10 +25,10 @@ https://lh6.googleusercontent.com/-fJn5femmgco/T2j6S6Uyl5I/AAAAAAAAA-s/C6MwHDxcp
 <br>
 ==Configuration file (srjg.cfg) details==<br>
 <br>
-The parameters are between tags. Do not change the tags names.&lt;br&gt;<br>
-Example:&lt;br&gt;<br>
+The parameters are between tags. Do not change the tags names.<br>
+Exemple:<br>
 <br>
-`&lt;Lang&gt;en&lt;/Lang&gt;`&lt;br&gt;<br>
+`<Lang>en</Lang>`<br>
 The parameter name is "Lang" and its value is "en" &lt;br&gt;<br>
 <br>
 <br>
