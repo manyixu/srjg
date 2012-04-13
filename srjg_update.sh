@@ -28,6 +28,7 @@ fi
 MoviesList="/tmp/srjg_movies.list"
 InsertList="/tmp/srjg_insert.list"
 DeleteList="/tmp/srjg_delete.list"
+ExluList="/tmp/srjg_exclu.list"
 IMDB=""
 Force_DB_Update=""
 Sqlite="${Jukebox_Path}sqlite3"
@@ -137,16 +138,24 @@ CreateMovieDB;
 }
 
 GenerateMovieList()
-# Find the movies based on movie extension and path provided.  Remove movies 
-# that contains the string(s) specified in $Movie_Filter
+# Find the movies based on movie extension and path provided.
+# Remove movies: 
+# - That contains the string(s) specified in $Movie_Filter
+# - In all path that contains files exclu.txt
 {
 # Replace the comma in Movie_Filter to pipes |
-Movie_Filter=`echo $Movie_Filter | sed 's/,/|/ g'`
+Movie_Filter=`echo ${Movie_Filter} | sed 's/,/|/ g'`
 echo "Searching for movies.."
-find "$Movies_Path" \
-  | egrep -i '\.(asf|avi|dat|divx|flv|img|iso|m1v|m2p|m2t|m2ts|m2v|m4v|mkv|mov|mp4|mpg|mts|qt|rm|rmp4|rmvb|tp|trp|ts|vob|wmv)$' \
-  | egrep -iv "$Movie_Filter" > $MoviesList
-echo "Found `sed -n '$=' $MoviesList` movies"
+find "${Movies_Path}" \
+  | egrep -i 'exclu.txt|\.(asf|avi|dat|divx|flv|img|iso|m1v|m2p|m2t|m2ts|m2v|m4v|mkv|mov|mp4|mpg|mts|qt|rm|rmp4|rmvb|tp|trp|ts|vob|wmv)$' \
+  | egrep -iv "${Movie_Filter}" > ${MoviesList}
+
+# create exclu path list
+sed '/exclu.txt/!d;s:\(.*/\)\([^/]*\):\\\#\1\#d:' ${MoviesList} >${ExluList}
+# remove exlu path
+[ -s "${ExluList}" ] && sed -i -f ${ExluList} ${MoviesList}
+
+echo "Found `sed -n '$=' ${MoviesList}` movies"
 }
 
 
@@ -174,11 +183,15 @@ GenerateInsDelFiles()
 # Generate insertion and deletion files
 {
 sed -i -e 's/\[/\&lsqb;/g' -e 's/\]/\&rsqb;/g' $MoviesList # Conversion of [] for grep
-if [ -s "${PreviousMovieList}" ] ; then # because the grep -f don't work with empty file
-  grep -vf $MoviesList "${PreviousMovieList}" | sed -e 's/\&lsqb;/\[/g' -e 's/\&rsqb;/\]/g' > $DeleteList
-  grep -vf "${PreviousMovieList}" $MoviesList | sed -e 's/\&lsqb;/\[/g' -e 's/\&rsqb;/\]/g' > $InsertList
+if [ -s $MoviesList ]; then
+  if [ -s "${PreviousMovieList}" ] ; then # because the grep -f don't work with empty file
+    grep -vf $MoviesList "${PreviousMovieList}" | sed -e 's/\&lsqb;/\[/g' -e 's/\&rsqb;/\]/g' > $DeleteList
+    grep -vf "${PreviousMovieList}" $MoviesList | sed -e 's/\&lsqb;/\[/g' -e 's/\&rsqb;/\]/g' > $InsertList
+  else
+    cat $MoviesList | sed -e 's/\&lsqb;/\[/g' -e 's/\&rsqb;/\]/g' > $InsertList
+  fi
 else
-  cat $MoviesList | sed -e 's/\&lsqb;/\[/g' -e 's/\&rsqb;/\]/g' > $InsertList
+  cat "${PreviousMovieList}" | sed -e 's/\&lsqb;/\[/g' -e 's/\&rsqb;/\]/g' > $DeleteList
 fi
 mv $MoviesList "${PreviousMovieList}"
 }

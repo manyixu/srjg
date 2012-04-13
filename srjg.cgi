@@ -44,6 +44,7 @@ Sqlite=${Jukebox_Path}"sqlite3"
 MoviesList="/tmp/srjg_movies.list"
 InsertList="/tmp/srjg_insert.list"
 DeleteList="/tmp/srjg_delete.list"
+ExluList="/tmp/srjg_exclu.list"
 
 # Genre "All Movies" depending of the language
 AllMovies=`sed "/>All Movies|/!d;s:|\(.*\)>.*:\1:" "${Jukebox_Path}lang/${Language}_genre"`
@@ -101,26 +102,37 @@ MovieYear=`sed '/<year>/!d;s:.*>\(.*\)</.*:\1:' "$NFOPATH/$INFONAME"`
 }
 
 GenerateMovieList()
-# Find the movies based on movie extension and path provided.  Remove movies 
-# that contains the string(s) specified in $Movie_Filter
+# Find the movies based on movie extension and path provided.
+# Remove movies: 
+# - That contains the string(s) specified in $Movie_Filter
+# - In all path that contains files exclu.txt
 {
 # Replace the comma in Movie_Filter to pipes |
-Movie_Filter=`echo $Movie_Filter | sed 's/,/|/ g'`
+Movie_Filter=`echo ${Movie_Filter} | sed 's/,/|/ g'`
 
-find "$Movies_Path" \
-  | egrep -i '\.(asf|avi|dat|divx|flv|img|iso|m1v|m2p|m2t|m2ts|m2v|m4v|mkv|mov|mp4|mpg|mts|qt|rm|rmp4|rmvb|tp|trp|ts|vob|wmv)$' \
-  | egrep -iv "$Movie_Filter" > $MoviesList
+find "${Movies_Path}" \
+  | egrep -i 'exclu.txt|\.(asf|avi|dat|divx|flv|img|iso|m1v|m2p|m2t|m2ts|m2v|m4v|mkv|mov|mp4|mpg|mts|qt|rm|rmp4|rmvb|tp|trp|ts|vob|wmv)$' \
+  | egrep -iv "${Movie_Filter}" > ${MoviesList}
+
+# create exclu path list
+sed '/exclu.txt/!d;s:\(.*/\)\([^/]*\):\\\#\1\#d:' ${MoviesList} >${ExluList}
+# remove exlu path
+[ -s "${ExluList}" ] && sed -i -f ${ExluList} ${MoviesList}
 }
 
 GenerateInsDelFiles()
 # Generate insertion and deletion files
 {
 sed -i -e 's/\[/\&lsqb;/g' -e 's/\]/\&rsqb;/g' $MoviesList # Conversion of [] for grep
-if [ -s "${PreviousMovieList}" ] ; then # because the grep -f don't work with empty file
-  grep -vf $MoviesList "${PreviousMovieList}" | sed -e 's/\&lsqb;/\[/g' -e 's/\&rsqb;/\]/g' > $DeleteList
-  grep -vf "${PreviousMovieList}" $MoviesList | sed -e 's/\&lsqb;/\[/g' -e 's/\&rsqb;/\]/g' > $InsertList
+if [ -s $MoviesList ]; then
+  if [ -s "${PreviousMovieList}" ] ; then # because the grep -f don't work with empty file
+    grep -vf $MoviesList "${PreviousMovieList}" | sed -e 's/\&lsqb;/\[/g' -e 's/\&rsqb;/\]/g' > $DeleteList
+    grep -vf "${PreviousMovieList}" $MoviesList | sed -e 's/\&lsqb;/\[/g' -e 's/\&rsqb;/\]/g' > $InsertList
+  else
+    cat $MoviesList | sed -e 's/\&lsqb;/\[/g' -e 's/\&rsqb;/\]/g' > $InsertList
+  fi
 else
-  cat $MoviesList | sed -e 's/\&lsqb;/\[/g' -e 's/\&rsqb;/\]/g' > $InsertList
+  cat "${PreviousMovieList}" | sed -e 's/\&lsqb;/\[/g' -e 's/\&rsqb;/\]/g' > $DeleteList
 fi
 mv $MoviesList "${PreviousMovieList}"
 }
@@ -741,7 +753,7 @@ cat <<EOF
           Cd2 = "false";
           executeScript("PlayMovie");
 					"false";
-        } else if (userInput == "video_completed") {
+        } else if (userInput == "video_completed" ) {
           FindCd1=findString(M_File, "cd1");
           if ( FindCd1 == "cd1" ) {
             M_File=urlEncode(M_File); 
@@ -758,7 +770,7 @@ cat <<EOF
 			  		ToggleEAWatched = "off"; /* don't toggle watched */
             MovieID=M_ID;
             executeScript("WatchUpdate"); /* update array AWatched */
-				   jumpToLink("Watchcgi"); /* update watched state in database */
+            jumpToLink("Watchcgi"); /* update watched state in database */
           } else Cd2 = "false";
 					"false";
         } else if (userInput == "video_search") {
