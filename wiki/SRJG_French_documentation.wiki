@@ -218,12 +218,10 @@ Vous avez une grande liberté sur l’organisation de vos fichiers : les films s
   |-- Film 1
   |-- Film 2
   |-- …
-Dossier Principal
   |-- Dossier Film 1
         |-- Film 1
   |-- Dossier Film 2
         |-- Film 2
-Dossier Principal
   |-- Dossier  ensemble 1
         |-- Film 1
         |-- Film 2
@@ -240,6 +238,32 @@ Pour le chemin /tmp/usbmounts/sdb1/film on aura:<br>
 <Movies_Path>"/tmp/public/zozo(usb)/film/"</Movies_Path>
 }}}
 Notez qu’il y a un / à la fin du chemin.
+
+==Exclusion de dossiers==
+En plaçant un fichier nommé exclu.txt, vous pouvez exclure un dossier pour que les films qui s'y trouvent n'apparaissent pas dans le jukebox.<br>
+Dans l'exemple, ci-dessous, tous les films situés dans "Dossier 2" et "Dossier 3" sont exclus du Jukebox.
+
+{{{
+Dossier Principal
+  |-- Dossier 1
+        |-- Film 1
+        |-- Film 2
+        |-- …
+        |-- Dossier 2
+            |-- exclu.txt
+            |-- Film 222
+            |-- Film 223
+            |-- …
+            |-- Dossier 3
+                |-- Film 333
+                |-- Film 334
+                |-- …
+        |-- Dossier 4
+            |-- Film 444
+            |-- Film 445
+            |-- …   
+}}}
+Vous pouvez mettre autant de fichier exclu.txt que vous voulez, mais n'oubliez pas que s'il n'y a plus rien dans votre Jukebox, c'est peut-être que vous avez mis un fichier exclu.txt au mauvais endroit...
 
 ==Les pochettes, les images Sheet et les fichiers Nfo==
 
@@ -365,32 +389,6 @@ Vous pouvez marquer les films comme étant vu.<br>
 Positionnez-vous sur la Pochette, ou bien sur la page Sheet, puis appuyez sur la touche 2. En appuyant une deuxième fois sur 2, vous pouvez enlever le Tag vu.<br>
 Le fait de visionner un film va automatiquement le taguer comme vu. Le fait d'arrêter la lecture avec la touche arrêt, n'empêchera pas qu'il soit Tagué, il faudra le dé-taguer manuellement.<br>
 Un film qui comporte un Tag vu, n'apparaît plus dans la liste des films « Pas regardés ».
-
-=Exclusion de dossiers=
-En plaçant un fichier nommé exclu.txt, vous pouvez exclure un dossier pour que les films qui s'y trouvent n'apparaissent pas dans le jukebox.<br>
-Dans l'exemple, ci-dessous, tous les films situés dans "Dossier 2" et "Dossier 3" sont exclus du Jukebox.
-
-{{{
-Dossier Principal
-  |-- Dossier 1
-        |-- Film 1
-        |-- Film 2
-        |-- …
-        |-- Dossier 2
-            |-- exclu.txt
-            |-- Film 222
-            |-- Film 223
-            |-- …
-            |-- Dossier 3
-                |-- Film 333
-                |-- Film 334
-                |-- …
-        |-- Dossier 4
-            |-- Film 444
-            |-- Film 445
-            |-- …   
-}}}
-Vous pouvez mettre autant de fichier exclu.txt que vous voulez, mais n'oubliez pas que s'il n'y a plus rien dans votre Jukebox, c'est peut-être que vous avez mis un fichier exclu.txt au mauvais endroit...
 
 =Mises à jour=
 
