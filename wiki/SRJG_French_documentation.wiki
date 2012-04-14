@@ -366,6 +366,32 @@ Positionnez-vous sur la Pochette, ou bien sur la page Sheet, puis appuyez sur la
 Le fait de visionner un film va automatiquement le taguer comme vu. Le fait d'arrêter la lecture avec la touche arrêt, n'empêchera pas qu'il soit Tagué, il faudra le dé-taguer manuellement.<br>
 Un film qui comporte un Tag vu, n'apparaît plus dans la liste des films « Pas regardés ».
 
+=Exclusion de dossiers=
+En plaçant un fichier nommé exclu.txt, vous pouvez exclure un dossier pour que les films qui s'y trouvent n'apparaissent pas dans le jukebox.<br>
+Dans l'exemple, ci-dessous, tous les films situés dans "Dossier 2" et "Dossier 3" sont exclus du Jukebox.
+
+{{{
+Dossier Principal
+  |-- Dossier 1
+        |-- Film 1
+        |-- Film 2
+        |-- …
+        |-- Dossier 2
+            |-- exclu.txt
+            |-- Film 222
+            |-- Film 223
+            |-- …
+            |-- Dossier 3
+                |-- Film 333
+                |-- Film 334
+                |-- …
+        |-- Dossier 4
+            |-- Film 444
+            |-- Film 445
+            |-- …   
+}}}
+Vous pouvez mettre autant de fichier exclu.txt que vous voulez, mais n'oubliez pas que s'il n'y a plus rien dans votre Jukebox, c'est peut-être que vous avez mis un fichier exclu.txt au mauvais endroit...
+
 =Mises à jour=
 
 La première fois que l'on va créer le Jukebox, il va falloir créer la base de données en faisant une mise à jour complète (Reconstruire)<br>
