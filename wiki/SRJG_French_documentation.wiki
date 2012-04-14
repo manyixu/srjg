@@ -83,11 +83,15 @@ Ce filtre contient une liste qui va permettre d’écarter des films qui contien
 Ces éléments doivent être séparés par une virgule. Si un élément comporte un blanc, il doit être entre guillemets.<br>
 Si une vidéo est coupée en deux, cd2 sert à masquer le deuxième cd. Les films en deux parties sont gérés par SRJG, qui passe automatiquement à la deuxième partie. Il faut impérativement que la partie 1 comporte l’élément cd1 à la fin de son nom et la partie 2 contienne cd2 :
 Exemple<br>
-{{{<nom du film>_cd1.avi
-<nom du film>_cd2.avi}}}
+{{{
+<nom du film>_cd1.avi
+<nom du film>_cd2.avi
+}}}
 Ou bien 
-{{{<nom du film>cd1.avi
-<nom du film>cd2.avi}}}
+{{{
+<nom du film>cd1.avi
+<nom du film>cd2.avi
+}}}
 Les minuscules sont importantes pour reconnaître cd1 et cd2.
 
  * Port (defaut 80)
@@ -101,9 +105,37 @@ Indique le nombre maximum de films affichés dans la rubrique « Pas Regardés �
 Valeurs possibles: white, black<br>
 Indique la couleur d’affichage du texte sur les Pochettes des genres (blanc, noir).
 
- * Dspl_HelpBar (defaut top)
-Valeurs possibles: up, down, no<br>
-Permet de décider de l’emplacement de la barre d’aide (haut, bas ou pas du tout).
+ * Subt_OneAuto (defaut no)
+Valeurs possibles: yes, no<br>
+Si à "yes", si la vidéo n'a qu'un seul sous-titre, la vidéo sera lancée automatiquement avec le sous-titre présent. Le menu de sélection des sous-titres n'apparaît que s'il y a plusieurs sous-titres pour la même vidéo.
+
+ * Subt_FontPath (defaut JukeboxPath)
+Valeurs possibles: JukeboxPath, un chemin vers un dossier de polices.<br>
+JukeboxPath: le menu des polices va chercher les polices dans le dossier "font" situé dans le dossier du programme srjg<br>
+Vous pouvez définir le dossier de votre choix qui contient des Polices.<br>
+Votre Firwmare contient déjà des polices:
+{{{
+/usr/local/bin/Resource
+/usr/local/bin/Resource/CC_Font
+}}}
+
+ * Subt_FontFile (defaut "")
+Si rien n'est précisé, la police système est utilisée.<br>
+Attention, si le nom de la police précisée ici n'existe pas, votre Player va rebooter. Il est conseillé d'utiliser les menus de configuration depuis votre TV pour renseigner ce paramètre.
+
+ * Subt_Color (defaut white)
+Valeurs possibles: white, yellow.<br>
+C'est la couleur d'affichage de la police.
+
+ * Subt_ColorBg (defaut transparent)
+Valeurs possibles: trasparent, white, black.<br>
+C'est la couleur de fond pour la police.
+
+ * Subt_Size (defaut 24)
+Taille de la police.
+
+ * Subt_Pos (defaut 0)
+Position a partir du bas de l'écran, les valeurs doivent être négatives.
 
  * Imdb (defaut no)
 Permet d’utiliser Imdb pour récupérer automatiquement des Pochettes, Jaquettes et/ou fichiers .nfo, en fonction des paramètres choisis.
