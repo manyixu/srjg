@@ -1,0 +1,11 @@
+#summary One-sentence summary of this page.
+
+= Introduction =
+
+Nom du fichier de Police
+
+
+= Details =
+
+Si rien n'est précisé, la police système est utilisée.
+Attention, si le nom de la police précisée ici n'existe pas, votre Player va rebooter. Il est conseillé d'utiliser les menus de configuration depuis votre TV pour renseigner ce paramètre
