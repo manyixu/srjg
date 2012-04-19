@@ -218,10 +218,14 @@ Vous avez une grande liberté sur l’organisation de vos fichiers : les films s
   |-- Film 1
   |-- Film 2
   |-- …
+
+ Dossier principal
   |-- Dossier Film 1
         |-- Film 1
   |-- Dossier Film 2
         |-- Film 2
+
+ Dossier principal
   |-- Dossier  ensemble 1
         |-- Film 1
         |-- Film 2
@@ -356,6 +360,8 @@ Vous pouvez aussi utiliser d'autres outils pour récupérer ces informations
  * Tvixie2PlayOn!HD 
 
 =Gestion des Genres=
+
+ <font color="red" >ATTENTION</font> si vous éditez les fichiers sous Windows, n'utilisez pas "notepad", il va ajouter des CRLF en fin de ligne qui vont faire planter les scripts, utilisez par exemple [http://notepad-plus-plus.org/fr/ notepad++] (gratuit).
 
 Les Genres sont dépendants de la langue utilisée dans le fichier Nfo. Tout va dépendre de la source utilisée pour récupérer ces fichiers, vous aurez des genres en Anglais, et d’autres dans votre langue.<br>
 Deux fichiers vont vous servir à paramétrer l’affichage des genres :
