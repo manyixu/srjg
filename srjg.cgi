@@ -15,8 +15,12 @@ mode=`echo $1`
 CategoryTitle=$(echo $2 | sed 's/+/ /g;s/%\(..\)/\\x\1/g;')
 CategoryTitle=`echo -n -e $CategoryTitle`
 Jukebox_Size=`echo $3`
-Item_Pos=`echo $4`
-[ -z $Item_Pos ] && Item_Pos=0
+Parm_4=`echo $4`
+[ -z $Parm_4 ] && Parm_4=0
+Parm_5=`echo $5`
+[ -z $Parm_5 ] && Parm_5=0
+Parm_6=`echo $6`
+[ -z $Parm_6 ] && Parm_6=0
 IFS=$SAVEIFS
 Search=${CategoryTitle}
 
@@ -428,7 +432,7 @@ cat <<EOF
 		DefaultView = getXMLText("Config", "Jukebox_Size");
             Category_Title = "$CategoryTitle";
 	    Category_Background = "${Jukebox_Path}images/background.jpg";
-            setFocusItemIndex($Item_Pos);
+            setFocusItemIndex($Parm_4);
             Current_Item_index=0;
             Genre_Title = Category_Title;
 	    Jukebox_Size ="$Jukebox_Size";
@@ -774,7 +778,7 @@ cat <<EOF
           } else Cd2 = "false";
 					"false";
         } else if (userInput == "video_search") {
-          SelNum = doModalRss("http://127.0.0.1:$Port/cgi-bin/srjg.cgi?JSeekPopup@"+Jukebox_itemSize);
+					SelNum=doModalRss("http://127.0.0.1:$Port/cgi-bin/srjg.cgi?NumberEdit@"+Jukebox_itemSize+"@60@85@0@Seek");
           if ( SelNum != 0 ) {
             SelNum -= 1;
 				  	setFocusItemIndex(SelNum);
@@ -1737,6 +1741,12 @@ cat <<EOF
           SelParam=inputFilter;
 					jumpToLink("SelectionEntered");
         }
+      } else if ( mode == "NumberEdit" ) {
+        TmpVal=doModalRss("http://127.0.0.1:"+Port+"/cgi-bin/srjg.cgi?NumberEdit@2000@13@67@"+Recent_Max+"@");
+        if ( TmpVal &gt; 0 ) {
+          Recent_Max = TmpVal;
+          dlok = loadXMLFile("http://127.0.0.1:$Port/cgi-bin/srjg.cgi?UpdateCfg@"+Recent_Max+"@Recent_Max@");
+        }
       } else {
         SelParam=getItemInfo(indx, "param");
         YPos=getItemInfo(indx, "pos");
@@ -1752,14 +1762,8 @@ cat <<EOF
 
 <image type="image/png" offsetXPC="0" offsetYPC="0" widthPC="100" heightPC="100">
  <script>
-  if (getDrawingItemState() == "focus")
-  {
-      print(Jukebox_Path + "images/focus_on.png");
-  }
- else
-  {
-      print(Jukebox_Path + "images/focus_off.png");
-  }
+  if (getDrawingItemState() == "focus") print(Jukebox_Path + "images/focus_on.png");
+  else print(Jukebox_Path + "images/focus_off.png");
  </script>
 </image>
 
@@ -1885,8 +1889,8 @@ cat <<EOF
 		print(Lang_Recent_Max);
 	</script>
 </title>
-<selection>Recent_Max</selection>
-<param>10%2025%2050%2075%20100</param>
+<selection>NumberEdit</selection>
+<param>Recent_Max</param>
 <pos>50</pos>
 </item>
 
@@ -2427,7 +2431,6 @@ cat <<EOF
     if (yy == 0 &amp;&amp; ref == 0)
     {
      ref = 1;
-     postMessage("edit");
     } 
 		if (play_total &gt; 0 &amp;&amp; play_total &lt; 1000000 &amp;&amp; nTotSubs &gt; 2 &amp;&amp; (nCurSub/4) &lt;= nTotSubs)
 		{
@@ -2741,7 +2744,7 @@ do
   let Item_nb+=1
 done
 
-XPos=$Item_Pos
+XPos=$Parm_4
 [ $XPos = 0 ] && XPos=10
 YPos=$Jukebox_Size
 
@@ -3101,7 +3104,13 @@ cat <<EOF
       mode=getItemInfo(indx, "selection");
       SelParam=getItemInfo(indx, "param");
       YPos=getItemInfo(indx, "pos");
-      jumpToLink("SelectionEntered");
+      if ( mode == "NumberEdit" ) {
+        TmpVal=doModalRss("http://127.0.0.1:"+Port+"/cgi-bin/srjg.cgi?NumberEdit@10@13@67@"+Imdb_MaxDl+"@");
+        if ( TmpVal &gt; 0 ) {
+          Imdb_MaxDl = TmpVal;
+          dlok = loadXMLFile("http://127.0.0.1:$Port/cgi-bin/srjg.cgi?UpdateCfg@"+Imdb_MaxDl+"@Imdb_MaxDl@");
+        }
+      } else jumpToLink("SelectionEntered");
       "false";
     }	else if (userInput == "one") {
 		  mode="ImdbSheetDspl";
@@ -3328,9 +3337,9 @@ cat <<EOF
 		print(Lang_MaxDl);
 	</script>
 </title>
-<selection>Imdb_MaxDl</selection>
-<param>1%202%203%204%205%206%207%208%209%2010</param>
-<pos>10</pos>
+<selection>NumberEdit</selection>
+<param>Imdb_MaxDl</param>
+<pos>0</pos>
 </item>
 
 </channel>
@@ -3433,7 +3442,7 @@ cat <<EOF
 <SelectionEntered>
     <link>
        <script>
-           print("http://127.0.0.1:$Port/cgi-bin/srjg.cgi?"+action+"@$Item_Pos@$mode");
+           print("http://127.0.0.1:$Port/cgi-bin/srjg.cgi?"+action+"@$Parm_4@$mode");
        </script>
     </link>
 </SelectionEntered>
@@ -4072,32 +4081,44 @@ redrawDisplay("yes");
 EOF
 }
 
-JSeekPopup()
-# Seek popup in Jukebox during move in Items
-# Idea from Cristian
+NumberEdit()
+# Edit numbers in the config
+# Seek popup in Jukebox during move in Items, Idea from Cristian
 {
+Max_Item=${CategoryTitle}
+PosX=${Jukebox_Size}
+PosY=${Parm_4}
+SelNum=${Parm_5}
+PopupType=${Parm_6}
 echo -e '
 <?xml version="1.0" encoding="UTF-8" ?>
 <rss version="2.0" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:media="http://purl.org/dc/elements/1.1/">
 '
 cat <<EOF
 <onEnter>
+  ISelNum=${SelNum};
   SelNum=0;
-  Max_Item=${CategoryTitle};
+  Max_Item=${Max_Item};
   showIdle();
   RedrawDisplay();
 </onEnter>
 
-<mediaDisplay name="onePartView" sideLeftWidthPC="0" sideColorLeft="0:0:0" sideRightWidthPC="0" viewAreaXPC="60" viewAreaYPC="85" viewAreaWidthPC="20" viewAreaHeightPC="10" headerImageWidthPC="0" infoYPC="90" infoXPC="90" backgroundColor="-1:-1:-1" showHeader="no" showDefaultInfo="no">
+<mediaDisplay name="onePartView" sideLeftWidthPC="0" sideColorLeft="0:0:0" sideRightWidthPC="0" viewAreaXPC="${PosX}" viewAreaYPC="${PosY}" viewAreaWidthPC="20" viewAreaHeightPC="10" headerImageWidthPC="0" infoYPC="90" infoXPC="90" backgroundColor="-1:-1:-1" showHeader="no" showDefaultInfo="no">
 
 <backgroundDisplay>
   <image type="image/png" offsetXPC="0" offsetYPC="0" widthPC="100" heightPC="100">
-    <script>print("${Jukebox_Path}images/Seek_Button.png");</script>
+    <script>
+			if ( "${PopupType}" == "Seek" ) print("${Jukebox_Path}images/Seek_Button.png");
+		  else print("${Jukebox_Path}images/focus_on.png");
+		</script>
   </image>
 </backgroundDisplay>
 
 <text align="right" offsetXPC="30" offsetYPC="10" widthPC="60" heightPC="65" fontSize="16" backgroundColor="-1:-1:-1" foregroundColor="250:250:250">
-  <script>print(SelNum);</script>
+  <script>
+    if ( ISelNum != 0 ) print(ISelNum);
+    else print(SelNum);
+  </script>
 </text>
 
 <onUserInput>
@@ -4119,6 +4140,7 @@ cat <<EOF
     } else if ( userInput == "eight" ) { InputNum=8;
     } else if ( userInput == "nine" ) { InputNum=9;
     } else if ( userInput == "zero" ) { InputNum=0;
+    } else if ( userInput == "right" ) { ret="true";
     } else if ( userInput == "left" ) {
       SelNum=Integer(SelNum / 10);
       RedrawDisplay();
@@ -4126,9 +4148,10 @@ cat <<EOF
     }
 
     if ( InputNum != 99 ) {
+      ISelNum = 0;
       SelNum=SelNum * 10;
       SelNum=Add(SelNum, InputNum);
-      if ( SelNum &gt;= Max_Item ) SelNum = Max_Item;
+      if ( Max_Item != 0 &amp;&amp; SelNum &gt;= Max_Item ) SelNum = Max_Item;
       InputNum=99;
       RedrawDisplay();
       ret="true";
@@ -4388,13 +4411,13 @@ case $mode in
     else
       UpdateMenu;
     fi;;
-  Lang|Jukebox_Size|SingleDb|Port|Recent_Max|Nfo_Path|Poster_Path|Sheet_Path|UnlockRM|\
+  Jukebox_Size|SingleDb|Port|Nfo_Path|Poster_Path|Sheet_Path|UnlockRM|\
 	Dspl_Genre_txt|Subt_OneAuto|Subt_Color|Subt_ColorBg|Subt_Size|Subt_Pos|Subt_FontPath|\
 	Imdb|Imdb_Lang|Imdb_Source|\
   Imdb_Poster|Imdb_PBox|Imdb_PPost|Imdb_Sheet|\
   Imdb_SBox|Imdb_SPost|Imdb_Backdrop|Imdb_Font|\
   Imdb_Genres|Imdb_Tagline|Imdb_Time|Imdb_Info|\
-  Imdb_MaxDl) SubMenucfg;;   # display submenu to choose settings
+  Lang) SubMenucfg;;   # display submenu to choose settings
   UpdateCfg) UpdateCfg;;    # update the cfg file
   DirList) DirList;;        # FBrowser list directorys
   FBrowser) FBrowser;;
@@ -4402,6 +4425,7 @@ case $mode in
 	ImdbSheetDspl) ImdbSheetDspl;;
   ImdbCfgEdit) ImdbCfgEdit;;
 	DsplCfgEdit) DsplCfgEdit;;
+  NumberEdit) NumberEdit;;
   ReplaceCd1byCd2) ReplaceCd1byCd2;;
   srtList) srtList;;
   FontList) FontList;;
@@ -4413,7 +4437,6 @@ case $mode in
   SubTitleGen) SubTitleGen;;
   PlayMovie) PlayMovie;;
   SeekPopup) SeekPopup;; # during video play
-  JSeekPopup) JSeekPopup;; # in Jukebox
   SubtPopup) SubtPopup;; # Subtitle popup
   SubtFontchg) SubtFontchg;; # Subtitle font changer
   *)
