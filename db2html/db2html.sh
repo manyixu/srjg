@@ -28,6 +28,7 @@ COUNT=1;						# Starting counter
 USECATEG=0;						# Create alphabetical page categories (default Off)
 USEDATE=0;						# Display creation date (default Off)
 USESHEET=0;						# Include moviesheets (default Off)
+USENUMBER=0;					# Display number of movies (default Off)
 USESYMLINK=0;					# Use symlinks (default Off)
 USETITLE=0;						# Show title (default Off)
 
@@ -45,6 +46,7 @@ OPTIONS:
    -d	   Display creation date (Optional, no argument needed)
    -h      Show this message
    -m	   Include moviesheets (Optional, no argument needed)
+   -n      Display number of movies
    -o      Output path to HTML jukebox (Optional) 
    -s	   Use symlinks (Optional, no argument needed)
    -t	   Display movie title (Optional, no argument needed)
@@ -54,17 +56,18 @@ EOF
 exit 1
 }
 
-while getopts o:c:adhmst OPTION 
+while getopts o:c:adhmnst OPTION 
 do
   case $OPTION in  
-	 o)	MAINPATH=$OPTARG	;;
+     o)	MAINPATH=$OPTARG	;;
      c)	PACK=$OPTARG		;;
-     a)	USECATEG=1			;;
-     d)	USEDATE=1			;;
-     h)	usage				;;
-     m)	USESHEET=1			;;
-	 s) USESYMLINK=1		;;
-     t)	USETITLE=1			;;
+     a)	USECATEG=1		;;
+     d)	USEDATE=1		;;
+     h)	usage			;;
+     m)	USESHEET=1		;;
+     n) USENUMBER=1		;;
+     s) USESYMLINK=1		;;
+     t)	USETITLE=1		;;
    esac
 done
 
@@ -179,10 +182,6 @@ then
   
   echo '</div><br>' >> "$HTMLPATH/index.html"
 fi
-  
-  	    
-echo '<br><br><table align="center" cellpadding="1"><tbody><tr>' >> "$HTMLPATH/index.html"
-
 
 # Path to movies.db
 if [ $SINGLEDB = "yes" ];
@@ -191,7 +190,6 @@ then
 else
 	DBFILE="$MOVPATH/SRJG/movies.db"	
 fi
-
 
 # Get all required data
 "$SQLPATH" -separator '' "$DBFILE" "SELECT path FROM t1 ORDER BY title COLLATE NOCASE" | sed -n '/<path>/,/<\/path>/s/.*<path>\(.*\)<\/path>/\1/p' > "$TMPPATH"
@@ -204,7 +202,15 @@ cat "$TMPPATH" | sed "s|$MOVPATH|/hdd|" > "$TMPHDD"
 
 "$SQLPATH" -separator '' "$DBFILE" "SELECT ext FROM t1 ORDER BY title COLLATE NOCASE" | sed -n '/<ext>/,/<\/ext>/s/.*<ext>\(.*\)<\/ext>/\1/p' > "$TMPEXT"
 
-echo "Movies found: `sed -n '$=' "$TMPTITLE"`"
+TOTALMOV="`sed -n '$=' "$TMPTITLE"`"
+echo "Movies found: $TOTALMOV"
+
+if [ $USENUMBER = 1 ];
+then
+  echo "<br>Total: $TOTALMOV movies" >> "$HTMLPATH/index.html"
+fi
+
+echo '<br><br><table align="center" cellpadding="1"><tbody><tr>' >> "$HTMLPATH/index.html"
 
 # Copy basic files
 echo "Copying basic files.."
