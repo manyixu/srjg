@@ -54,8 +54,9 @@ ExluList="/tmp/srjg_exclu.list"
 AllMovies=`sed "/>All Movies|/!d;s:|\(.*\)>.*:\1:" "${Jukebox_Path}lang/${Language}_genre"`
 
 SetVar()
-# Settting up a few variables needed
 {
+# Settting up a few variables needed
+
 [ $mode = "genreSelection" ] && nextmode="genre";
 [ $mode = "yearSelection" ] && nextmode="year";
 [ $mode = "alphaSelection" ] && nextmode="alpha";
@@ -66,20 +67,22 @@ fi
 }
 
 CreateMovieDB()
+{
 # Create the Movie Database
 # DB as an automatic datestamp but unfortunately it relies on the player having the
 # correct date which can be trivial with some players.
-{
+
 ${Sqlite} "${Database}" "create table t1 (Movie_ID INTEGER PRIMARY KEY AUTOINCREMENT,genre TEXT,title TEXT,year TEXT,path TEXT,file TEXT,ext TEXT,watched INTEGER,dateStamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP)";
 ${Sqlite} "${Database}" "create table t2 (header TEXT, footer TEXT, IdMovhead TEXT, IdMovFoot TEXT,WatchedHead TEXT, WatchedFoot TEXT)";
 ${Sqlite} "${Database}" "insert into t2 values ('<item>','</item>','<IdMovie>','</IdMovie>','<Watched>','</Watched>')";
 }
 
 Force_DB_Creation()
+{
 # Force creation of the Database using the "u" parameter option
 # This option can be use to start up with a fresh database in case of
 # Database corruption
-{
+
 rm "${PreviousMovieList}" 2>/dev/null # The /dev/null if list not exist due to rss update
 rm "${Database}" 2>/dev/null
 CreateMovieDB;
@@ -87,8 +90,9 @@ CreateMovieDB;
 
 
 Infoparsing()
-# Parse nfo file to extract movie title, genre and year
 {
+# Parse nfo file to extract movie title, genre and year
+
 # Look for lines matching <title>
 while read LINE
 do
@@ -106,11 +110,12 @@ MovieYear=`sed '/<year>/!d;s:.*>\(.*\)</.*:\1:' "$NFOPATH/$INFONAME"`
 }
 
 GenerateMovieList()
+{
 # Find the movies based on movie extension and path provided.
 # Remove movies: 
 # - That contains the string(s) specified in $Movie_Filter
 # - In all path that contains files exclu.txt
-{
+
 # Replace the comma in Movie_Filter to pipes |
 Movie_Filter=`echo ${Movie_Filter} | sed 's/,/|/ g'`
 
@@ -125,8 +130,9 @@ sed '/exclu.txt/!d;s:\(.*/\)\([^/]*\):\\\#\1\#d:' ${MoviesList} >${ExluList}
 }
 
 GenerateInsDelFiles()
-# Generate insertion and deletion files
 {
+# Generate insertion and deletion files
+
 sed -i -e 's/\[/\&lsqb;/g' -e 's/\]/\&rsqb;/g' $MoviesList # Conversion of [] for grep
 if [ -s $MoviesList ]; then
   if [ -s "${PreviousMovieList}" ] ; then # because the grep -f don't work with empty file
@@ -142,8 +148,9 @@ mv $MoviesList "${PreviousMovieList}"
 }
 
 DBMovieDelete()
-# Delete records from the movies.db database.
 {
+# Delete records from the movies.db database.
+
 echo "Removing movies from the Database ...."
 while read LINE
 do
@@ -158,8 +165,9 @@ ${Sqlite} "${Database}"  "VACUUM";
 }
 
 DBMovieInsert()
-# Add movies to the Database and extract movies posters/folders
 {
+# Add movies to the Database and extract movies posters/folders
+
 rm "${UpdateLog}" 2>/dev/null
 while read LINE
 do
@@ -203,8 +211,8 @@ done < $InsertList
 }
 
 Update()
-# Will update the Database based on the parameters in srjg.cfg
 {
+# Will update the Database based on the parameters in srjg.cfg
 
 Header;
 cat <<EOF
@@ -238,8 +246,9 @@ Footer;
 }
 
 WatcheUpDB()
-# Update the watched field in the Database.
 {
+# Update the watched field in the Database.
+
 echo -e '
 <?xml version="1.0" ?>
 <rss version="2.0" xmlns:dc="http://purl.org/dc/elements/1.1/">
@@ -261,8 +270,9 @@ exit 0
 }
 
 Header()
-#Insert RSS Header
 {
+#Insert RSS Header
+
 echo -e '
 <?xml version="1.0" ?>
 <rss version="2.0" xmlns:dc="http://purl.org/dc/elements/1.1/">
@@ -270,8 +280,9 @@ echo -e '
 }
 
 Footer()
-#Insert RSS Footer
 {
+#Insert RSS Footer
+
 cat <<EOF
 </channel>
 </rss>
@@ -279,8 +290,9 @@ EOF
 }
 
 UpdateMenu()
-#Display UpdateMenu
 {
+#Display UpdateMenu
+
 echo -e '
 <?xml version="1.0"   encoding="utf-8" ?>
 <rss version="2.0" xmlns:dc="http://purl.org/dc/elements/1.1/">
@@ -360,8 +372,9 @@ EOF
 }
 
 DisplayRss()
-#Display many of the RSS required based on various parameters/variables
 {
+#Display many of the RSS required based on various parameters/variables
+
 if [ $Jukebox_Size = "2x6" ]; then
    row="2"; col="6"; itemWidth="14.06"; itemHeight="35.42"; itemXPC="5.5"; itemYPC="12.75";
 elif [ $Jukebox_Size = "sheetwall" ]; then
@@ -1169,8 +1182,9 @@ fi
 }
 
 LoadCfg()
-# Load settings from /usr/local/etc/srjg.cfg
 {
+# Load settings from /usr/local/etc/srjg.cfg
+
 cat <<EOF
 	Config = "/usr/local/etc/srjg.cfg";
   Config_ok = loadXMLFile(Config);
@@ -1219,8 +1233,9 @@ EOF
 }
 
 SaveTmpCfg()
-# Save settings to /tmp/srjg.cfg
 {
+# Save settings to /tmp/srjg.cfg
+
 cat <<EOF
   srjgconf="/tmp/srjg.cfg";
   tmpconfigArray=null;
@@ -1264,8 +1279,9 @@ EOF
 }
 
 DsplCfgEdit()
-# RSS to edit Display
 {
+# RSS to edit Display
+
 echo -e '
 <?xml version="1.0" encoding="UTF-8" ?>
 <rss version="2.0" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:media="http://purl.org/dc/elements/1.1/">
@@ -1562,8 +1578,9 @@ EOF
 }
 
 MenuCfg()
-# RSS to edit srjg.cfg
 {
+# RSS to edit srjg.cfg
+
 echo -e '
 <?xml version="1.0" encoding="UTF-8" ?>
 <rss version="2.0" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:media="http://purl.org/dc/elements/1.1/">
@@ -1933,11 +1950,12 @@ EOF
 }
 
 FBrowser()
+{
 # File browser
 # Original code from DMD RM Jukebox by Martini(CZ) from DMD team
 #    Contact: w0m@seznam.cz, http://www.hddplayer.cz
 # Modified and adapted to the srjg project
-{
+
 echo -e '
 <?xml version='1.0' ?>
 <rss version="2.0" xmlns:dc="http://purl.org/dc/elements/1.1/">
@@ -2120,8 +2138,9 @@ EOF
 }
 
 UpdateCfg()
-# Update the srjg.cfg
 {
+# Update the srjg.cfg
+
 echo -e '
 <?xml version="1.0" ?>
 <rss version="2.0" xmlns:dc="http://purl.org/dc/elements/1.1/">
@@ -2149,8 +2168,9 @@ exit 0
 }
 
 ReplaceCd1byCd2()
-# replace string
 {
+# replace string
+
 Cd2=`echo "$CategoryTitle" | sed 's:\(.*\)cd1:\1cd2:'`
 echo -e '
 <?xml version="1.0" ?>
@@ -2169,8 +2189,9 @@ exit 0
 }
 
 srtList()
-# Find srt files
 {
+# Find srt files
+
 ls "${CategoryTitle}"*.srt >/tmp/srjg_srt_dir.list 2>/dev/null
 
 echo -e '
@@ -2189,8 +2210,8 @@ exit 0
 }
 
 FontList()
-# Find fonts files
 {
+# Find fonts files
 
 if [ "${Subt_FontPath}" = "JukeboxPath" ]; then
   FontPath="${Jukebox_Path}font/"
@@ -2217,8 +2238,9 @@ exit 0
 }
 
 SubTitleGen()
-# convert srt -> xml
 {
+# convert srt -> xml
+
 echo -e '
 <?xml version="1.0" ?>
 <rss version="2.0" xmlns:dc="http://purl.org/dc/elements/1.1/">
@@ -2268,13 +2290,14 @@ exit 0
 }
 
 PlayMovie()
+{
 # Screen to play movie with subtitle and Time seek
 # Idea from Serge A. Timchenko
 # http://code.google.com/media-translate/
 # Credit to vb6rocod for subtitle add-on
 # http://code.google.com/p/hdforall
 # Modified and adapted to the srjg project
-{
+
 echo -e '
 <?xml version='1.0' encoding="UTF-8" ?>
 <rss version="2.0" xmlns:dc="http://purl.org/dc/elements/1.1/">
@@ -2706,8 +2729,9 @@ EOF
 
 
 DirList()
-# List HDD or Usb devices
 {
+# List HDD or Usb devices
+
 echo -e '
 <?xml version="1.0" ?>
 <rss version="2.0" xmlns:dc="http://purl.org/dc/elements/1.1/">
@@ -2735,8 +2759,8 @@ exit 0
 }
 
 SubMenucfg()
-# auto choice menu to edit cfg
 {
+# auto choice menu to edit cfg
 
 Item_nb=0
 for SelParam in $CategoryTitle
@@ -2842,8 +2866,9 @@ echo '</channel></rss>' # to close the RSS
 }
 
 ImdbSheetDspl()
-# fullscreen display demo Imdb sheet
 {
+# fullscreen display demo Imdb sheet
+
 echo -e '
 <?xml version="1.0"?>
 <rss version="2.0" xmlns:media="http://purl.org/dc/elements/1.1/" xmlns:dc="http://purl.org/dc/elements/1.1/">
@@ -2900,8 +2925,8 @@ EOF
 }
 
 ImdbCfgEdit()
-# Imdb Config editor
 {
+# Imdb Config editor
 
 echo -e '
 <?xml version="1.0" encoding="UTF-8" ?>
@@ -3348,8 +3373,8 @@ EOF
 }
 
 SubMenuEdit()
-# auto choice menu to confirm Edit
 {
+# auto choice menu to confirm Edit
 
 Item_nb=0
 for SelParam in $CategoryTitle
@@ -3471,8 +3496,9 @@ echo '</channel></rss>' # to close the RSS
 }
 
 DelMedia()
-# Remove Nfo, Poster, Sheet or/and Movie
 {
+# Remove Nfo, Poster, Sheet or/and Movie
+
 echo -e '
 <?xml version="1.0" encoding="UTF-8" ?>
 <rss version="2.0" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:media="http://purl.org/dc/elements/1.1/">
@@ -3526,8 +3552,9 @@ exit 0
 }
 
 MenuEdit()
-# Menu to remove Poster, Sheet, Nfo or/and Movie File
 {
+# Menu to remove Poster, Sheet, Nfo or/and Movie File
+
 echo -e '
 <?xml version="1.0" encoding="UTF-8" ?>
 <rss version="2.0" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:media="http://purl.org/dc/elements/1.1/">
@@ -3673,8 +3700,9 @@ EOF
 }
 
 MenuSubT()
-# Menu to choose Subtitle
 {
+# Menu to choose Subtitle
+
 echo -e '
 <?xml version="1.0" encoding="UTF-8" ?>
 <rss version="2.0" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:media="http://purl.org/dc/elements/1.1/">
@@ -3786,8 +3814,9 @@ EOF
 }
 
 MenuFont()
-# Menu to choose Fonts
 {
+# Menu to choose Fonts
+
 echo -e '
 <?xml version="1.0" encoding="UTF-8" ?>
 <rss version="2.0" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:media="http://purl.org/dc/elements/1.1/">
@@ -3883,13 +3912,13 @@ EOF
 }
 
 SeekPopup()
+{
 # Seek popup during video play
 # Idea from Serge A. Timchenko
 # http://code.google.com/media-translate/
 # Credit to vb6rocod for subtitle add-on
 # http://code.google.com/p/hdforall
 # Modified and adapted to the srjg project
-{
 
 echo -e '
 <?xml version="1.0" encoding="UTF-8" ?>
@@ -4082,9 +4111,10 @@ EOF
 }
 
 NumberEdit()
+{
 # Edit numbers in the config
 # Seek popup in Jukebox during move in Items, Idea from Cristian
-{
+
 Max_Item=${CategoryTitle}
 PosX=${Jukebox_Size}
 PosY=${Parm_4}
@@ -4167,8 +4197,9 @@ EOF
 }
 
 SubtFontchg()
-# To change font file during play
 {
+# To change font file during play
+
 echo -e '
 <?xml version="1.0" ?>
 <rss version="2.0" xmlns:dc="http://purl.org/dc/elements/1.1/">
@@ -4193,8 +4224,9 @@ exit 0
 }
 
 SubtPopup()
-# Menu popup to setup subtitle during play
 {
+# Menu popup to setup subtitle during play
+
 if [ "${Subt_FontPath}" = "JukeboxPath" ]; then
   FontPath="${Jukebox_Path}font/"
 else
